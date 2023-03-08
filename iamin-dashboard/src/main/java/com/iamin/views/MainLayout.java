@@ -4,6 +4,7 @@ import com.iamin.components.appnav.AppNav;
 import com.iamin.components.appnav.AppNavItem;
 import com.iamin.data.entity.User;
 import com.iamin.security.AuthenticatedUser;
+import com.iamin.views.AccountSettings.AccountSettings;
 import com.iamin.views.dashboard.DashboardView;
 import com.iamin.views.manageemployees.ManageEmployeesView;
 import com.vaadin.flow.component.applayout.AppLayout;
@@ -77,6 +78,9 @@ public class MainLayout extends AppLayout {
         if (accessChecker.hasAccess(ManageEmployeesView.class)) {
             nav.addItem(new AppNavItem("Manage Employees", ManageEmployeesView.class, "la la-columns"));
 
+        }
+        if (accessChecker.hasAccess(AccountSettings.class)) {
+            nav.addItem(new AppNavItem("Account Settings", AccountSettings.class, "la la-hammer"));
         }
 
         return nav;

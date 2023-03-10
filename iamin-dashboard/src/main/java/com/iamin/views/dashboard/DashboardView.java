@@ -21,6 +21,16 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import java.util.ArrayList;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
+import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
+import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexWrap;
+
+
 
 
 @PageTitle("Dashboard")
@@ -28,12 +38,15 @@ import com.vaadin.flow.component.html.Div;
 @RouteAlias(value = "", layout = MainLayout.class)
 @PermitAll
 
+
 public class DashboardView extends VerticalLayout {
 
     public DashboardView() {
         // Define the data for the grid table
         // TO DO: show department employees for manager of specific department.
         List<Person> people = new ArrayList<Person>();
+        people.add(new Person("John", "Doe"));
+        people.add(new Person("John", "Doe"));
         people.add(new Person("John", "Doe"));
         people.add(new Person("John", "Doe"));
         people.add(new Person("John", "Doe"));
@@ -53,9 +66,9 @@ public class DashboardView extends VerticalLayout {
     
         // Set the height of the grid to be the height of five rows,
         // or add a scroll bar if there are more than five rows
-        int numberOfRows = Math.min(5, people.size());
+        int numberOfRows = Math.min(8, people.size());
         grid.setAllRowsVisible(false);
-        grid.getStyle().set("max-height", "200px");
+        grid.getStyle().set("max-height", "275px");
         grid.getElement().getStyle().set("overflow-y", "scroll");
 
         grid.getElement().executeJs("var mouseDown = false;\n" +
@@ -90,33 +103,45 @@ public class DashboardView extends VerticalLayout {
         label.getStyle().set("font-size", "24px");
 
 
-        // Create a div and add the label and grid to it
         Div cardsContainer = new Div();
+        cardsContainer.getStyle().set("width", "100%");
+
+
+
+        FlexLayout cardsLayout = new FlexLayout();
+        cardsLayout.setWidthFull();
+        //cardsLayout.getStyle().set("border", "2px solid red");
+        cardsLayout.setFlexWrap(FlexWrap.WRAP);
+        cardsLayout.getStyle().set("justify-content", "space-around");
+        cardsLayout.getStyle().set("gap", "20px");
+
+        
         Div card1 = new Div();
+        card1.setWidth("350px");
+        card1.setHeight("250px");
+        card1.getStyle().set("background-color", "blue");
+        card1.getStyle().set("border-radius", "10px");
+
+        
         Div card2 = new Div();
+        card2.setWidth("350px");
+        card2.setHeight("250px");
+        card2.getStyle().set("background-color", "green");
+        card2.getStyle().set("border-radius", "10px");
+
+        
         Div card3 = new Div();
+        card3.setWidth("350px");
+        card3.setHeight("250px");
+        card3.getStyle().set("background-color", "yellow");
+        card3.getStyle().set("border-radius", "10px");
 
-        // Cards Container Config
-        cardsContainer.setWidth("100%");
-        cardsContainer.getStyle().set("border", "2px solid red");
-        cardsContainer.setHeight("250px");
-        cardsContainer.getStyle().set("display", "flex");
-        cardsContainer.getStyle().set("justify-content", "space-between");
-        cardsContainer.add(card1,card2,card3);
+        
+        cardsLayout.add(card1, card2, card3);
+        cardsContainer.add(cardsLayout);
+        
+        
 
-        // Card1 Config
-        card1.setWidth("30%");
-        card1.getStyle().set("border", "2px solid blue");
-        card1.getStyle().set("margin", "10px");
-        // Card2 Config
-        card2.setWidth("30%");
-        card2.getStyle().set("border", "2px solid blue");
-        card2.getStyle().set("margin", "10px");
-
-        // Card3 Config
-        card3.setWidth("30%");
-        card3.getStyle().set("border", "2px solid blue");
-        card3.getStyle().set("margin", "10px");
 
 
         // Add the content div to the layout

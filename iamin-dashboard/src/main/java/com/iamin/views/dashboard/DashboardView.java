@@ -3,6 +3,8 @@ package com.iamin.views.dashboard;
 import com.iamin.views.MainLayout;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -18,14 +20,14 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import java.util.ArrayList;
-
-
+import com.vaadin.flow.component.html.Div;
 
 
 @PageTitle("Dashboard")
 @Route(value = "dashboard", layout = MainLayout.class)
 @RouteAlias(value = "", layout = MainLayout.class)
 @PermitAll
+
 public class DashboardView extends VerticalLayout {
 
     public DashboardView() {
@@ -82,14 +84,48 @@ public class DashboardView extends VerticalLayout {
         "});", grid);
 
 
-        // Create Label 
+        // Create Labels
         Label label = new Label("Your Department's Employees");
         label.getStyle().set("font-weight", "bold");
+        label.getStyle().set("font-size", "24px");
 
-        // Add the grid to the layout
+
+        // Create a div and add the label and grid to it
+        Div cardsContainer = new Div();
+        Div card1 = new Div();
+        Div card2 = new Div();
+        Div card3 = new Div();
+
+        // Cards Container Config
+        cardsContainer.setWidth("100%");
+        cardsContainer.getStyle().set("border", "2px solid red");
+        cardsContainer.setHeight("250px");
+        cardsContainer.getStyle().set("display", "flex");
+        cardsContainer.getStyle().set("justify-content", "space-between");
+        cardsContainer.add(card1,card2,card3);
+
+        // Card1 Config
+        card1.setWidth("30%");
+        card1.getStyle().set("border", "2px solid blue");
+        card1.getStyle().set("margin", "10px");
+        // Card2 Config
+        card2.setWidth("30%");
+        card2.getStyle().set("border", "2px solid blue");
+        card2.getStyle().set("margin", "10px");
+
+        // Card3 Config
+        card3.setWidth("30%");
+        card3.getStyle().set("border", "2px solid blue");
+        card3.getStyle().set("margin", "10px");
+
+
+        // Add the content div to the layout
+        add(cardsContainer);
         add(label);
         add(grid);
     }
+
+
     
     private static class Person {
         private final String firstName;

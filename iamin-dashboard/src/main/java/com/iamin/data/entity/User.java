@@ -15,7 +15,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "application_user")
 public class User extends AbstractEntity {
-
+	
     private String username;
     private String name;
     @JsonIgnore

@@ -63,6 +63,8 @@ public class ManageEmployeesView extends Div implements BeforeEnterObserver {
     private final SamplePersonService samplePersonService;
 
     public ManageEmployeesView(SamplePersonService samplePersonService) {
+    
+    	
         this.samplePersonService = samplePersonService;
         addClassNames("manage-employees-view");
 

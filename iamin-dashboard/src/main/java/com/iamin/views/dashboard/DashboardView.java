@@ -69,7 +69,9 @@ public class DashboardView extends VerticalLayout {
         int numberOfRows = Math.min(8, people.size());
         grid.setAllRowsVisible(false);
         grid.getStyle().set("max-height", "275px");
+
         grid.getElement().getStyle().set("overflow-y", "scroll");
+        
 
         grid.getElement().executeJs("var mouseDown = false;\n" +
         "var scrollTop;\n" +
@@ -117,24 +119,29 @@ public class DashboardView extends VerticalLayout {
 
         
         Div card1 = new Div();
-        card1.setWidth("350px");
+        card1.setWidth("360px");
         card1.setHeight("250px");
-        card1.getStyle().set("background-color", "blue");
-        card1.getStyle().set("border-radius", "10px");
+        card1.getStyle().set("background-color", "rgba(250, 250, 250)");
+        card1.getStyle().set("border-radius", "5px");
+        card1.getStyle().set("box-shadow", "0 2px 4px rgba(0, 0, 0, 0.25)");
+
 
         
         Div card2 = new Div();
-        card2.setWidth("350px");
+        card2.setWidth("360px");
         card2.setHeight("250px");
-        card2.getStyle().set("background-color", "green");
-        card2.getStyle().set("border-radius", "10px");
+        card2.getStyle().set("background-color", "rgba(250, 250, 250)");
+        card2.getStyle().set("border-radius", "5px");
+        card2.getStyle().set("box-shadow", "0 2px 4px rgba(0, 0, 0, 0.25)");
+
 
         
         Div card3 = new Div();
-        card3.setWidth("350px");
+        card3.setWidth("360px");
         card3.setHeight("250px");
-        card3.getStyle().set("background-color", "yellow");
-        card3.getStyle().set("border-radius", "10px");
+        card3.getStyle().set("background-color", "rgba(250, 250, 250)");
+        card3.getStyle().set("border-radius", "5px");
+        card3.getStyle().set("box-shadow", "0 2px 4px rgba(0, 0, 0, 0.25)");
 
         
         cardsLayout.add(card1, card2, card3);

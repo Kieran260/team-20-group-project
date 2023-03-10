@@ -19,15 +19,15 @@ import javax.persistence.Table;
 @Table(name = "login")
 public class Login extends AbstractEntity {
 	
-	public Login(String login_id ,String User_id , String username , String hashedPassword , String role , String datamodified ){
-		setUsername(username);
-		setDatamodified(datamodified);
-		setHashedPassword(hashedPassword);
-		setRole(role);
-		setUser_id(User_id);
-		setLogin_id(login_id);
-		
-	}
+//	public Login(String login_id ,String User_id , String username , String hashedPassword , Set<Role> role , String datamodified ){
+//		setUsername(username);
+//		setDatamodified(datamodified);
+//		setHashedPassword(hashedPassword);
+//		setRole(role);
+//		setUser_id(User_id);
+//		setLogin_id(login_id);
+//		
+//	}
 	
 	
     private String login_id;
@@ -35,9 +35,10 @@ public class Login extends AbstractEntity {
     private String username;
     @JsonIgnore
     private String hashedPassword;
+   
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
-    private String role;
+    private Set<Role> role;
     
     
   
@@ -68,10 +69,10 @@ public class Login extends AbstractEntity {
     public void setHashedPassword(String hashedPassword) {
         this.hashedPassword = hashedPassword;
     }
-    public String getRole() {
+    public Set<Role> getRole() {
         return role;
     }
-    public void setRole(String roles) {
+    public void setRole(Set<Role> role) {
         this.role = role;
     }
     

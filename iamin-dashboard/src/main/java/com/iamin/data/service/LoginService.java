@@ -20,13 +20,7 @@ import org.springframework.stereotype.Service;
 public class LoginService {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
-	public List findAll() { 
-		  try { 
-		    return jdbcTemplate.query("SELECT * FROM login", (rs, rowNum) -> new Login( rs.getString("login_id") , rs.getString("username"), rs.getString("User_id"), rs.getString("role"), rs.getString("hashedPassword"), rs.getString("datamodified"))); 
-		  } catch (Exception e) { 
-		    return new ArrayList(); 
-		  } 
-	}
+	
     
     private final LoginRepository repository;
     

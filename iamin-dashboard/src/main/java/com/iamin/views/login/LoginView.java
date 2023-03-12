@@ -35,10 +35,8 @@ import java.util.HashSet;
 
 public class LoginView extends VerticalLayout {
     // TODO: 
-    // Add more fields for sign up
+    // Add all fields for sign up
     // Test animation on all browsers
-    // Implement a back button to return from register screen to login container
-    // Registration back end
 
 
     // Authentication Vars

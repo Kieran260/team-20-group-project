@@ -1,7 +1,9 @@
 package com.iamin.data.service;
 
-import com.iamin.data.entity.User;
+import com.iamin.data.entity.Login;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,20 +16,23 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserService {
-
+@Component
+public class LoginService {
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
+	
     
-    private final UserRepository repository;
+    private final LoginRepository repository;
     
-    public UserService(UserRepository repository) {
+    public LoginService(LoginRepository repository) {
         this.repository = repository;
     }
 
-    public Optional<User> get(Long id) {
+    public Optional<Login> get(Long id) {
         return repository.findById(id);
     }
 
-    public User update(User entity) {
+    public Login update(Login entity) {
         return repository.save(entity);
     }
 
@@ -35,11 +40,11 @@ public class UserService {
         repository.deleteById(id);
     }
 
-    public Page<User> list(Pageable pageable) {
+    public Page<Login> list(Pageable pageable) {
         return repository.findAll(pageable);
     }
 
-    public Page<User> list(Pageable pageable, Specification<User> filter) {
+    public Page<Login> list(Pageable pageable, Specification<Login> filter) {
         return repository.findAll(filter, pageable);
     }
 

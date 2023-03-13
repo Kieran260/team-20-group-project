@@ -1,7 +1,7 @@
 package com.iamin.views.login;
 
-import com.iamin.data.entity.User;
-import com.iamin.data.service.UserRepository;
+import com.iamin.data.entity.Login;
+import com.iamin.data.service.LoginRepository;
 import com.iamin.data.Role;
 import com.iamin.security.AuthenticatedUser;
 import com.vaadin.flow.component.button.Button;
@@ -45,7 +45,7 @@ public class LoginView extends VerticalLayout {
     private final AuthenticatedUser authenticatedUser;
     
     @Autowired
-    private UserRepository userRepository;
+    private LoginRepository LoginRepository;
     
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -56,7 +56,7 @@ public class LoginView extends VerticalLayout {
 
     // Register Vars
     private Label registerText = new Label("Sign up to IAMIN as a manager");
-    private TextField emailField = new TextField("Email Address");
+    private TextField usernamelField = new TextField("Username");
     private TextField firstNameField = new TextField("First Name");
     private TextField lastNameField = new TextField("Last Name");
     private PasswordField passwordField = new PasswordField("Password");
@@ -124,7 +124,7 @@ public class LoginView extends VerticalLayout {
         // Flex Layout for register screen - this controls the layout of the items inside
         FlexLayout registerLayout = new FlexLayout();
         styleRegisterLayout(registerLayout);
-        registerLayout.add(registerText,emailField,firstNameField,lastNameField,passwordField,confirmPassword,signUpButton,returnButton);
+        registerLayout.add(registerText,usernamelField,firstNameField,lastNameField,passwordField,confirmPassword,signUpButton,returnButton);
         registerContainer.add(registerLayout);
 
         // Styles for card flip animation
@@ -144,7 +144,7 @@ public class LoginView extends VerticalLayout {
           
     // AUTHENTICATION START: Sign Up
         signUpButton.addClickListener(event -> {
-            String email = emailField.getValue();
+            String username = usernamelField.getValue();
             String password = passwordField.getValue();
             String confirmedPassword = confirmPassword.getValue();
         
@@ -155,16 +155,16 @@ public class LoginView extends VerticalLayout {
                 return;
             }
         
-            User user = new User();
+            Login user = new Login();
         
             Set<Role> roles = new HashSet<>();
             roles.add(Role.ADMIN);
-            user.setRoles(roles);
+            user.setRole(roles);
 
-            user.setName(firstNameField.getValue() + " " + lastNameField.getValue());
-            user.setUsername(email);
+            //user.setName(firstNameField.getValue() + " " + lastNameField.getValue());
+            user.setUsername(username);
             user.setHashedPassword(passwordEncoder.encode(password));
-            userRepository.save(user);
+            LoginRepository.save(user);
 
             
             
@@ -176,7 +176,7 @@ public class LoginView extends VerticalLayout {
             }
             
             // Clear fields after sign up
-            emailField.setValue("");
+            usernamelField.setValue("");
             passwordField.setValue("");
             confirmPassword.setValue("");
 

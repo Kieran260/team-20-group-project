@@ -32,12 +32,14 @@ import java.util.HashSet;
 // This class displays a custom login and registration screen. A user can login using their credentials or a manager
 // can sign up to use the system. The registration is for managers only therefore every registered user is given
 // the ADMIN role.
+//
+// Sections of code which deal with authentication are labelled with "AUTHENTICATION START" and "END" comments.
 public class LoginView extends VerticalLayout {
     // TODO: 
-    // Check all fields for "sign up"
     // Add password requirements - e.g. 8+ characters, alphanumeric, etc
-    // Test animation on all browsers
-
+    // Test password requirements
+    // Test layout on all browsers and devices
+    // Add feedback to incorrect login details
 
     // Authentication Vars
     private final AuthenticatedUser authenticatedUser;
@@ -49,9 +51,6 @@ public class LoginView extends VerticalLayout {
     private PasswordEncoder passwordEncoder;
     
     // Login Vars
-    private TextField username = new TextField("Username");
-    private PasswordField password = new PasswordField("Password");
-    private Button signInButton = new Button("Sign in");
     private Button registerButton = new Button("Register");
 
 
@@ -131,27 +130,13 @@ public class LoginView extends VerticalLayout {
         // Styles for card flip animation
         styleContainerAnimation(loginContainer,registerContainer);
 
-        // Add click listener to register button
+        // Turn card to register form when registerButton clicked
         registerButton.addClickListener(e -> {
-            loginContainer.getStyle().set("transform", "rotateY(180deg)");
-            loginContainer.getStyle().set("-webkit-transform", "rotateY(180deg)");
+            animationToRegister(loginContainer, registerContainer);
 
-            // Delay appearance of registerContainer by 250
-            // This is used to debug animation errors in Safari
-            registerContainer.getElement().executeJs(
-                "setTimeout(function() {\n"
-                + "var registerContainer = document.getElementById('" + registerContainer.getId().orElse("") + "');\n"
-                + "registerContainer.style.opacity = '1';\n"
-                + "}, 250);\n");
-
-            registerContainer.getStyle().set("-webkit-transform", "rotateY(180deg)");
-            registerContainer.getStyle().set("transform", "rotateY(180deg)");
-
-            getStyle().set("background-color", "#ff4d4d");
-            getStyle().set("transition", "background-color 500ms linear");
-            getStyle().set("-webkit-transition", "background-color 500ms linear");
         });
 
+        // Turn card back to login form when returnButton clicked
         returnButton.addClickListener(e -> {
             animationToLogin(loginContainer,registerContainer);
         });
@@ -216,7 +201,7 @@ public class LoginView extends VerticalLayout {
         loginLayout.getStyle().set("border-radius", "10px");
         loginLayout.getStyle().set("width", "300px");
         loginLayout.getStyle().set("height", "500px");
-        loginLayout.getStyle().set("margin","10vh auto");
+        loginLayout.getStyle().set("margin","15% auto");
         loginLayout.getStyle().set("padding","25px");
         loginLayout.getStyle().set("box-shadow", "0 2px 4px rgba(0, 0, 0, 0.25)");
         loginLayout.getStyle().set("background-color", "white");
@@ -231,7 +216,7 @@ public class LoginView extends VerticalLayout {
         registerLayout.getStyle().set("border-radius", "10px");
         registerLayout.getStyle().set("width", "250px");
         registerLayout.getStyle().set("height", "500px");
-        registerLayout.getStyle().set("margin","10vh auto");
+        registerLayout.getStyle().set("margin","15% auto");
         registerLayout.getStyle().set("padding","25px 50px");
         registerLayout.getStyle().set("box-shadow", "0 2px 4px rgba(0, 0, 0, 0.25)");
     }
@@ -262,6 +247,7 @@ public class LoginView extends VerticalLayout {
 
     }
 
+    // Function to animate the card to turn back to the login form
     public void animationToLogin(Div loginContainer, Div registerContainer) {
         loginContainer.getStyle().set("transform", "rotateY(0deg)");
         loginContainer.getStyle().set("-webkit-transform", "rotateY(0deg)");
@@ -277,7 +263,30 @@ public class LoginView extends VerticalLayout {
         registerContainer.getStyle().set("-webkit-transform", "rotateY(0)");
         registerContainer.getStyle().set("transform", "rotateY(0deg)");
 
+        // Change background colour transition
         getStyle().set("background-color", "#8000ff");
+        getStyle().set("transition", "background-color 500ms linear");
+        getStyle().set("-webkit-transition", "background-color 500ms linear");
+    }
+
+    // Function to animate the card to turn to the register form
+    public void animationToRegister(Div loginContainer, Div registerContainer) {
+        loginContainer.getStyle().set("transform", "rotateY(180deg)");
+        loginContainer.getStyle().set("-webkit-transform", "rotateY(180deg)");
+
+        // Delay appearance of registerContainer by 250
+        // This is used to debug animation errors in Safari
+        registerContainer.getElement().executeJs(
+            "setTimeout(function() {\n"
+            + "var registerContainer = document.getElementById('" + registerContainer.getId().orElse("") + "');\n"
+            + "registerContainer.style.opacity = '1';\n"
+            + "}, 250);\n");
+
+        registerContainer.getStyle().set("-webkit-transform", "rotateY(180deg)");
+        registerContainer.getStyle().set("transform", "rotateY(180deg)");
+        
+        // Change background colour transition
+        getStyle().set("background-color", "#ff4d4d");
         getStyle().set("transition", "background-color 500ms linear");
         getStyle().set("-webkit-transition", "background-color 500ms linear");
     }

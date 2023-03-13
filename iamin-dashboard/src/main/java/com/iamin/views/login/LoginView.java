@@ -58,9 +58,11 @@ public class LoginView extends VerticalLayout {
     // Register Vars
     private Label registerText = new Label("Sign up to IAMIN as a manager");
     private TextField emailField = new TextField("Email Address");
+    private TextField firstNameField = new TextField("First Name");
+    private TextField lastNameField = new TextField("Last Name");
     private PasswordField passwordField = new PasswordField("Password");
     private PasswordField confirmPassword = new PasswordField("Confirm Password");
-    private Button registerConfirmButton = new Button("Sign Up");
+    private Button signUpButton = new Button("Sign Up");
     private Button returnButton = new Button("Return to Login");
 
 
@@ -79,9 +81,11 @@ public class LoginView extends VerticalLayout {
 
         // Register Items Styles
         registerText.getStyle().set("font-weight","600");
-        registerConfirmButton.getStyle().set("background-color", "blue");
-        registerConfirmButton.getStyle().set("color", "white");
-        registerConfirmButton.getStyle().set("background-color","#005eec");
+        signUpButton.getStyle().set("background-color", "blue");
+        signUpButton.getStyle().set("color", "white");
+        signUpButton.getStyle().set("background-color","#005eec");
+        signUpButton.getStyle().set("margin-top","20px");
+
 
         // Container Divs
         Div loginContainer = new Div(); // Login container Div
@@ -121,7 +125,7 @@ public class LoginView extends VerticalLayout {
         // Flex Layout for register screen - this controls the layout of the items inside
         FlexLayout registerLayout = new FlexLayout();
         styleRegisterLayout(registerLayout);
-        registerLayout.add(registerText,emailField,passwordField,confirmPassword,registerConfirmButton,returnButton);
+        registerLayout.add(registerText,emailField,firstNameField,lastNameField,passwordField,confirmPassword,signUpButton,returnButton);
         registerContainer.add(registerLayout);
 
         // Styles for card flip animation
@@ -154,7 +158,7 @@ public class LoginView extends VerticalLayout {
           
           
     // AUTHENTICATION START: Sign Up
-        registerConfirmButton.addClickListener(event -> {
+        signUpButton.addClickListener(event -> {
             String email = emailField.getValue();
             String password = passwordField.getValue();
             String confirmedPassword = confirmPassword.getValue();
@@ -172,6 +176,7 @@ public class LoginView extends VerticalLayout {
             roles.add(Role.ADMIN);
             user.setRoles(roles);
 
+            user.setName(firstNameField.getValue() + " " + lastNameField.getValue());
             user.setUsername(email);
             user.setHashedPassword(passwordEncoder.encode(password));
             userRepository.save(user);
@@ -210,7 +215,7 @@ public class LoginView extends VerticalLayout {
         loginLayout.getStyle().set("align-items","center");
         loginLayout.getStyle().set("border-radius", "10px");
         loginLayout.getStyle().set("width", "300px");
-        loginLayout.getStyle().set("height", "450px");
+        loginLayout.getStyle().set("height", "500px");
         loginLayout.getStyle().set("margin","10vh auto");
         loginLayout.getStyle().set("padding","25px");
         loginLayout.getStyle().set("box-shadow", "0 2px 4px rgba(0, 0, 0, 0.25)");
@@ -219,14 +224,13 @@ public class LoginView extends VerticalLayout {
 
     public void styleRegisterLayout(FlexLayout registerLayout) {
         registerLayout.getStyle().set("display","flex");
-        registerLayout.getStyle().set("gap", "20px");
         registerLayout.getStyle().set("flex-direction", "column");
         registerLayout.getStyle().set("transform","rotateY(180deg)");
         registerLayout.getStyle().set("-webkit-transform","rotateY(180deg)");
         registerLayout.getStyle().set("background-color","white");
         registerLayout.getStyle().set("border-radius", "10px");
         registerLayout.getStyle().set("width", "250px");
-        registerLayout.getStyle().set("height", "450px");
+        registerLayout.getStyle().set("height", "500px");
         registerLayout.getStyle().set("margin","10vh auto");
         registerLayout.getStyle().set("padding","25px 50px");
         registerLayout.getStyle().set("box-shadow", "0 2px 4px rgba(0, 0, 0, 0.25)");

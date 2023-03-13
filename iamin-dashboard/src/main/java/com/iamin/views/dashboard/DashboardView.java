@@ -29,10 +29,22 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexWrap;
+import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.ComponentEvent;
+import com.vaadin.flow.component.ComponentUtil;
+import com.vaadin.flow.dom.Element;
+import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.router.Route;
+import com.vaadin.flow.component.grid.GridVariant;
 
 
-
-
+@CssImport(value = "dashboard-styles.css")
 @PageTitle("Dashboard")
 @Route(value = "dashboard", layout = MainLayout.class)
 @RouteAlias(value = "", layout = MainLayout.class)
@@ -56,6 +68,32 @@ public class DashboardView extends VerticalLayout {
     
         ListDataProvider<Person> dataProvider = new ListDataProvider<>(people);
     
+        
+
+
+        Div cardsContainer = new Div();
+
+        //cardsContainer.getStyle().set("border", "2px solid red");
+        cardsContainer.setClassName("cardContainer");
+  
+/* 
+        FlexLayout cardsLayout = new FlexLayout();
+        cardsLayout.setWidthFull();
+        cardsLayout.getStyle().set("border", "2px solid red");
+        cardsLayout.setFlexWrap(FlexWrap.WRAP);
+        cardsLayout.getStyle().set("justify-content", "space-between");
+        cardsLayout.getStyle().set("gap", "5px");
+        cardsLayout.getStyle().set("max-width", "1399px");
+        cardsLayout.getStyle().set("margin", "0 auto");
+*/
+        
+        Div card1 = new Div();
+        card1.getStyle().set("display","flex");
+        card1.getStyle().set("flex-direction","column");
+        card1.getStyle().set("justify-content","space-between");
+
+        styleBoxes(card1);
+
         // Create the grid and set its data provider
         Grid<Person> grid = new Grid<>();
         grid.setDataProvider(dataProvider);
@@ -68,9 +106,12 @@ public class DashboardView extends VerticalLayout {
         // or add a scroll bar if there are more than five rows
         int numberOfRows = Math.min(8, people.size());
         grid.setAllRowsVisible(false);
-        grid.getStyle().set("max-height", "275px");
+        grid.getStyle().set("max-height", "80%");
+        grid.getStyle().set("width", "100%");
+        grid.getStyle().set("overflow", "hidden");
 
-        grid.getElement().getStyle().set("overflow-y", "scroll");
+        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         
 
         grid.getElement().executeJs("var mouseDown = false;\n" +
@@ -103,58 +144,38 @@ public class DashboardView extends VerticalLayout {
         Label label = new Label("Your Department's Employees");
         label.getStyle().set("font-weight", "bold");
         label.getStyle().set("font-size", "24px");
-
-
-        Div cardsContainer = new Div();
-        cardsContainer.getStyle().set("width", "100%");
-
-
-
-        FlexLayout cardsLayout = new FlexLayout();
-        cardsLayout.setWidthFull();
-        //cardsLayout.getStyle().set("border", "2px solid red");
-        cardsLayout.setFlexWrap(FlexWrap.WRAP);
-        cardsLayout.getStyle().set("justify-content", "space-around");
-        cardsLayout.getStyle().set("gap", "20px");
-
+        label.getStyle().set("margin-left","10px");
+        card1.add(label,grid);
         
-        Div card1 = new Div();
-        card1.setWidth("360px");
-        card1.setHeight("250px");
-        card1.getStyle().set("background-color", "rgba(250, 250, 250)");
-        card1.getStyle().set("border-radius", "5px");
-        card1.getStyle().set("box-shadow", "0 2px 4px rgba(0, 0, 0, 0.25)");
 
 
-        
+
+
         Div card2 = new Div();
-        card2.setWidth("360px");
-        card2.setHeight("250px");
-        card2.getStyle().set("background-color", "rgba(250, 250, 250)");
-        card2.getStyle().set("border-radius", "5px");
-        card2.getStyle().set("box-shadow", "0 2px 4px rgba(0, 0, 0, 0.25)");
-
+        styleBoxes(card2);
 
         
         Div card3 = new Div();
-        card3.setWidth("360px");
-        card3.setHeight("250px");
-        card3.getStyle().set("background-color", "rgba(250, 250, 250)");
-        card3.getStyle().set("border-radius", "5px");
-        card3.getStyle().set("box-shadow", "0 2px 4px rgba(0, 0, 0, 0.25)");
+        styleBoxes(card3);
+                
+        Div card4 = new Div();
+        styleBoxes(card4);
+                
+        Div card5 = new Div();
+        styleBoxes(card5);
+                
+        Div card6 = new Div();
+        styleBoxes(card6);
+    
+        //cardsLayout.add();
+        cardsContainer.add(card1,card2,card3,card4,card5,card6);
 
-        
-        cardsLayout.add(card1, card2, card3);
-        cardsContainer.add(cardsLayout);
-        
-        
+
 
 
 
         // Add the content div to the layout
         add(cardsContainer);
-        add(label);
-        add(grid);
     }
 
 
@@ -175,5 +196,14 @@ public class DashboardView extends VerticalLayout {
         public String getLastName() {
             return lastName;
         }
+    }
+
+
+
+    private void styleBoxes(Div div) {
+        div.getStyle().set("background-color", "rgba(250, 250, 250)");
+        div.getStyle().set("border-radius", "2.5px");
+        div.getStyle().set("box-shadow", "0 2px 4px rgba(0, 0, 0, 0.25)");
+        div.setClassName("card");
     }
 }

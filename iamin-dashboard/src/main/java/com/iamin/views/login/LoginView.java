@@ -1,8 +1,13 @@
 package com.iamin.views.login;
 
 import com.iamin.data.entity.User;
-
+import com.iamin.data.service.UserRepository;
+import com.iamin.data.Role;
+import com.iamin.security.AuthenticatedUser;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.login.LoginForm;
+import com.vaadin.flow.component.login.LoginI18n;
+import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
@@ -12,30 +17,25 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
-import com.iamin.data.service.UserRepository;
-import com.iamin.security.AuthenticatedUser;
 import com.vaadin.flow.router.internal.RouteUtil;
-import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.notification.Notification.Position;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Set;
-import com.iamin.data.Role;
 import java.util.HashSet;
-
-
 
 @PageTitle("Login")
 @Route(value = "login")
 @AnonymousAllowed
 
-
-
+// This class displays a custom login and registration screen. A user can login using their credentials or a manager
+// can sign up to use the system. The registration is for managers only therefore every registered user is given
+// the ADMIN role.
 public class LoginView extends VerticalLayout {
     // TODO: 
-    // Add all fields for sign up
+    // Check all fields for "sign up"
+    // Add password requirements - e.g. 8+ characters, alphanumeric, etc
     // Test animation on all browsers
 
 
@@ -48,10 +48,6 @@ public class LoginView extends VerticalLayout {
     @Autowired
     private PasswordEncoder passwordEncoder;
     
-   
-
-
-
     // Login Vars
     private TextField username = new TextField("Username");
     private PasswordField password = new PasswordField("Password");
@@ -108,11 +104,11 @@ public class LoginView extends VerticalLayout {
 
 
 
-        // Authentication
-
-        // Login Form
+    // AUTHENTICATION START: Login Form
         this.authenticatedUser = authenticatedUser;
-        var login = new LoginForm();
+
+        LoginI18n i18n = LoginI18n.createDefault();
+        LoginForm login = new LoginForm(i18n);
         login.setAction(RouteUtil.getRoutePath(VaadinService.getCurrent().getContext(), getClass()));
         login.setForgotPasswordButtonVisible(true);
         
@@ -120,23 +116,18 @@ public class LoginView extends VerticalLayout {
         loginLayout.add(login,registerButton);
         loginContainer.add(loginLayout);
 
-        
-
-
-
+    // AUTHENTICATION END: Login Form
+    
         // Flex Layout for register screen - this controls the layout of the items inside
         FlexLayout registerLayout = new FlexLayout();
         styleRegisterLayout(registerLayout);
-
         registerLayout.add(registerText,emailField,passwordField,confirmPassword,registerConfirmButton,returnButton);
         registerContainer.add(registerLayout);
 
         // Styles for card flip animation
         styleContainerAnimation(loginContainer,registerContainer);
 
-    
         // Add click listener to register button
-
         registerButton.addClickListener(e -> {
             loginContainer.getStyle().set("transform", "rotateY(180deg)");
             loginContainer.getStyle().set("-webkit-transform", "rotateY(180deg)");
@@ -162,12 +153,7 @@ public class LoginView extends VerticalLayout {
         });
           
           
-        
-
-
-
-        // AUTHENTICATION: Sign Up
-
+    // AUTHENTICATION START: Sign Up
         registerConfirmButton.addClickListener(event -> {
             String email = emailField.getValue();
             String password = passwordField.getValue();
@@ -194,7 +180,7 @@ public class LoginView extends VerticalLayout {
             
             Notification.show("Account created successfully!", 3000, Position.TOP_CENTER);
             try {
-                Thread.sleep(3000); // Sleep for 2 seconds (2000 milliseconds)
+                Thread.sleep(2000); // Sleep for 2 seconds (2000 milliseconds)
             } catch (InterruptedException e) {
                 // Handle the exception
             }
@@ -207,9 +193,9 @@ public class LoginView extends VerticalLayout {
             animationToLogin(loginContainer, registerContainer);
         });
         
-    
+    // AUTHENTICATION END: Sign Up
 
-        // Add final container
+        // Add final containers
         add(loginContainer);
         add(registerContainer);
     }
@@ -217,7 +203,6 @@ public class LoginView extends VerticalLayout {
 
 
     // Styles Functions
-
     public void styleLoginLayout(FlexLayout loginLayout) {
         loginLayout.getStyle().set("display","flex");
         loginLayout.getStyle().set("flex-direction","column");
@@ -268,7 +253,6 @@ public class LoginView extends VerticalLayout {
         registerContainer.getStyle().set("z-index","0");
         registerContainer.getStyle().set("-webkit-transform-style", "preserve-3d");
         registerContainer.getStyle().set("-webkit-transition", "transform 1s");
-
         registerContainer.getStyle().set("opacity","0");
         registerContainer.setId("register-container"); // Used for JavaScript access
 
@@ -293,10 +277,4 @@ public class LoginView extends VerticalLayout {
         getStyle().set("transition", "background-color 500ms linear");
         getStyle().set("-webkit-transition", "background-color 500ms linear");
     }
-
-
-
-    
-
-    
 }

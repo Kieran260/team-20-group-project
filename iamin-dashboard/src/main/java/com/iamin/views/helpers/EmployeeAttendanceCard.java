@@ -47,17 +47,18 @@ public class EmployeeAttendanceCard {
         // Change authentication.getName() to fetch the legal first and last name
         // Query the table to see if the user is actually checked in currently or not and update statusLabel 
         
+        // TODO: Determine if user is checked in and display to label
         Label statusLabel = new Label(authentication.getName() + ": You are currently not checked in");
         statusLabel.getStyle().set("font-size", "16px");
     
-        Button checkInButton = new Button("Check Out");
+        Button checkInButton = new Button("Check In");
         checkInButton.addClickListener(e -> {
             Dialog confirmDialog = new Dialog();
             confirmDialog.setCloseOnEsc(false);
             confirmDialog.setCloseOnOutsideClick(false);
 
             VerticalLayout confirmContent = new VerticalLayout();
-            Label confirmMessage = new Label("Are you sure you want to check out?");
+            Label confirmMessage = new Label("Are you sure you want to check in?");
             confirmContent.add(confirmMessage);
 
             Button confirmButton = new Button("Yes", event -> {

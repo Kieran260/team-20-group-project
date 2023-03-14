@@ -42,7 +42,30 @@ import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.component.grid.GridVariant;
-
+import java.time.LocalTime;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.server.VaadinSession;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinSession;
+import com.vaadin.flow.server.VaadinServletRequest;
+import com.vaadin.flow.server.VaadinServletResponse;
+import com.vaadin.flow.server.VaadinService;
+import com.vaadin.flow.server.VaadinSession;
+import com.iamin.data.entity.User;
+import com.iamin.security.AuthenticatedUser;
+import java.time.LocalTime;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @CssImport(value = "dashboard-styles.css")
 @PageTitle("Dashboard")
@@ -53,9 +76,22 @@ import com.vaadin.flow.component.grid.GridVariant;
 
 public class DashboardView extends VerticalLayout {
 
+    String currentUserName;
+    String currentUserRole;
+
     public DashboardView() {
-        // Define the data for the grid table
+        
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        Dialog holidayDialog = new Dialog();
+        Dialog absenceDialog = new Dialog();
+   
+
+        // Define the data for the employeeTable table
         // TO DO: show department employees for manager of specific department.
+
+        getStyle().set("background-color","rgba(250, 250, 250)");
+
         List<Person> people = new ArrayList<Person>();
         people.add(new Person("John", "Doe"));
         people.add(new Person("John", "Doe"));
@@ -67,54 +103,36 @@ public class DashboardView extends VerticalLayout {
         people.add(new Person("John", "Doe"));
     
         ListDataProvider<Person> dataProvider = new ListDataProvider<>(people);
-    
-        
-
-
         Div cardsContainer = new Div();
 
         //cardsContainer.getStyle().set("border", "2px solid red");
         cardsContainer.setClassName("cardContainer");
-  
-/* 
-        FlexLayout cardsLayout = new FlexLayout();
-        cardsLayout.setWidthFull();
-        cardsLayout.getStyle().set("border", "2px solid red");
-        cardsLayout.setFlexWrap(FlexWrap.WRAP);
-        cardsLayout.getStyle().set("justify-content", "space-between");
-        cardsLayout.getStyle().set("gap", "5px");
-        cardsLayout.getStyle().set("max-width", "1399px");
-        cardsLayout.getStyle().set("margin", "0 auto");
-*/
         
+        // Employees Table Card    
         Div card1 = new Div();
         card1.getStyle().set("display","flex");
         card1.getStyle().set("flex-direction","column");
         card1.getStyle().set("justify-content","space-between");
+        card1.getStyle().set("padding","20px 10px");
+        styleSquareBox(card1);
 
-        styleBoxes(card1);
-
-        // Create the grid and set its data provider
-        Grid<Person> grid = new Grid<>();
-        grid.setDataProvider(dataProvider);
+        // Create the employeeTable and set its data provider
+        Grid<Person> employeeTable = new Grid<>();
+        employeeTable.setDataProvider(dataProvider);
     
-        // Add columns to the grid
-        grid.addColumn(Person::getFirstName).setHeader("First Name");
-        grid.addColumn(Person::getLastName).setHeader("Last Name");
+        // Add columns to the employeeTable
+        employeeTable.addColumn(Person::getFirstName).setHeader("First Name");
+        employeeTable.addColumn(Person::getLastName).setHeader("Last Name");
     
-        // Set the height of the grid to be the height of five rows,
+        // Set the height of the employeeTable to be the height of five rows,
         // or add a scroll bar if there are more than five rows
         int numberOfRows = Math.min(8, people.size());
-        grid.setAllRowsVisible(false);
-        grid.getStyle().set("max-height", "80%");
-        grid.getStyle().set("width", "100%");
-        grid.getStyle().set("overflow", "hidden");
-
-        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
+        employeeTable.setAllRowsVisible(false);
+        employeeTable.getStyle().set("overflow", "hidden");
+        employeeTable.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         
 
-        grid.getElement().executeJs("var mouseDown = false;\n" +
+        employeeTable.getElement().executeJs("var mouseDown = false;\n" +
         "var scrollTop;\n" +
         "var scrollLeft;\n" +
         "var startX;\n" +
@@ -137,41 +155,127 @@ public class DashboardView extends VerticalLayout {
         "        scrollable.scrollTop = scrollTop - yDiff;\n" +
         "        scrollable.scrollLeft = scrollLeft - xDiff;\n" +
         "    }\n" +
-        "});", grid);
-
+        "});", employeeTable);
 
         // Create Labels
-        Label label = new Label("Your Department's Employees");
-        label.getStyle().set("font-weight", "bold");
-        label.getStyle().set("font-size", "24px");
-        label.getStyle().set("margin-left","10px");
-        card1.add(label,grid);
+        Label card1Header = new Label("Your Department's Employees");
+        card1Header.getStyle().set("font-weight", "bold");
+        card1Header.getStyle().set("font-size", "24px");
+        card1Header.getStyle().set("margin-left","10px");
+        
+        card1.add(card1Header,employeeTable);
         
 
-
-
-
+        // Check In / Check Out Card
         Div card2 = new Div();
-        styleBoxes(card2);
+        card2.getStyle().set("display","flex");
+        card2.getStyle().set("flex-direction","column");
+        card2.getStyle().set("justify-content","flex-start");
+        card2.getStyle().set("gap","20px");
 
-        
+        Div card2Top = new Div();
+        card2Top.getStyle().set("display","flex");
+        card2Top.getStyle().set("flex-direction","column");
+        card2Top.getStyle().set("justify-content","flex-start");
+
+        styleHalfSquareBox(card2Top);
+
+        Label card2Header = new Label("Work Hours");
+        card2Header.getStyle().set("font-weight", "bold");
+        card2Header.getStyle().set("font-size", "18px");
+
+
+        // TODO: 
+        // Change authentication.getName() to fetch the legal first and last name
+        // Query the table to see if the user is actually checked in currently or not 
+        Label card2SubHeader = new Label(authentication.getName() + ": You are currently not checked in");
+        card2SubHeader.getStyle().set("font-size", "16px");
+    
+        Button checkInButton = new Button("Check In");
+        Button checkOutButton = new Button("Check Out");
+        Button editTimesheetButton = new Button("Edit");
+
+        FlexLayout buttonContainer = new FlexLayout();        
+        buttonContainer.getStyle().set("gap","10px");
+        buttonContainer.getStyle().set("align-items", "start");
+        buttonContainer.getStyle().set("margin-top", "10px");
+        buttonContainer.add(checkInButton,checkOutButton,editTimesheetButton);
+
+        card2Top.add(card2Header,card2SubHeader,buttonContainer);
+
+        Div card2Bottom = new Div();
+        styleHalfSquareBox(card2Bottom);
+
+
+        Label card2BottomHeader = new Label("Request Absence");
+        card2BottomHeader.getStyle().set("font-weight", "bold");
+        card2BottomHeader.getStyle().set("font-size", "18px");
+
+        FlexLayout absenceButtonContainer = new FlexLayout();
+        Button holidayRequestButton = new Button("Holiday Request");
+        Button absenceRequestButton = new Button("Other Absence");
+        absenceButtonContainer.getStyle().set("margin-top","10px");
+        absenceButtonContainer.getStyle().set("gap", "10px");   
+        absenceButtonContainer.add(holidayRequestButton, absenceRequestButton);
+
+
+        // Holiday Dialog
+        VerticalLayout holidayDialogLayout = new VerticalLayout();
+        holidayDialogLayout.getStyle().set("width","300px");
+        holidayDialogLayout.getStyle().set("height","300px");
+        holidayDialog.add(holidayDialogLayout);
+        holidayDialog.setHeaderTitle("Holiday Request");
+
+        Button holidayCancelButton = new Button("Cancel", ee -> holidayDialog.close());
+        holidayDialog.getFooter().add(holidayCancelButton);
+       
+        holidayRequestButton.addClickListener(e -> {
+            holidayDialog.open();
+        });
+
+
+        // Absence Dialog
+        VerticalLayout absenceDialogLayout = new VerticalLayout();
+        absenceDialogLayout.getStyle().set("width","300px");
+        absenceDialogLayout.getStyle().set("height","300px");
+        absenceDialog.add(absenceDialogLayout);
+        absenceDialog.setHeaderTitle("Absence Request");
+
+        Button absenceCancelButton = new Button("Cancel", ee -> absenceDialog.close());
+        absenceDialog.getFooter().add(absenceCancelButton);
+       
+        absenceRequestButton.addClickListener(e -> {
+            absenceDialog.open();
+        });
+
+
+        // Add cards
+        card2Bottom.add(card2BottomHeader,absenceButtonContainer);
+        card2.add(card2Top,card2Bottom);
+
+
+
+
+
+
+
         Div card3 = new Div();
-        styleBoxes(card3);
+        styleSquareBox(card3);
                 
         Div card4 = new Div();
-        styleBoxes(card4);
+        styleSquareBox(card4);
                 
         Div card5 = new Div();
-        styleBoxes(card5);
+        styleSquareBox(card5);
                 
         Div card6 = new Div();
-        styleBoxes(card6);
+        styleSquareBox(card6);
     
         //cardsLayout.add();
         cardsContainer.add(card1,card2,card3,card4,card5,card6);
 
 
-
+        add(holidayDialog,absenceDialog);
 
 
         // Add the content div to the layout
@@ -200,10 +304,19 @@ public class DashboardView extends VerticalLayout {
 
 
 
-    private void styleBoxes(Div div) {
-        div.getStyle().set("background-color", "rgba(250, 250, 250)");
-        div.getStyle().set("border-radius", "2.5px");
+    private void styleSquareBox(Div div) {
+        div.getStyle().set("background-color", "white");
         div.getStyle().set("box-shadow", "0 2px 4px rgba(0, 0, 0, 0.25)");
         div.setClassName("card");
     }
+
+    private void styleHalfSquareBox(Div div) {
+        div.getStyle().set("background-color", "white");
+        div.getStyle().set("box-shadow", "0 2px 4px rgba(0, 0, 0, 0.25)");
+        div.getStyle().set("height", "120px");
+
+        div.setClassName("card");
+    }
+    
+
 }

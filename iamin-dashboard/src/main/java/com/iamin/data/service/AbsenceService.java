@@ -1,7 +1,9 @@
 package com.iamin.data.service;
 
-import com.iamin.data.entity.User;
+import com.iamin.data.entity.Absence;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,32 +16,34 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserService {
+@Component
+public class AbsenceService {
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
-    
-    private final UserRepository repository;
-    
-    public UserService(UserRepository repository) {
+    private final AbsenceRepository repository;
+
+    public AbsenceService(AbsenceRepository repository) {
         this.repository = repository;
     }
 
-    public Optional<User> get(Long id) {
-        return repository.findById(id);
+    public Optional<Absence> get(Long Absence_id) {
+        return repository.findById(Absence_id);
     }
 
-    public User update(User entity) {
+    public Absence update(Absence entity) {
         return repository.save(entity);
     }
 
-    public void delete(Long id) {
-        repository.deleteById(id);
+    public void delete(Long Absence_id) {
+        repository.deleteById(Absence_id);
     }
 
-    public Page<User> list(Pageable pageable) {
+    public Page<Absence> list(Pageable pageable) {
         return repository.findAll(pageable);
     }
 
-    public Page<User> list(Pageable pageable, Specification<User> filter) {
+    public Page<Absence> list(Pageable pageable, Specification<Absence> filter) {
         return repository.findAll(filter, pageable);
     }
 

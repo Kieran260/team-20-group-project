@@ -2,8 +2,6 @@ package com.iamin.data.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.iamin.data.Role;
-import java.io.Serializable;
-import java.util.List;
 import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -12,14 +10,12 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Lob;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "application_user")
+public class User extends AbstractEntity {
 
-public class User extends AbstractEntity implements Serializable {
-	
     private String username;
     private String name;
     @JsonIgnore
@@ -30,18 +26,7 @@ public class User extends AbstractEntity implements Serializable {
     @Lob
     @Column(length = 1000000)
     private byte[] profilePicture;
-    
-    @OneToMany
-    private List<Events> eventsOrganiser;
 
-    public List<Events> getEventsOrganiser() {
-        return eventsOrganiser;
-    }
-    
-    public void setEventsOrganiser(List<Events> eventsOrganiser) {
-        this.eventsOrganiser = eventsOrganiser;
-    }
-    
     public String getUsername() {
         return username;
     }
@@ -72,5 +57,5 @@ public class User extends AbstractEntity implements Serializable {
     public void setProfilePicture(byte[] profilePicture) {
         this.profilePicture = profilePicture;
     }
-}
 
+}

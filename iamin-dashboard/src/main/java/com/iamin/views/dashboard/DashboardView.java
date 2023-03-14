@@ -57,7 +57,8 @@ public class DashboardView extends VerticalLayout {
         Div card1 = new Div();
         card1Config(card1);
         
-        // Check In / Check Out Card
+        // Check In / Check Out
+        // Absence Request 
         Div card2 = new Div();
         card2Config(card2,authentication);
 
@@ -76,6 +77,10 @@ public class DashboardView extends VerticalLayout {
         styleSquareBox(card6);
     
         //cardsLayout.add();
+
+        // All cards
+
+
         cardsContainer.add(card1,card2,card3,card4,card5,card6);
 
 
@@ -223,7 +228,15 @@ public class DashboardView extends VerticalLayout {
 
         holidayDialog.add(holidayDialogLayout);
 
-        Button holidaySubmitButton = new Button("Submit", ee -> holidayDialog.close());
+        // TODO:
+        // Validate holidaysSelected to be LESS OR EQUAL to holidaysRemaining
+        // Validate that all fields are NOT empty when submit clicked
+        Button holidaySubmitButton = new Button("Submit");
+        holidaySubmitButton.addClickListener(e -> {
+            
+        });
+
+
         Button holidayCancelButton = new Button("Cancel", ee -> holidayDialog.close());
         holidayDialog.getFooter().add(holidaySubmitButton, holidayCancelButton);
        
@@ -249,10 +262,13 @@ public class DashboardView extends VerticalLayout {
         absenceDialog.add(absenceDialogLayout);
 
         // TODO: 
+        // Validation: check that all fields are not empty
         // AFTER VALIDATION submit absence request to DB
-        Button absenceSubmitButton = new Button("Submit", ee -> 
-            absenceDialog.close()
-        );
+        Button absenceSubmitButton = new Button("Submit");
+
+        absenceSubmitButton.addClickListener(e -> {
+            
+        });
 
         Button absenceCancelButton = new Button("Cancel", ee -> absenceDialog.close());
         absenceDialog.getFooter().add(absenceSubmitButton, absenceCancelButton);
@@ -262,10 +278,6 @@ public class DashboardView extends VerticalLayout {
         });
 
         absenceSubmitButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-
-
-
-
 
 
         // Add cards
@@ -313,7 +325,6 @@ public class DashboardView extends VerticalLayout {
         div.getStyle().set("background-color", "white");
         div.getStyle().set("box-shadow", "0 2px 4px rgba(0, 0, 0, 0.25)");
         div.getStyle().set("height", "120px");
-
         div.setClassName("card");
     }
 }

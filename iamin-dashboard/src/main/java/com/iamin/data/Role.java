@@ -1,5 +1,5 @@
 package com.iamin.data;
 
 public enum Role {
-    USER, ADMIN;
+    USER, ADMIN, MANAGER, HR;
 }

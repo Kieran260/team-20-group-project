@@ -111,7 +111,7 @@ public class LoginView extends VerticalLayout {
         LoginI18n i18n = LoginI18n.createDefault();
         LoginForm login = new LoginForm(i18n);
         login.setAction(RouteUtil.getRoutePath(VaadinService.getCurrent().getContext(), getClass()));
-        login.setForgotPasswordButtonVisible(true);
+        login.setForgotPasswordButtonVisible(false);
         
         // Add login form and buttons to login layout, then add to login container
         loginLayout.add(login,registerButton);

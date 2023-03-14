@@ -1,7 +1,9 @@
 package com.iamin.data.service;
 
-import com.iamin.data.entity.User;
+import com.iamin.data.entity.PaymentInfo;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,32 +16,34 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserService {
+@Component
+public class PaymentInfoService {
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
-    
-    private final UserRepository repository;
-    
-    public UserService(UserRepository repository) {
+    private final PaymentInfoRepository repository;
+
+    public PaymentInfoService(PaymentInfoRepository repository) {
         this.repository = repository;
     }
 
-    public Optional<User> get(Long id) {
-        return repository.findById(id);
+    public Optional<PaymentInfo> get(Long PaymentInfo_id) {
+        return repository.findById(PaymentInfo_id);
     }
 
-    public User update(User entity) {
+    public PaymentInfo update(PaymentInfo entity) {
         return repository.save(entity);
     }
 
-    public void delete(Long id) {
-        repository.deleteById(id);
+    public void delete(Long PaymentInfo_id) {
+        repository.deleteById(PaymentInfo_id);
     }
 
-    public Page<User> list(Pageable pageable) {
+    public Page<PaymentInfo> list(Pageable pageable) {
         return repository.findAll(pageable);
     }
 
-    public Page<User> list(Pageable pageable, Specification<User> filter) {
+    public Page<PaymentInfo> list(Pageable pageable, Specification<PaymentInfo> filter) {
         return repository.findAll(filter, pageable);
     }
 

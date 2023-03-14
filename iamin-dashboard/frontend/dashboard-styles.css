@@ -12,6 +12,13 @@
     height: auto;
     width: 100%;
 }
+
+@media only screen and (max-width: 480px) {
+    .cardContainer{
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    }
+}
+  
   
 
 .card {

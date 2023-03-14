@@ -87,6 +87,8 @@ public class ManageEmployeesView extends Div implements BeforeEnterObserver {
         grid.addColumn("jobTitle").setAutoWidth(true);
         grid.addColumn("address").setAutoWidth(true);
         grid.addColumn("maxHolidays").setAutoWidth(true);
+        grid.addColumn("dateModified").setAutoWidth(true);
+
         
         grid.setItems(query -> samplePersonService.list(
                 PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))

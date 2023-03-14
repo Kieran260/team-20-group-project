@@ -45,7 +45,7 @@ public class LoginView extends VerticalLayout {
     private final AuthenticatedUser authenticatedUser;
     
     @Autowired
-    private LoginRepository LoginRepository;
+    private LoginRepository loginRepository;
     
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -164,7 +164,7 @@ public class LoginView extends VerticalLayout {
             //user.setName(firstNameField.getValue() + " " + lastNameField.getValue());
             user.setUsername(username);
             user.setHashedPassword(passwordEncoder.encode(password));
-            LoginRepository.save(user);
+            loginRepository.save(user);
 
             
             

@@ -37,8 +37,6 @@ import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexWrap;
 @Route(value = "dashboard", layout = MainLayout.class)
 @RouteAlias(value = "", layout = MainLayout.class)
 @PermitAll
-
-
 public class DashboardView extends VerticalLayout {
 
     public DashboardView() {

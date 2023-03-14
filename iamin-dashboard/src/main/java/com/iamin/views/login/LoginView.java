@@ -56,7 +56,9 @@ public class LoginView extends VerticalLayout {
 
     // Register Vars
     private Label registerText = new Label("Sign up to IAMIN as a manager");
-    private TextField usernameField = new TextField("Username");
+    private TextField emailField = new TextField("Email Address");
+    private TextField firstNameField = new TextField("First Name");
+    private TextField lastNameField = new TextField("Last Name");
     private PasswordField passwordField = new PasswordField("Password");
     private PasswordField confirmPassword = new PasswordField("Confirm Password");
     private Button signUpButton = new Button("Sign Up");
@@ -122,7 +124,7 @@ public class LoginView extends VerticalLayout {
         // Flex Layout for register screen - this controls the layout of the items inside
         FlexLayout registerLayout = new FlexLayout();
         styleRegisterLayout(registerLayout);
-        registerLayout.add(registerText,usernameField,passwordField,confirmPassword,signUpButton,returnButton);
+        registerLayout.add(registerText,emailField,firstNameField,lastNameField,passwordField,confirmPassword,signUpButton,returnButton);
         registerContainer.add(registerLayout);
 
         // Styles for card flip animation
@@ -142,14 +144,10 @@ public class LoginView extends VerticalLayout {
           
     // AUTHENTICATION START: Sign Up
         signUpButton.addClickListener(event -> {
-            String username = usernameField.getValue();
+            String email = emailField.getValue();
             String password = passwordField.getValue();
             String confirmedPassword = confirmPassword.getValue();
         
-            // TODO: Sign Up Validation
-            // Password is 8+ characters AND contains at least 1 number
-            // Check that username does not already exist from user database
-            // Check that the fields are NOT empty
             if (!password.equals(confirmedPassword)) {
                 Notification.show("Passwords do not match", 3000, Position.TOP_CENTER);
                 passwordField.setValue("");
@@ -162,7 +160,9 @@ public class LoginView extends VerticalLayout {
             Set<Role> roles = new HashSet<>();
             roles.add(Role.ADMIN);
             user.setRoles(roles);
-            user.setUsername(username);
+
+            user.setName(firstNameField.getValue() + " " + lastNameField.getValue());
+            user.setUsername(email);
             user.setHashedPassword(passwordEncoder.encode(password));
             userRepository.save(user);
 
@@ -176,7 +176,7 @@ public class LoginView extends VerticalLayout {
             }
             
             // Clear fields after sign up
-            usernameField.setValue("");
+            emailField.setValue("");
             passwordField.setValue("");
             confirmPassword.setValue("");
 
@@ -189,6 +189,8 @@ public class LoginView extends VerticalLayout {
         add(loginContainer);
         add(registerContainer);
     }
+
+
 
     // Styles Functions
     public void styleLoginLayout(FlexLayout loginLayout) {

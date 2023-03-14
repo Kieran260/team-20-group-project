@@ -4,6 +4,7 @@ import com.iamin.components.appnav.AppNav;
 import com.iamin.components.appnav.AppNavItem;
 import com.iamin.data.entity.User;
 import com.iamin.security.AuthenticatedUser;
+import com.iamin.views.AddUserView.AddUserView;
 import com.iamin.views.dashboard.DashboardView;
 import com.iamin.views.manageemployees.ManageEmployeesView;
 import com.vaadin.flow.component.applayout.AppLayout;
@@ -39,7 +40,6 @@ public class MainLayout extends AppLayout {
     public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker) {
         this.authenticatedUser = authenticatedUser;
         this.accessChecker = accessChecker;
-
         setPrimarySection(Section.DRAWER);
         addDrawerContent();
         addHeaderContent();
@@ -78,7 +78,12 @@ public class MainLayout extends AppLayout {
             nav.addItem(new AppNavItem("Manage Employees", ManageEmployeesView.class, "la la-columns"));
 
         }
+        if (accessChecker.hasAccess(AddUserView.class)) {
+            //TODO 
+            //choose appropriate Icon
+            nav.addItem(new AppNavItem("AddUsers", AddUserView.class, "la la-columns"));
 
+        }
         return nav;
     }
 

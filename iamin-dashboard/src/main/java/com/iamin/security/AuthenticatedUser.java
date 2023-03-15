@@ -1,7 +1,7 @@
 package com.iamin.security;
 
-import com.iamin.data.entity.User;
-import com.iamin.data.service.UserRepository;
+import com.iamin.data.entity.Login;
+import com.iamin.data.service.LoginRepository;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import java.util.Optional;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,17 +10,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthenticatedUser {
 
-    private final UserRepository userRepository;
+    private final LoginRepository loginRepository;
     private final AuthenticationContext authenticationContext;
 
-    public AuthenticatedUser(AuthenticationContext authenticationContext, UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public AuthenticatedUser(AuthenticationContext authenticationContext, LoginRepository loginRepository) {
+        this.loginRepository = loginRepository;
         this.authenticationContext = authenticationContext;
     }
 
-    public Optional<User> get() {
+    public Optional<Login> get() {
         return authenticationContext.getAuthenticatedUser(UserDetails.class)
-                .map(userDetails -> userRepository.findByUsername(userDetails.getUsername()));
+                .map(userDetails -> loginRepository.findByUsername(userDetails.getUsername()));
     }
 
     public void logout() {

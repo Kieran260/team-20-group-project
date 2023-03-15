@@ -1,7 +1,12 @@
 package com.iamin.data.entity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.PreUpdate;
 import javax.validation.constraints.Email;
 
 @Entity
@@ -13,10 +18,23 @@ public class SamplePerson extends AbstractEntity {
     private String email;
     private String phone;
     private LocalDate dateOfBirth;
+    private String address;
     private String occupation;
-    private String role;
-    private boolean important;
+    private String jobTitle;
+    private LocalDateTime dateModified;
+    private Integer maxHolidays;
+    @ManyToOne
+    @JoinColumn(name = "department_id")
+    private Department department;
 
+   
+
+    public Department getDepartment() {
+        return department;
+    }
+    public void setDepartment(Department department) {
+        this.department = department;
+    }
     public String getFirstName() {
         return firstName;
     }
@@ -47,23 +65,40 @@ public class SamplePerson extends AbstractEntity {
     public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
+    public String getAddress() {
+        return address;
+    }
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
     public String getOccupation() {
         return occupation;
     }
     public void setOccupation(String occupation) {
         this.occupation = occupation;
     }
-    public String getRole() {
-        return role;
+    public String getjobTitle() {
+        return jobTitle;
     }
-    public void setRole(String role) {
-        this.role = role;
+    public void setjobTitle(String jobTitle) {
+        this.jobTitle = jobTitle;
     }
-    public boolean isImportant() {
-        return important;
+    public LocalDateTime getDateModified() {
+        return dateModified;
     }
-    public void setImportant(boolean important) {
-        this.important = important;
+    @PreUpdate
+    public void updateDateModified() {
+    	this.dateModified = LocalDateTime.now();
     }
+
+	public Integer getmaxHolidays() {
+        return maxHolidays;
+    }
+    public void setmaxHolidays(Integer maxHolidays) {
+        this.maxHolidays = maxHolidays;
+    }
+
+
 
 }

@@ -1,33 +1,31 @@
 package com.iamin.data.service;
 
-import com.iamin.data.entity.User;
-
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.batch.BatchProperties.Jdbc;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
-@Service
-public class UserService {
+import com.iamin.data.entity.Department;
+@Component
+public class DepartmentService {
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
+	
+    private final DepartmentRepository repository;
 
-    
-    private final UserRepository repository;
-    
-    public UserService(UserRepository repository) {
+    public DepartmentService(DepartmentRepository repository) {
         this.repository = repository;
     }
 
-    public Optional<User> get(Long id) {
+    public Optional<Department> get(Long id) {
         return repository.findById(id);
     }
 
-    public User update(User entity) {
+    public Department update(Department entity) {
         return repository.save(entity);
     }
 
@@ -35,16 +33,16 @@ public class UserService {
         repository.deleteById(id);
     }
 
-    public Page<User> list(Pageable pageable) {
+    public Page<Department> list(Pageable pageable) {
         return repository.findAll(pageable);
-    }
-
-    public Page<User> list(Pageable pageable, Specification<User> filter) {
-        return repository.findAll(filter, pageable);
     }
 
     public int count() {
         return (int) repository.count();
+    }
+    
+    public Optional<Department> findByName(String name) {
+        return repository.findByDepartmentName(name);
     }
 
 }

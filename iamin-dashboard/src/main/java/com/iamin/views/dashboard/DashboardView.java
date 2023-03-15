@@ -36,7 +36,9 @@ public class DashboardView extends VerticalLayout {
         Div cardsContainer = new Div();
         cardsContainer.setClassName("cardContainer");
         
-        // Employees Table
+        // Employees Table Card - Manager View Only
+        // This specifically shows all employees that are currently checked in today
+        // TODO: Show Check in / Check out times in new column
         Div card1 = new Div();
         EmployeesTableCard employeesTableCard = new EmployeesTableCard();
         employeesTableCard.createCard(card1);
@@ -48,16 +50,39 @@ public class DashboardView extends VerticalLayout {
         employeeAttendanceCard.createCard(card2,authentication);
 
 
-
+        // Calendar - All Roles
+        // Filter button to decide whether view is today's calendar, weekly or monthly
+        // Three calendar views which are interchangable by the filter button
+        // Display all events, holidays and absences
+        // First increment daily calendar
         Div card3 = new Div();
         Styling.styleSquareBox(card3);
                 
+                        
+        // Department Members - Employees Only
+        // This specifically shows all employees that are in the same department as user
         Div card4 = new Div();
         Styling.styleSquareBox(card4);
+
+        // Department Members - Managers Only
+        // This specifically shows all employees of a department with an average department attendance
+        // Employee can be selected to show individual attendance
+        
+        //Div cardx = new Div();
+        //styleSquareBox(card4);
                 
+        // Charts View - All Roles
+        // Framework: https://vaadin.com/directory/component/apexchartsjs
+        // Task summary
+        // Potentially add another card with employee attendance for managers only
+        
         Div card5 = new Div();
         Styling.styleSquareBox(card5);
                 
+        // Notifications card - All Roles
+        // Notifies Managers of requests
+        // Notifies Employees of denied requests 
+        // When notification click, it moves to the necessary view
         Div card6 = new Div();
         Styling.styleSquareBox(card6);
     
@@ -82,3 +107,4 @@ public class DashboardView extends VerticalLayout {
 
 
 }
+

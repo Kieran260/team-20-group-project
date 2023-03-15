@@ -3,6 +3,7 @@ package com.iamin.views.dashboard;
 import com.iamin.views.MainLayout;
 import com.iamin.views.helpers.EmployeeAttendanceCard;
 import com.iamin.views.helpers.EmployeesTableCard;
+import com.iamin.views.helpers.CalendarCard;
 import com.iamin.views.helpers.Styling;
 
 import com.vaadin.flow.component.dependency.CssImport;
@@ -14,8 +15,6 @@ import javax.annotation.security.PermitAll;
 import com.vaadin.flow.component.html.Div;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-
-
 
 @CssImport(value = "dashboard-styles.css")
 @PageTitle("Dashboard")
@@ -36,6 +35,7 @@ public class DashboardView extends VerticalLayout {
         Div cardsContainer = new Div();
         cardsContainer.setClassName("cardContainer");
         
+
         // Employees Table Card - Manager View Only
         // This specifically shows all employees that are currently checked in today
         // TODO: Show Check in / Check out times in new column
@@ -43,6 +43,7 @@ public class DashboardView extends VerticalLayout {
         EmployeesTableCard employeesTableCard = new EmployeesTableCard();
         employeesTableCard.createCard(card1);
         
+
         // Check In / Check Out
         // Absence Request 
         Div card2 = new Div();
@@ -56,9 +57,10 @@ public class DashboardView extends VerticalLayout {
         // Display all events, holidays and absences
         // First increment daily calendar
         Div card3 = new Div();
-        Styling.styleSquareBox(card3);
-                
-                        
+        CalendarCard calendarCard = new CalendarCard();
+        calendarCard.createCard(card3);
+        
+           
         // Department Members - Employees Only
         // This specifically shows all employees that are in the same department as user
         Div card4 = new Div();

@@ -76,13 +76,6 @@ public class DashboardView extends VerticalLayout {
 
 
 
-    private void card3Config(Div card3) {
-    }
-
-    private void card4Config(Div card4) {
-    }
-
-
 
 
 

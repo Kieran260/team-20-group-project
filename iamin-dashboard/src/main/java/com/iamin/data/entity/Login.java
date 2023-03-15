@@ -2,42 +2,49 @@ package com.iamin.data.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.iamin.data.Role;
+
+import java.time.LocalDateTime;
 import java.util.Set;
-import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
-import javax.persistence.Lob;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "application_user")
-public class User extends AbstractEntity {
-
+@Table(name = "login")
+public class Login extends AbstractEntity  {
+	
+	@ManyToOne
+	@JoinColumn(name = "person_id")
+	private SamplePerson person;
     private String username;
-    private String name;
     @JsonIgnore
     private String hashedPassword;
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
-    private Set<Role> roles;
-    @Lob
-    @Column(length = 1000000)
-    private byte[] profilePicture;
-
+    private Set<Role> role;    
+    private LocalDateTime datemodified;
+    
+    
     public String getUsername() {
         return username;
     }
     public void setUsername(String username) {
         this.username = username;
     }
-    public String getName() {
-        return name;
+    public LocalDateTime getDatemodified() {
+		return datemodified;
+    	
     }
-    public void setName(String name) {
-        this.name = name;
+
+    @PreUpdate
+    public void updateDatemodified() {
+    	this.datemodified = LocalDateTime.now();
     }
     public String getHashedPassword() {
         return hashedPassword;
@@ -46,16 +53,18 @@ public class User extends AbstractEntity {
         this.hashedPassword = hashedPassword;
     }
     public Set<Role> getRoles() {
-        return roles;
+        return role;
     }
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
+    public void setRoles(Set<Role> role) {
+        this.role = role;
     }
-    public byte[] getProfilePicture() {
-        return profilePicture;
+    
+    public SamplePerson getPerson() {
+        return person;
     }
-    public void setProfilePicture(byte[] profilePicture) {
-        this.profilePicture = profilePicture;
+
+    public void setPerson(SamplePerson person) {
+        this.person = person;
     }
 
 }

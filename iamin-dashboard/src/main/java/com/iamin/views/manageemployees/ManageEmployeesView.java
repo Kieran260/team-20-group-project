@@ -50,9 +50,10 @@ public class ManageEmployeesView extends Div implements BeforeEnterObserver {
     private TextField phone;
     private DatePicker dateOfBirth;
     private TextField occupation;
-    private TextField role;
-    private Checkbox important;
-
+    private TextField jobTitle;
+    private TextField address;
+    private TextField maxHolidays;
+    
     private final Button cancel = new Button("Cancel");
     private final Button save = new Button("Save");
 
@@ -81,16 +82,12 @@ public class ManageEmployeesView extends Div implements BeforeEnterObserver {
         grid.addColumn("phone").setAutoWidth(true);
         grid.addColumn("dateOfBirth").setAutoWidth(true);
         grid.addColumn("occupation").setAutoWidth(true);
-        grid.addColumn("role").setAutoWidth(true);
-        LitRenderer<SamplePerson> importantRenderer = LitRenderer.<SamplePerson>of(
-                "<vaadin-icon icon='vaadin:${item.icon}' style='width: var(--lumo-icon-size-s); height: var(--lumo-icon-size-s); color: ${item.color};'></vaadin-icon>")
-                .withProperty("icon", important -> important.isImportant() ? "check" : "minus").withProperty("color",
-                        important -> important.isImportant()
-                                ? "var(--lumo-primary-text-color)"
-                                : "var(--lumo-disabled-text-color)");
-
-        grid.addColumn(importantRenderer).setHeader("Important").setAutoWidth(true);
-
+        grid.addColumn("jobTitle").setAutoWidth(true);
+        grid.addColumn("address").setAutoWidth(true);
+        grid.addColumn("maxHolidays").setAutoWidth(true);
+        grid.addColumn("dateModified").setAutoWidth(true);
+        
+        
         grid.setItems(query -> samplePersonService.list(
                 PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
                 .stream());
@@ -174,9 +171,11 @@ public class ManageEmployeesView extends Div implements BeforeEnterObserver {
         phone = new TextField("Phone");
         dateOfBirth = new DatePicker("Date Of Birth");
         occupation = new TextField("Occupation");
-        role = new TextField("Role");
-        important = new Checkbox("Important");
-        formLayout.add(firstName, lastName, email, phone, dateOfBirth, occupation, role, important);
+        jobTitle = new TextField("Job Title");
+        address = new TextField("Address");
+        maxHolidays = new TextField("Maximum Holidays");
+        formLayout.add(firstName, lastName, email, phone, dateOfBirth, occupation, jobTitle, address,maxHolidays );
+
 
         editorDiv.add(formLayout);
         createButtonLayout(editorLayoutDiv);

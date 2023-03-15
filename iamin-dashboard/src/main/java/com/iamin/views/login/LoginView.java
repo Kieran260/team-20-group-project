@@ -1,7 +1,7 @@
 package com.iamin.views.login;
 
-import com.iamin.data.entity.User;
-import com.iamin.data.service.UserRepository;
+import com.iamin.data.entity.Login;
+import com.iamin.data.service.LoginRepository;
 import com.iamin.data.Role;
 import com.iamin.security.AuthenticatedUser;
 import com.vaadin.flow.component.button.Button;
@@ -45,7 +45,7 @@ public class LoginView extends VerticalLayout {
     private final AuthenticatedUser authenticatedUser;
     
     @Autowired
-    private UserRepository userRepository;
+    private LoginRepository loginRepository;
     
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -145,7 +145,24 @@ public class LoginView extends VerticalLayout {
             String username = usernameField.getValue();
             String password = passwordField.getValue();
             String confirmedPassword = confirmPassword.getValue();
-        
+            usernameField.setRequired(true);
+            usernameField.setErrorMessage("Please enter username");
+            if(usernameField.isEmpty()) {
+                    usernameField.setInvalid(true);
+                    return;
+                    }
+            passwordField.setRequired(true);
+            passwordField.setErrorMessage("Please enter password");
+                if(passwordField.isEmpty()) {
+                        passwordField.setInvalid(true);
+                        return;
+                }
+            confirmPassword.setRequired(true);
+            confirmPassword.setErrorMessage("Please confirm password");
+                if(confirmPassword.isEmpty()) {
+                        confirmPassword.setInvalid(true);
+                        return;
+                }
             // TODO: Sign Up Validation
             // Password is 8+ characters AND contains at least 1 number
             // Check that username does not already exist from user database
@@ -157,14 +174,14 @@ public class LoginView extends VerticalLayout {
                 return;
             }
         
-            User user = new User();
+            Login user = new Login();
         
             Set<Role> roles = new HashSet<>();
             roles.add(Role.ADMIN);
             user.setRoles(roles);
             user.setUsername(username);
             user.setHashedPassword(passwordEncoder.encode(password));
-            userRepository.save(user);
+            loginRepository.save(user);
 
             
             

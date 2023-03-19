@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 @Service
-@Component
 public class LoginService {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
@@ -45,6 +44,11 @@ public class LoginService {
 
     public int count() {
         return (int) repository.count();
+    }
+
+    public boolean checkIfUsernameExists(String username) {
+        Login login = repository.findByUsername(username);
+        return login != null;
     }
 
 }

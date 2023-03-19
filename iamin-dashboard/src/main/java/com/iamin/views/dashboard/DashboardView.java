@@ -79,39 +79,38 @@ public class DashboardView extends VerticalLayout {
         
            
         // Department Members - Employees Only
-        // This specifically shows all employees that are in the same department as user
+        // This specifically shows all coworkers that are in the same department as user
         Div card4 = new Div();
         DepartmentMembersCard departmentMembersCard = new DepartmentMembersCard();
         departmentMembersCard.createCard(card4);
 
 
-        // Department Members - Managers Only
+        // Department Members Attendance - Managers Only
         // This specifically shows all employees of a department with an average department attendance
         // Employee can be selected to show individual attendance
-        //Div cardx = new Div();
-        //styleSquareBox(card4);
+        Div card5 = new Div();
                 
         // Charts View - All Roles
         // Framework: https://vaadin.com/directory/component/apexchartsjs
         // Task summary
         // Potentially add another card with employee attendance for managers only
         
-        Div card5 = new Div();
-        Styling.styleSquareBox(card5);
+        Div card6 = new Div();
+        Styling.styleSquareBox(card6);
                 
         // Notifications card - All Roles
         // Notifies Managers of requests
         // Notifies Employees of denied requests 
         // When notification click, it moves to the necessary view
-        Div card6 = new Div();
-        Styling.styleSquareBox(card6);
+        Div card7 = new Div();
+        Styling.styleSquareBox(card7);
     
         //cardsLayout.add();
 
         // Tasks card - Employee role only
         // Shows current tasks that are not yet completed
         // Query from "events" database for category "tasks" that are not yet completed
-        Div card7 = new Div();
+        Div card8 = new Div();
         
         // Get user's role
         String userRole = getUserRole(authentication);

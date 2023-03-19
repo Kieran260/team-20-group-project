@@ -2,7 +2,6 @@ package com.iamin.views.login;
 
 import com.iamin.data.entity.Login;
 import com.iamin.data.service.LoginRepository;
-import com.iamin.data.service.LoginService;
 import com.iamin.data.Role;
 import com.iamin.security.AuthenticatedUser;
 import com.iamin.data.validation.Validation;
@@ -61,13 +60,12 @@ public class LoginView extends VerticalLayout {
 
 
     // Register Vars
-    private Label registerText = new Label("Sign up to IAMIN as a manager");
+    private Label registerText = new Label("Sign Up");
     private TextField usernameField = new TextField("Username");
     private PasswordField passwordField = new PasswordField("Password");
     private PasswordField confirmPassword = new PasswordField("Confirm Password");
     private Button signUpButton = new Button("Sign Up");
     private Button returnButton = new Button("Return to Login");
-
 
 
     public LoginView(AuthenticatedUser authenticatedUser) {
@@ -76,18 +74,22 @@ public class LoginView extends VerticalLayout {
         getStyle().set("width","100%");
         getStyle().set("height","100%");
 
-        // Login Iteuses Styles
+        // Login Items Styles
         registerButton.getStyle().set("background-color", "light-grey");
         registerButton.getStyle().set("color", "#005eec");
         registerButton.getStyle().set("width", "250px");
         registerButton.getStyle().set("align-self", "center");
 
         // Register Items Styles
+        registerText.getStyle().set("font-size","24px");
         registerText.getStyle().set("font-weight","600");
+        registerText.getStyle().set("margin-top","30px");
         signUpButton.getStyle().set("background-color", "blue");
         signUpButton.getStyle().set("color", "white");
         signUpButton.getStyle().set("background-color","#005eec");
         signUpButton.getStyle().set("margin-top","20px");
+        returnButton.getStyle().set("margin-top", "100px");
+        
 
 
         // Container Divs

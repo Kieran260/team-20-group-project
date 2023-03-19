@@ -6,6 +6,9 @@ import com.iamin.views.helpers.EmployeesTableCard;
 import com.iamin.views.helpers.CalendarCard;
 import com.iamin.views.helpers.DepartmentMembersCard;
 import com.iamin.views.helpers.Styling;
+import com.iamin.views.helpers.PersonFormDialog;
+import com.iamin.data.entity.Login;
+import com.iamin.data.service.LoginRepository;
 
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -28,9 +31,23 @@ public class DashboardView extends VerticalLayout {
     String currentUserName;
     String currentUserRole;
 
-    public DashboardView() {
+    private final PersonFormDialog personFormDialog;
+    private final LoginRepository loginRepository;
+
+    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository) {
+        this.personFormDialog = personFormDialog;
+        this.loginRepository = loginRepository;
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         getStyle().set("background-color","rgba(250, 250, 250)");
+
+        // Checks if current user has a SamplePerson entity and if not shows a sign up dialog
+        String currentUsername = authentication.getName();
+        Login userLogin = loginRepository.findByUsername(currentUsername);
+        if (userLogin != null && userLogin.getPerson() == null) {
+            personFormDialog.showPersonFormDialog();
+        }
+        
 
         // Master Container
         Div cardsContainer = new Div();

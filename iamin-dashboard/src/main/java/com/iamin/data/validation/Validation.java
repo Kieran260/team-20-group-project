@@ -26,11 +26,6 @@ public class Validation {
     // Check that username does not already exist in table
     // Check that length is 8 characters and alphanumeric
     public boolean userNameValidation(String username) {
-    
-        if (loginService.checkIfUsernameExists(username)) {
-            return false;
-        }
-
         // Check length
         if (username.length() != 8) {
             return false;
@@ -47,6 +42,14 @@ public class Validation {
                 }
             }
         }
+        return true;
+    }
+
+    public boolean userNameExists(String username) {
+        if (loginService.checkIfUsernameExists(username)) {
+            return false;
+        }
+
         return true;
     }
 

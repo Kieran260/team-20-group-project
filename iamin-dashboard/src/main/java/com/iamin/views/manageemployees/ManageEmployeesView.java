@@ -118,6 +118,7 @@ public class ManageEmployeesView extends Div implements BeforeEnterObserver {
         save.addClickListener(e -> {
             try {
                 if (this.samplePerson == null) {
+                    // TODO: Notification.show to prevent new person from being crated
                     this.samplePerson = new SamplePerson();
                 }
                 binder.writeBean(this.samplePerson);

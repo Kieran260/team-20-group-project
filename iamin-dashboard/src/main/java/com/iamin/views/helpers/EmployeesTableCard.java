@@ -13,7 +13,7 @@ public class EmployeesTableCard {
 
     public Div createCard(Div card) {
 
-        // Card1 Styles
+        // Card Styles
         card.getStyle().set("display","flex");
         card.getStyle().set("flex-direction","column");
         card.getStyle().set("justify-content","space-between");
@@ -21,7 +21,8 @@ public class EmployeesTableCard {
         Styling.styleSquareBox(card);
 
 
-        // TODO: Populate people with employees for each manager department
+        // TODO: Populate "people" with employees from same manager as department who have checked in today
+        // Order table by latest check in at the top and earliest at the bottom
         List<Person> people = new ArrayList<Person>();
         people.add(new Person("John", "Doe"));
         people.add(new Person("John", "Doe"));
@@ -41,6 +42,7 @@ public class EmployeesTableCard {
         // Add columns to the employeeTable
         employeeTable.addColumn(Person::getFirstName).setHeader("First Name");
         employeeTable.addColumn(Person::getLastName).setHeader("Last Name");
+        employeeTable.addColumn(Person::getCheckInTime).setHeader("Check-In Time");
     
         // Set the height of the employeeTable to be the height of five rows,
         // or add a scroll bar if there are more than five rows
@@ -51,7 +53,7 @@ public class EmployeesTableCard {
         
 
         // Create Labels
-        Label card1Header = new Label("Your Department's Employees");
+        Label card1Header = new Label("Employee Check-Ins");
         card1Header.getStyle().set("font-weight", "bold");
         card1Header.getStyle().set("font-size", "18px");
         card1Header.getStyle().set("margin-left","10px");
@@ -64,6 +66,7 @@ public class EmployeesTableCard {
     private static class Person {
         private final String firstName;
         private final String lastName;
+
     
         public Person(String firstName, String lastName) {
             this.firstName = firstName;
@@ -76,6 +79,10 @@ public class EmployeesTableCard {
     
         public String getLastName() {
             return lastName;
+        }
+
+        public String getCheckInTime() {
+            return "9:00";
         }
     }
     

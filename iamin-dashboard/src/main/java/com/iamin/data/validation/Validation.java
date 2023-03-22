@@ -8,6 +8,8 @@ import org.jsoup.safety.Safelist;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
+@Component
 public class Validation {
     private final LoginService loginService;
 
@@ -17,14 +19,14 @@ public class Validation {
     }
 
     // Checks a character is alphanumeric
-    public static boolean isAlphaNumeric(char char1) {
+    public boolean isAlphaNumeric(char char1) {
         return (char1 >= 'a' && char1 <= 'z') || (char1 >= 'A' && char1 <= 'Z') || (char1 >= '0' && char1 <= '9');
     }
 
     // Check that username does not already exist in table
     // Check that length is 8 characters and alphanumeric
     public boolean userNameValidation(String username) {
-
+    
         if (loginService.checkIfUsernameExists(username)) {
             return false;
         }
@@ -51,7 +53,6 @@ public class Validation {
     // Check password is 8+ characters and contains one number
     // Check confirmPassword is the same as password
     public boolean passwordValidation(String password, String confirmPassword) {
-
         if (password.length() < 8) {
             return false;
         } else {
@@ -104,11 +105,13 @@ public class Validation {
 
     }
 
+
+    
     // Checks for SQL injections
-    public static boolean isSqlInjection(String message) {
+    public boolean isSqlInjection(String message) {
         // Common SQL injection keywords
-        String[] sqlKeywords = { "SELECT", "INSERT", "UPDATE", "DELETE", "CREATE", "DROP", "ALTER", "EXECUTE",
-                "TRUNCATE" };
+        String[] sqlKeywords = {"SELECT", "INSERT", "UPDATE", "DELETE", "CREATE", "DROP", "ALTER", "EXECUTE", "TRUNCATE"};
+            
 
         // Loop through the message and check for SQL injection keywords
         for (String keyword : sqlKeywords) {
@@ -116,15 +119,14 @@ public class Validation {
                 return true;
             }
         }
-
         // No SQL injection keywords found
         return false;
     }
 
     // Function to sanitize inputs
-    public static String sanitizeInput(String input) {
+    public String sanitizeInput(String input) {
         // Remove any HTML tags and attributes from the input using Jsoup
-        String sanitized = Jsoup.clean(input, null);
+        String sanitized = Jsoup.clean(input, Safelist.none());
         // Return the sanitized input
         return sanitized;
     }

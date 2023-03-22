@@ -28,8 +28,7 @@ public class Login extends AbstractEntity  {
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<Role> role;    
-    private LocalDateTime datemodified;
-    
+    private LocalDateTime dateModified;    
     
     public String getUsername() {
         return username;
@@ -37,14 +36,13 @@ public class Login extends AbstractEntity  {
     public void setUsername(String username) {
         this.username = username;
     }
-    public LocalDateTime getDatemodified() {
-		return datemodified;
-    	
+    public LocalDateTime getDateModified() {
+		return dateModified;
     }
 
     @PreUpdate
-    public void updateDatemodified() {
-    	this.datemodified = LocalDateTime.now();
+    public void updateDateModified() {
+    	this.dateModified = LocalDateTime.now();
     }
     public String getHashedPassword() {
         return hashedPassword;
@@ -58,13 +56,10 @@ public class Login extends AbstractEntity  {
     public void setRoles(Set<Role> role) {
         this.role = role;
     }
-    
     public SamplePerson getPerson() {
         return person;
     }
-
     public void setPerson(SamplePerson person) {
         this.person = person;
     }
-
 }

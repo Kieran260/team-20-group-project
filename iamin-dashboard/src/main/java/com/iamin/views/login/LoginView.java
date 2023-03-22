@@ -4,6 +4,7 @@ import com.iamin.data.entity.Login;
 import com.iamin.data.service.LoginRepository;
 import com.iamin.data.Role;
 import com.iamin.security.AuthenticatedUser;
+import com.iamin.data.validation.Validation;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.login.LoginI18n;
@@ -49,19 +50,22 @@ public class LoginView extends VerticalLayout {
     
     @Autowired
     private PasswordEncoder passwordEncoder;
-    
+
+    @Autowired
+    private Validation validation;
+
+
     // Login Vars
     private Button registerButton = new Button("Register");
 
 
     // Register Vars
-    private Label registerText = new Label("Sign up to IAMIN as a manager");
+    private Label registerText = new Label("Sign Up");
     private TextField usernameField = new TextField("Username");
     private PasswordField passwordField = new PasswordField("Password");
     private PasswordField confirmPassword = new PasswordField("Confirm Password");
     private Button signUpButton = new Button("Sign Up");
     private Button returnButton = new Button("Return to Login");
-
 
 
     public LoginView(AuthenticatedUser authenticatedUser) {
@@ -70,18 +74,22 @@ public class LoginView extends VerticalLayout {
         getStyle().set("width","100%");
         getStyle().set("height","100%");
 
-        // Login Iteuses Styles
+        // Login Items Styles
         registerButton.getStyle().set("background-color", "light-grey");
         registerButton.getStyle().set("color", "#005eec");
         registerButton.getStyle().set("width", "250px");
         registerButton.getStyle().set("align-self", "center");
 
         // Register Items Styles
+        registerText.getStyle().set("font-size","24px");
         registerText.getStyle().set("font-weight","600");
+        registerText.getStyle().set("margin-top","30px");
         signUpButton.getStyle().set("background-color", "blue");
         signUpButton.getStyle().set("color", "white");
         signUpButton.getStyle().set("background-color","#005eec");
         signUpButton.getStyle().set("margin-top","20px");
+        returnButton.getStyle().set("margin-top", "100px");
+        
 
 
         // Container Divs
@@ -150,54 +158,62 @@ public class LoginView extends VerticalLayout {
             if(usernameField.isEmpty()) {
                     usernameField.setInvalid(true);
                     return;
-                    }
+            }
             passwordField.setRequired(true);
             passwordField.setErrorMessage("Please enter password");
-                if(passwordField.isEmpty()) {
-                        passwordField.setInvalid(true);
-                        return;
-                }
+                
+            if(passwordField.isEmpty()) {
+                passwordField.setInvalid(true);
+                return;
+            }
             confirmPassword.setRequired(true);
             confirmPassword.setErrorMessage("Please confirm password");
-                if(confirmPassword.isEmpty()) {
-                        confirmPassword.setInvalid(true);
-                        return;
-                }
-            // TODO: Sign Up Validation
-            // Password is 8+ characters AND contains at least 1 number
-            // Check that username does not already exist from user database
-            // Check that the fields are NOT empty
+            if(confirmPassword.isEmpty()) {
+                confirmPassword.setInvalid(true);
+                return;
+            }
+          
+            // Check that passwords match
             if (!password.equals(confirmedPassword)) {
-                Notification.show("Passwords do not match", 3000, Position.TOP_CENTER);
+                Notification.show("Passwords do not match, please try again", 3000, Position.TOP_CENTER);
                 passwordField.setValue("");
                 confirmPassword.setValue("");
                 return;
             }
         
-            Login user = new Login();
-        
-            Set<Role> roles = new HashSet<>();
-            roles.add(Role.ADMIN);
-            user.setRoles(roles);
-            user.setUsername(username);
-            user.setHashedPassword(passwordEncoder.encode(password));
-            loginRepository.save(user);
+            if (!validation.userNameValidation(username)) {
+                Notification.show("Username is invalid. Please create an 8 character username that does not contain a number", 3000, Position.TOP_CENTER);
+                usernameField.setValue("");
+            } else if (!validation.passwordValidation(password,confirmedPassword)) {
+                Notification.show("Password is invalid. Please create an 8 character password with at least one number", 3000, Position.TOP_CENTER);
+                passwordField.setValue("");
+                confirmPassword.setValue("");
+            } else {
+                Login user = new Login();
 
-            
-            
-            Notification.show("Account created successfully!", 3000, Position.TOP_CENTER);
-            try {
-                Thread.sleep(2000); // Sleep for 2 seconds (2000 milliseconds)
-            } catch (InterruptedException e) {
-                // Handle the exception
+                Set<Role> roles = new HashSet<>();
+                roles.add(Role.ADMIN);
+                user.setRoles(roles);
+                user.setUsername(username);
+                user.setHashedPassword(passwordEncoder.encode(password));
+                loginRepository.save(user);
+    
+                Notification.show("Account created successfully!", 3000, Position.TOP_CENTER);
+                try {
+                    Thread.sleep(1000); // Sleep for 1 second (1000 milliseconds)
+                } catch (InterruptedException e) {
+                    // Handle the exception
+                }
+                
+                // Clear fields after sign up
+                usernameField.setValue("");
+                passwordField.setValue("");
+                confirmPassword.setValue("");
+    
+                animationToLogin(loginContainer, registerContainer);
+                return;
             }
             
-            // Clear fields after sign up
-            usernameField.setValue("");
-            passwordField.setValue("");
-            confirmPassword.setValue("");
-
-            animationToLogin(loginContainer, registerContainer);
         });
         
     // AUTHENTICATION END: Sign Up

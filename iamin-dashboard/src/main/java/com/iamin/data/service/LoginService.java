@@ -47,4 +47,9 @@ public class LoginService {
         return (int) repository.count();
     }
 
+    public boolean checkIfUsernameExists(String username) {
+        Login login = repository.findByUsername(username);
+        return login != null;
+    }
+
 }

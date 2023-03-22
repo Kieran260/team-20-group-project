@@ -159,18 +159,25 @@ public class LoginView extends VerticalLayout {
             confirmPassword.setRequired(true);
           
           
-            // Check that passwords match
+
+        
+            // Username Validation
+            if (!validation.userNameValidation(username)) {
+                Notification.show("Username is invalid", 3000, Position.TOP_CENTER);
+                usernameField.setValue("");
+            } else if (!validation.userNameExists(username)) {
+                Notification.show("Username already exists, please try again.", 3000, Position.TOP_CENTER);
+                usernameField.setValue("");
+            }
+
+            // Password Validation
+
             if (!password.equals(confirmedPassword)) {
                 Notification.show("Passwords do not match, please try again", 3000, Position.TOP_CENTER);
                 passwordField.setValue("");
                 confirmPassword.setValue("");
                 return;
-            }
-        
-            if (!validation.userNameValidation(username)) {
-                Notification.show("Username is invalid", 3000, Position.TOP_CENTER);
-                usernameField.setValue("");
-            } if (!validation.passwordValidation(password,confirmedPassword)) {
+            } else if (!validation.passwordValidation(password,confirmedPassword)) {
                 Notification.show("Password is invalid", 3000, Position.TOP_CENTER);
                 passwordField.setValue("");
                 confirmPassword.setValue("");

@@ -87,9 +87,11 @@ public class LoginView extends VerticalLayout {
         signUpButton.getStyle().set("background-color", "blue");
         signUpButton.getStyle().set("color", "white");
         signUpButton.getStyle().set("background-color","#005eec");
-        signUpButton.getStyle().set("margin-top","20px");
-        returnButton.getStyle().set("margin-top", "100px");
-        
+        signUpButton.getStyle().set("margin-top","40px");
+
+        usernameField.setHelperText("Username must be 8 alphabetic characters.");
+        passwordField.setHelperText("Password must be at least 8 characters, at least one letter and one digit.");
+
 
 
         // Container Divs
@@ -120,7 +122,6 @@ public class LoginView extends VerticalLayout {
         LoginForm login = new LoginForm(i18n);
         login.setAction(RouteUtil.getRoutePath(VaadinService.getCurrent().getContext(), getClass()));
         login.setForgotPasswordButtonVisible(false);
-        
         // Add login form and buttons to login layout, then add to login container
         loginLayout.add(login,registerButton);
         loginContainer.add(loginLayout);
@@ -154,24 +155,9 @@ public class LoginView extends VerticalLayout {
             String password = passwordField.getValue();
             String confirmedPassword = confirmPassword.getValue();
             usernameField.setRequired(true);
-            usernameField.setErrorMessage("Please enter username");
-            if(usernameField.isEmpty()) {
-                    usernameField.setInvalid(true);
-                    return;
-            }
             passwordField.setRequired(true);
-            passwordField.setErrorMessage("Please enter password");
-                
-            if(passwordField.isEmpty()) {
-                passwordField.setInvalid(true);
-                return;
-            }
             confirmPassword.setRequired(true);
-            confirmPassword.setErrorMessage("Please confirm password");
-            if(confirmPassword.isEmpty()) {
-                confirmPassword.setInvalid(true);
-                return;
-            }
+          
           
             // Check that passwords match
             if (!password.equals(confirmedPassword)) {
@@ -182,10 +168,10 @@ public class LoginView extends VerticalLayout {
             }
         
             if (!validation.userNameValidation(username)) {
-                Notification.show("Username is invalid. Please create an 8 character username that does not contain a number", 3000, Position.TOP_CENTER);
+                Notification.show("Username is invalid", 3000, Position.TOP_CENTER);
                 usernameField.setValue("");
-            } else if (!validation.passwordValidation(password,confirmedPassword)) {
-                Notification.show("Password is invalid. Please create an 8 character password with at least one number", 3000, Position.TOP_CENTER);
+            } if (!validation.passwordValidation(password,confirmedPassword)) {
+                Notification.show("Password is invalid", 3000, Position.TOP_CENTER);
                 passwordField.setValue("");
                 confirmPassword.setValue("");
             } else {
@@ -209,6 +195,9 @@ public class LoginView extends VerticalLayout {
                 usernameField.setValue("");
                 passwordField.setValue("");
                 confirmPassword.setValue("");
+                usernameField.setRequired(false); // set required flag to false
+                passwordField.setRequired(false); // set required flag to false
+                confirmPassword.setRequired(false); // set required flag to false
     
                 animationToLogin(loginContainer, registerContainer);
                 return;

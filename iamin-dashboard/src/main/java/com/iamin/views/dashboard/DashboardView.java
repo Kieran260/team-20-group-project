@@ -3,6 +3,7 @@ package com.iamin.views.dashboard;
 import com.iamin.views.MainLayout;
 import com.iamin.views.helpers.EmployeeAttendanceCard;
 import com.iamin.views.helpers.EmployeesTableCard;
+import com.iamin.views.helpers.AverageAttendanceCard;
 import com.iamin.views.helpers.CalendarCard;
 import com.iamin.views.helpers.DepartmentMembersCard;
 import com.iamin.views.helpers.Styling;
@@ -20,6 +21,10 @@ import com.vaadin.flow.component.html.Div;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.GrantedAuthority;
+import com.iamin.views.helpers.AverageAttendanceCard;
+import com.iamin.views.helpers.AttendanceCalculator;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 @CssImport(value = "dashboard-styles.css")
 @PageTitle("Dashboard")
@@ -34,9 +39,17 @@ public class DashboardView extends VerticalLayout {
     private final PersonFormDialog personFormDialog;
     private final LoginRepository loginRepository;
 
-    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository) {
+    @Autowired
+    private AverageAttendanceCard averageAttendanceCard;
+
+    @Autowired
+    private AttendanceCalculator attendanceCalculator;
+    
+
+    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository, AverageAttendanceCard averageAttendanceCard) {
         this.personFormDialog = personFormDialog;
         this.loginRepository = loginRepository;
+        this.averageAttendanceCard = averageAttendanceCard;
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         getStyle().set("background-color","rgba(250, 250, 250)");
@@ -79,46 +92,46 @@ public class DashboardView extends VerticalLayout {
         
            
         // Department Members - Employees Only
-        // This specifically shows all employees that are in the same department as user
+        // This specifically shows all coworkers that are in the same department as user
         Div card4 = new Div();
         DepartmentMembersCard departmentMembersCard = new DepartmentMembersCard();
         departmentMembersCard.createCard(card4,authentication);
 
 
-        // Department Members - Managers Only
+        // Department Members Attendance - Managers Only
         // This specifically shows all employees of a department with an average department attendance
         // Employee can be selected to show individual attendance
-        //Div cardx = new Div();
-        //styleSquareBox(card4);
+        Div card5 = new Div();
+        averageAttendanceCard.createCard(card5);
                 
         // Charts View - All Roles
         // Framework: https://vaadin.com/directory/component/apexchartsjs
         // Task summary
         // Potentially add another card with employee attendance for managers only
         
-        Div card5 = new Div();
-        Styling.styleSquareBox(card5);
+        Div card6 = new Div();
+        Styling.styleSquareBox(card6);
                 
         // Notifications card - All Roles
         // Notifies Managers of requests
         // Notifies Employees of denied requests 
         // When notification click, it moves to the necessary view
-        Div card6 = new Div();
-        Styling.styleSquareBox(card6);
+        Div card7 = new Div();
+        Styling.styleSquareBox(card7);
     
         //cardsLayout.add();
 
         // Tasks card - Employee role only
         // Shows current tasks that are not yet completed
         // Query from "events" database for category "tasks" that are not yet completed
-        Div card7 = new Div();
+        Div card8 = new Div();
         
         // Get user's role
         String userRole = getUserRole(authentication);
 
         if ("ROLE_ADMIN".equals(userRole)) {
             // Add cards specific to the admin role
-            cardsContainer.add(card1,card2,card3,card4,card5,card6);
+            cardsContainer.add(card1,card2,card3,card5,card6);
         } else if ("ROLE_USER".equals(userRole)) {
             // Add cards specific to the user role
             cardsContainer.add(card2,card3,card4,card5,card6);

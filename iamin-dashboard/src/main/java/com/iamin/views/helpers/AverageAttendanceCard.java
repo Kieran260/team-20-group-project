@@ -1,14 +1,12 @@
 package com.iamin.views.helpers;
 
-import com.iamin.views.helpers.AttendanceCalculator;
-import com.iamin.views.helpers.Styling;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.select.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.time.LocalDate;
 
 @Component
@@ -63,6 +61,10 @@ public class AverageAttendanceCard {
             startDate = endDate.minusDays(30);
         }
 
+        // TODO: Calculate average attendance for all employees in the same department as the current user
+        // This can be done using an Authentication instance similar to the DepartmentMembersCard and get
+        // the current user's department then use a for loop to iterate through all department SamplePerson's
+        // and then call the attendanceCalculator on each person_id for each SamplePerson in the for loop.
         double averageAttendance = attendanceCalculator.calculateAverageAttendance(1, startDate, endDate);
 
         // Update the average attendance on the card
@@ -97,8 +99,6 @@ public class AverageAttendanceCard {
             existingBadge.getStyle().set("color", badge.getStyle().get("color") != null ? badge.getStyle().get("color") : "white");
             existingBadge.setText(badge.getText());
         }
-
-        
     }
 
     private Select<String> createTimePeriodSelect() {
@@ -132,8 +132,4 @@ public class AverageAttendanceCard {
 
         return badge;
     }
-
-
-
-
 }

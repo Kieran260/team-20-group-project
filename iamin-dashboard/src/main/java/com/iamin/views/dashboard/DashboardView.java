@@ -131,7 +131,7 @@ public class DashboardView extends VerticalLayout {
 
         if ("ROLE_ADMIN".equals(userRole)) {
             // Add cards specific to the admin role
-            cardsContainer.add(card1,card2,card3,card4,card5,card6);
+            cardsContainer.add(card1,card2,card3,card5,card6);
         } else if ("ROLE_USER".equals(userRole)) {
             // Add cards specific to the user role
             cardsContainer.add(card2,card3,card4,card5,card6);

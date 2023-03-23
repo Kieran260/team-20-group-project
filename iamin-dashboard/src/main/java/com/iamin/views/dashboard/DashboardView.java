@@ -68,7 +68,7 @@ public class DashboardView extends VerticalLayout {
         
         // Employees Table Card - Manager View Only
         // This specifically shows all employees that are currently checked in today
-        // TODO: Show Check in / Check out times in new column
+        // TODO: Show Check in / Check out times
         Div card1 = new Div();
         EmployeesTableCard employeesTableCard = new EmployeesTableCard();
         employeesTableCard.createCard(card1);
@@ -76,6 +76,7 @@ public class DashboardView extends VerticalLayout {
 
         // Check In / Check Out
         // Absence Request 
+        // TODO: Send absence requests to database
         Div card2 = new Div();
         EmployeeAttendanceCard employeeAttendanceCard = new EmployeeAttendanceCard();
         employeeAttendanceCard.createCard(card2,authentication);
@@ -93,6 +94,7 @@ public class DashboardView extends VerticalLayout {
            
         // Department Members - Employees Only
         // This specifically shows all coworkers that are in the same department as user
+        // TODO: on click, present user with employee's information including contact details and attendance
         Div card4 = new Div();
         DepartmentMembersCard departmentMembersCard = new DepartmentMembersCard();
         departmentMembersCard.createCard(card4,authentication);
@@ -100,7 +102,8 @@ public class DashboardView extends VerticalLayout {
 
         // Department Members Attendance - Managers Only
         // This specifically shows all employees of a department with an average department attendance
-        // Employee can be selected to show individual attendance
+        // TODO: Show department attendance which is the same department as current user (Authentication)
+        // TODO: Add a grid of employees from department which shows individual attendance
         Div card5 = new Div();
         averageAttendanceCard.createCard(card5);
                 
@@ -108,7 +111,6 @@ public class DashboardView extends VerticalLayout {
         // Framework: https://vaadin.com/directory/component/apexchartsjs
         // Task summary
         // Potentially add another card with employee attendance for managers only
-        
         Div card6 = new Div();
         Styling.styleSquareBox(card6);
                 

@@ -23,7 +23,7 @@ public class Validation {
         return (char1 >= 'a' && char1 <= 'z') || (char1 >= 'A' && char1 <= 'Z') || (char1 >= '0' && char1 <= '9');
     }
 
-    // Check that username does not already exist in table
+    // Check that username does not already exist in table and no SQL injection
     // Check that length is 8 characters and alphanumeric
     public boolean userNameValidation(String username) {
         // Check length
@@ -60,7 +60,7 @@ public class Validation {
         return true;
     }
 
-    // Check password is 8+ characters and contains one number
+    // Check password is > 8 characters but < 20 and has 1+ Char
     // Check confirmPassword is the same as password
     public boolean passwordValidation(String password, String confirmPassword) {
         int charCount = 0;
@@ -74,7 +74,7 @@ public class Validation {
                   charCount = charCount + 1;
                 }
             }
-            if (charCount > 0) {
+            if (charCount > 0 && password.equals(confirmPassword)) {
               return true;
             } else {
               return false;

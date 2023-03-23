@@ -37,13 +37,20 @@ public class Validation {
         // Check alphanumeric
         else {
             for (int i = 0; i < username.length(); i++) {
-                if (!isAlphaNumeric(username.charAt(i))) {
+                if (!Character.isLetter(username.charAt(i))) {
                     return false;
                 }
             }
         }
-        return true;
+        // Check if exists
+        if (userNameExists username) {
+            return true;
+        }
     }
+
+
+    // TO DO - Swap the logic of the below function to make sense
+    //         Currently returning true if the username doesn't exist
 
     public boolean userNameExists(String username) {
         if (loginService.checkIfUsernameExists(username)) {
@@ -56,18 +63,24 @@ public class Validation {
     // Check password is 8+ characters and contains one number
     // Check confirmPassword is the same as password
     public boolean passwordValidation(String password, String confirmPassword) {
-        if (password.length() < 8) {
+        int charCount = 0;
+
+        if (password.length() < 8 || password.length() > 20) {
             return false;
-        } else {
+        } 
+        else {
             for (int i = 0; i < password.length(); i++) {
-                if (Character.isDigit(password.charAt(i))) {
-                    if (password.equals(confirmPassword)) {
-                        return true;
-                    }
+                if(Character.isLetter(password.charAt(i))) {
+                  charCount = charCount + 1;
                 }
             }
-            return false;
+            if (charCount > 0) {
+              return true;
+            } else {
+              return false;
+            }
         }
+
     }
 
     // Check address line 1 and 2 contain only alphanumeric, space, (-,'.&'), up to

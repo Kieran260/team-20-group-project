@@ -177,13 +177,11 @@ public class EmployeeAttendanceCard {
         int holidaysSelected = 0;
 
         Label holidaysRemainingLabel = new Label("You have " + holidaysRemaining + " holidays remaining");
-        TextField holidayName = new TextField("Reason for request");
-        holidayName.setAutocomplete(Autocomplete.OFF);
         DatePicker fromDate = new DatePicker("Holiday Start");
         DatePicker toDate = new DatePicker("Holiday End");
         Label holidaysSelectedLabel = new Label("Holidays Requested: " + holidaysSelected);
 
-        holidayDialogLayout.add(holidaysRemainingLabel,holidayName,fromDate,toDate,holidaysSelectedLabel);
+        holidayDialogLayout.add(holidaysRemainingLabel,fromDate,toDate,holidaysSelectedLabel);
         holidayDialog.add(holidayDialogLayout);
 
         // TODO:

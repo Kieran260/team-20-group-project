@@ -68,7 +68,7 @@ public class DashboardView extends VerticalLayout {
         
         // Employees Table Card - Manager View Only
         // This specifically shows all employees that are currently checked in today
-        // TODO: Show Check in / Check out times
+        // TODO: Show Check in / Check out times from database
         Div card1 = new Div();
         EmployeesTableCard employeesTableCard = new EmployeesTableCard();
         employeesTableCard.createCard(card1);
@@ -105,7 +105,7 @@ public class DashboardView extends VerticalLayout {
         // TODO: Show department attendance which is the same department as current user (Authentication)
         // TODO: Add a grid of employees from department which shows individual attendance
         Div card5 = new Div();
-        averageAttendanceCard.createCard(card5);
+        averageAttendanceCard.createCard(card5,userLogin);
                 
         // Charts View - All Roles
         // Framework: https://vaadin.com/directory/component/apexchartsjs

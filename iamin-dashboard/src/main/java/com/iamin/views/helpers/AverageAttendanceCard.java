@@ -1,13 +1,17 @@
 package com.iamin.views.helpers;
 
+import com.iamin.data.entity.Login;
+
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.select.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.time.LocalDate;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.GrantedAuthority;
 
 @Component
 public class AverageAttendanceCard {
@@ -15,12 +19,20 @@ public class AverageAttendanceCard {
     @Autowired
     private AttendanceCalculator attendanceCalculator;
 
-    public Div createCard(Div card) {
+    String department = "";
+
+    public Div createCard(Div card, Login login) {
         card.getStyle().set("display", "flex");
         card.getStyle().set("flex-direction", "column");
         card.getStyle().set("justify-content", "flex-start");
         card.getStyle().set("padding", "20px 20px");
         Styling.styleSquareBox(card);
+
+        // TODO: Add department when Khaled finished with department entity 
+        // Currently this code creates an error of ".getDepartment() is null
+        if (login != null && login.getPerson() != null) {
+            //department = login.getPerson().getDepartment().getDepartmentName();
+        }
     
         // Create Label
         Label cardHeader = new Label("Department Attendance");

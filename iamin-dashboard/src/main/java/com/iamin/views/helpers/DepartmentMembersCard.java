@@ -1,23 +1,20 @@
 package com.iamin.views.helpers;
 
-import com.iamin.views.helpers.Styling;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import java.util.List;
 import com.vaadin.flow.component.html.Label;
 import java.util.ArrayList;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
+import org.springframework.security.core.Authentication;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.component.avatar.Avatar;
 
 
 public class DepartmentMembersCard {
 
-    public Div createCard(Div card) {
+    public Div createCard(Div card, Authentication authentication) {
         card.getStyle().set("display","flex");
         card.getStyle().set("flex-direction","column");
         card.getStyle().set("justify-content","space-between");
@@ -31,6 +28,7 @@ public class DepartmentMembersCard {
         cardHeader.getStyle().set("margin-left","10px");
 
         // Create Grid
+        // TODO: Show list of employees who are in the same department as the current login user (employee)
         List<Person> people = new ArrayList<Person>();
         people.add(new Person("John", "Doe"));
         people.add(new Person("John", "Doe"));

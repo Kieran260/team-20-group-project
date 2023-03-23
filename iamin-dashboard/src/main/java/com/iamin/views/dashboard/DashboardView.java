@@ -95,7 +95,7 @@ public class DashboardView extends VerticalLayout {
         // This specifically shows all coworkers that are in the same department as user
         Div card4 = new Div();
         DepartmentMembersCard departmentMembersCard = new DepartmentMembersCard();
-        departmentMembersCard.createCard(card4);
+        departmentMembersCard.createCard(card4,authentication);
 
 
         // Department Members Attendance - Managers Only

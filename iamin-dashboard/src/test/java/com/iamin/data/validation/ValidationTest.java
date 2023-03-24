@@ -19,12 +19,12 @@ public class ValidationTest {
     }
 
     @Test
-    public void testUserNameValidation() {
-        assertTrue(validation.userNameValidation("user1234"));
-        assertFalse(validation.userNameValidation("user123"));
-        assertFalse(validation.userNameValidation("user12345"));
-        assertFalse(validation.userNameValidation("user 1234"));
-        assertFalse(validation.userNameValidation("user_1234"));
+    public void testusernameValidation() {
+        assertTrue(validation.usernameValidation("user1234"));
+        assertFalse(validation.usernameValidation("user123"));
+        assertFalse(validation.usernameValidation("user12345"));
+        assertFalse(validation.usernameValidation("user 1234"));
+        assertFalse(validation.usernameValidation("user_1234"));
     }
 
     @Test
@@ -69,8 +69,8 @@ public class ValidationTest {
     }
 
     @Test
-    public void testUsernameValidationWithExistingUsername() {
+    public void testusernameValidationWithExistingUsername() {
         Mockito.when(mockLoginService.checkIfUsernameExists("user1234")).thenReturn(true);
-        assertFalse(validation.userNameValidation("user1234"));
+        assertFalse(validation.usernameValidation("user1234"));
     }
 }

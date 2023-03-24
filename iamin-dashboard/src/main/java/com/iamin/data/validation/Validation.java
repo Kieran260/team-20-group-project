@@ -8,6 +8,7 @@ import org.jsoup.safety.Safelist;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Component
 public class Validation {
     private final LoginService loginService;
 
@@ -17,11 +18,11 @@ public class Validation {
     }
 
     // Checks a character is alphanumeric
-    public static boolean isAlphaNumeric(char char1) {
+    public boolean isAlphaNumeric(char char1) {
         return (char1 >= 'a' && char1 <= 'z') || (char1 >= 'A' && char1 <= 'Z') || (char1 >= '0' && char1 <= '9');
     }
 
-    // Check that username does not already exist in table
+    // Check that username does not already exist in table and no SQL injection
     // Check that length is 8 characters and alphanumeric
     public boolean userNameValidation(String username) {
 
@@ -57,7 +58,7 @@ public class Validation {
         boolean containsAlpha = false;
 
         // check length
-        if (password.length() < 8) {
+        if (password.length() < 8 || password.length() > 20) {
             return false;
         }
         // check = confirmPassword
@@ -119,7 +120,7 @@ public class Validation {
     }
 
     // Checks for SQL injections
-    public static boolean isSqlInjection(String message) {
+    public boolean isSqlInjection(String message) {
         // Common SQL injection keywords
         String[] sqlKeywords = { "SELECT", "INSERT", "UPDATE", "DELETE", "CREATE", "DROP", "ALTER", "EXECUTE",
                 "TRUNCATE" };
@@ -130,15 +131,14 @@ public class Validation {
                 return true;
             }
         }
-
         // No SQL injection keywords found
         return false;
     }
 
     // Function to sanitize inputs
-    public static String sanitizeInput(String input) {
+    public String sanitizeInput(String input) {
         // Remove any HTML tags and attributes from the input using Jsoup
-        String sanitized = Jsoup.clean(input, null);
+        String sanitized = Jsoup.clean(input, Safelist.none());
         // Return the sanitized input
         return sanitized;
     }

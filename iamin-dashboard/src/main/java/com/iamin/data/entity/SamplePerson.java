@@ -78,10 +78,10 @@ public class SamplePerson extends AbstractEntity {
     public void setOccupation(String occupation) {
         this.occupation = occupation;
     }
-    public String getjobTitle() {
+    public String getJobTitle() {
         return jobTitle;
     }
-    public void setjobTitle(String jobTitle) {
+    public void setJobTitle(String jobTitle) {
         this.jobTitle = jobTitle;
     }
     public LocalDateTime getDateModified() {
@@ -92,10 +92,10 @@ public class SamplePerson extends AbstractEntity {
     	this.dateModified = LocalDateTime.now();
     }
 
-	public Integer getmaxHolidays() {
+	public Integer getMaxHolidays() {
         return maxHolidays;
     }
-    public void setmaxHolidays(Integer maxHolidays) {
+    public void setMaxHolidays(Integer maxHolidays) {
         this.maxHolidays = maxHolidays;
     }
 

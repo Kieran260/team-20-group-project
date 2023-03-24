@@ -39,6 +39,7 @@ public class MainLayout extends AppLayout {
     public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker) {
         this.authenticatedUser = authenticatedUser;
         this.accessChecker = accessChecker;
+        this.addClassName("main-layout");
 
         setPrimarySection(Section.DRAWER);
         addDrawerContent();

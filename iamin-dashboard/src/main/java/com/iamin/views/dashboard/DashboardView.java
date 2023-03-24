@@ -21,10 +21,7 @@ import com.vaadin.flow.component.html.Div;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.GrantedAuthority;
-import com.iamin.views.helpers.AverageAttendanceCard;
-import com.iamin.views.helpers.AttendanceCalculator;
 
-import org.springframework.beans.factory.annotation.Autowired;
 
 @CssImport(value = "dashboard-styles.css")
 @PageTitle("Dashboard")

@@ -22,12 +22,16 @@ public class Validation {
         return (char1 >= 'a' && char1 <= 'z') || (char1 >= 'A' && char1 <= 'Z') || (char1 >= '0' && char1 <= '9');
     }
 
+    public boolean usernameExists(String username) {
+        return loginService.checkIfUsernameExists(username);
+    }
+
     // Check that username does not already exist in table and no SQL injection
     // Check that length is 8 characters and alphanumeric
     public boolean userNameValidation(String username) {
 
         // Check username does not already exist
-        if (loginService.checkIfUsernameExists(username)) {
+        if (!usernameExists(username)) {
             return false;
         }
 

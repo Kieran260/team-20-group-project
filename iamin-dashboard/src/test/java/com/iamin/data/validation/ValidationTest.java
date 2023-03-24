@@ -58,11 +58,11 @@ public class ValidationTest {
         String input1 = "Hello, <b>World!</b>";
         String expected1 = "Hello, World!";
         assertEquals(expected1, validation.sanitizeInput(input1));
-    
+
         String input2 = "Hello, <script>alert('XSS');</script>World!";
         String expected2 = "Hello, World!";
         assertEquals(expected2, validation.sanitizeInput(input2));
-    
+
         String input3 = "<p>Hello, <a href=\"https://example.com\">Example</a></p>";
         String expected3 = "Hello, Example";
         assertEquals(expected3, validation.sanitizeInput(input3));

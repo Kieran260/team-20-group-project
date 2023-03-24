@@ -25,6 +25,7 @@ public class Validation {
     // Check that length is 8 characters and alphanumeric
     public boolean userNameValidation(String username) {
 
+        // Check username does not already exist
         if (loginService.checkIfUsernameExists(username)) {
             return false;
         }
@@ -38,13 +39,13 @@ public class Validation {
             return false;
         }
         // Check alphanumeric
-        else {
-            for (int i = 0; i < username.length(); i++) {
-                if (!isAlphaNumeric(username.charAt(i))) {
-                    return false;
-                }
+        for (int i = 0; i < username.length(); i++) {
+
+            if (!isAlphaNumeric(username.charAt(i))) {
+                return false;
             }
         }
+
         return true;
     }
 
@@ -52,18 +53,31 @@ public class Validation {
     // Check confirmPassword is the same as password
     public boolean passwordValidation(String password, String confirmPassword) {
 
+        boolean containsDigit = false;
+        boolean containsAlpha = false;
+
+        // check length
         if (password.length() < 8) {
             return false;
-        } else {
-            for (int i = 0; i < password.length(); i++) {
-                if (Character.isDigit(password.charAt(i))) {
-                    if (password.equals(confirmPassword)) {
-                        return true;
-                    }
-                }
-            }
+        }
+        // check = confirmPassword
+        if (!password.equals(confirmPassword)) {
             return false;
         }
+
+        // Check for both letters and numbers
+        for (int i = 0; i < password.length(); i++) {
+
+            if (!containsDigit && Character.isDigit(password.charAt(i))) {
+                containsDigit = true;
+            } else if (!containsAlpha && Character.isAlphabetic(password.charAt(i))) {
+                containsAlpha = true;
+            }
+        }
+
+        // Returns true if password contains both letters and numbers, false otherwise
+        return (containsAlpha && containsDigit);
+
     }
 
     // Check address line 1 and 2 contain only alphanumeric, space, (-,'.&'), up to

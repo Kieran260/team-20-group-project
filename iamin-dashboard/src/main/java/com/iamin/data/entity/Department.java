@@ -13,7 +13,7 @@ public class Department extends AbstractEntity {
 	private String departmentName;
 	
 	@OneToOne
-	@JoinColumn(name = "manger_id")
+	@JoinColumn(name = "jobTitle")
 	private SamplePerson manager;
 
     

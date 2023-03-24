@@ -39,17 +39,10 @@ public class DashboardView extends VerticalLayout {
     private final PersonFormDialog personFormDialog;
     private final LoginRepository loginRepository;
 
-    @Autowired
-    private AverageAttendanceCard averageAttendanceCard;
-
-    @Autowired
-    private AttendanceCalculator attendanceCalculator;
-    
-
-    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository, AverageAttendanceCard averageAttendanceCard) {
+    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository) {
         this.personFormDialog = personFormDialog;
         this.loginRepository = loginRepository;
-        this.averageAttendanceCard = averageAttendanceCard;
+
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         getStyle().set("background-color","rgba(250, 250, 250)");
@@ -105,6 +98,7 @@ public class DashboardView extends VerticalLayout {
         // TODO: Show department attendance which is the same department as current user (Authentication)
         // TODO: Add a grid of employees from department which shows individual attendance
         Div card5 = new Div();
+        AverageAttendanceCard averageAttendanceCard = new AverageAttendanceCard();
         averageAttendanceCard.createCard(card5,userLogin);
                 
         // Charts View - All Roles

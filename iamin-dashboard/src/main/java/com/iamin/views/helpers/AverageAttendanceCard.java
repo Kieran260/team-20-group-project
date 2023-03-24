@@ -1,5 +1,6 @@
 package com.iamin.views.helpers;
 
+import com.iamin.data.entity.CheckInOut;
 import com.iamin.data.entity.Login;
 
 import com.vaadin.flow.component.html.Div;
@@ -8,22 +9,25 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.select.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
+import java.time.temporal.ChronoUnit;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.GrantedAuthority;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
-@Component
+
 public class AverageAttendanceCard {
-
-    @Autowired
-    private AttendanceCalculator attendanceCalculator;
 
     String department = "";
     Div leftContainer = new Div();
+    Div rightContainer = new Div();
+
 
     public Div createCard(Div card, Login login) {
         leftContainer.getStyle().set("display","flex");
@@ -67,7 +71,6 @@ public class AverageAttendanceCard {
         updateAverageAttendance(timePeriodSelect.getValue(), leftContainer);
     
 
-        Div rightContainer = new Div();
         rightContainer.getStyle().set("display","flex");
         rightContainer.getStyle().set("flex-direction","column");
 
@@ -82,8 +85,6 @@ public class AverageAttendanceCard {
 
         rightContainer.add(barChart,barChartLabel);
         rightContainer.getStyle().set("display","flex");
-
-
 
         card.add(leftContainer,rightContainer);
 
@@ -105,7 +106,7 @@ public class AverageAttendanceCard {
         // This can be done using an Authentication instance similar to the DepartmentMembersCard and get
         // the current user's department then use a for loop to iterate through all department SamplePerson's
         // and then call the attendanceCalculator on each person_id for each SamplePerson in the for loop.
-        double averageAttendance = attendanceCalculator.calculateAverageAttendance(1, startDate, endDate);
+        double averageAttendance = calculateAverageAttendance(1, startDate, endDate);
 
         // Update the average attendance on the card
         Span averageAttendanceSpan = (Span) card.getChildren()
@@ -118,7 +119,7 @@ public class AverageAttendanceCard {
         }
 
         // Calculate previous average attendance
-        double previousAverageAttendance = attendanceCalculator.calculatePreviousAverageAttendance(1, startDate, endDate);
+        double previousAverageAttendance = calculatePreviousAverageAttendance(1, startDate, endDate);
 
         // Calculate percentage difference
         double percentageDifference = ((averageAttendance - previousAverageAttendance) / previousAverageAttendance) * 100;
@@ -174,6 +175,7 @@ public class AverageAttendanceCard {
     }
 
     private Div createBarChart() {
+        
         LocalDate now = LocalDate.now();
         LocalDate[] monthStarts = {
             now.minusMonths(3).withDayOfMonth(1),
@@ -186,11 +188,12 @@ public class AverageAttendanceCard {
             monthStarts[2].plusMonths(1).minusDays(1),
 
         };
-    
-        int[] attendanceData = new int[3];
+            
+        int[] attendanceData = {89,95,92};
+
         String[] monthLabels = new String[3];
         for (int i = 0; i < 3; i++) {
-            double averageAttendance = attendanceCalculator.calculateAverageAttendance(1, monthStarts[i], monthEnds[i]);
+            double averageAttendance = calculateAverageAttendance(1, monthStarts[i], monthEnds[i]);
             attendanceData[i] = (int) Math.round(averageAttendance * 100);
             monthLabels[i] = monthStarts[i].getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH).toUpperCase();
         }
@@ -241,5 +244,48 @@ public class AverageAttendanceCard {
     
     
     
+    public double calculateAverageAttendance(long person_id,LocalDate start,LocalDate finish) {
+
+        // Query the checkInOut table to retrieve all the records for the given person_id for the past 4 weeks
+        List<CheckInOut> checkInOutList = Collections.emptyList();
+    
+        int totalDaysAttended = 0;
+        for (CheckInOut checkInOut : checkInOutList) {
+            if (checkInOut.getcheckOutTime() != null) {
+                // Count the number of days the person attended
+                totalDaysAttended++;
+            }
+        }
+    
+        int totalWorkingDays = 0;
+        LocalDate date = start;
+        while (date.isBefore(finish) || date.equals(finish)) {
+            if (date.getDayOfWeek() != DayOfWeek.SATURDAY && date.getDayOfWeek() != DayOfWeek.SUNDAY) {
+                totalWorkingDays++;
+            }
+            date = date.plusDays(1);
+        }
+    
+        // Calculate the average attendance
+        double averageAttendance = (double) totalDaysAttended / totalWorkingDays;
+    
+       // return averageAttendance;
+
+       // Remove this when connected to DB
+       return 0.96;
+    }
+
+    public double calculatePreviousAverageAttendance(long person_id, LocalDate startDate, LocalDate endDate) {
+        LocalDate previousStartDate = startDate.minusDays(ChronoUnit.DAYS.between(startDate, endDate));
+        LocalDate previousEndDate = endDate.minusDays(ChronoUnit.DAYS.between(startDate, endDate));
+    
+        return calculateAverageAttendance(person_id, previousStartDate, previousEndDate);
+    }
+    
+    
+    
     
 }
+
+    
+

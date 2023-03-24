@@ -22,6 +22,8 @@ public class Validation {
         return (char1 >= 'a' && char1 <= 'z') || (char1 >= 'A' && char1 <= 'Z') || (char1 >= '0' && char1 <= '9');
     }
 
+
+
     public boolean usernameExists(String username) {
         return loginService.checkIfUsernameExists(username);
     }
@@ -43,11 +45,10 @@ public class Validation {
         if (isSqlInjection(username)) {
             return "Username contains a forbidden keyword";
         }
-        // Check alphanumeric
+        // Check alphabetic
         for (int i = 0; i < username.length(); i++) {
-
-            if (!isAlphaNumeric(username.charAt(i))) {
-                return "Username must contain alphanumeric characters only";
+            if (!Character.isAlphabetic(username.charAt(i))) {
+                return "Username must contain alphabetic characters only";
             }
         }
 

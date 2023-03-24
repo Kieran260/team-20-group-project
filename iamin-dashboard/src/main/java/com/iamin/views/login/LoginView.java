@@ -163,7 +163,10 @@ public class LoginView extends VerticalLayout {
                 Notification.show(passwordErrorMsg, 3000, Position.TOP_CENTER);
                 passwordField.setValue("");
                 confirmPassword.setValue("");
-            } else { // Create new Login and save to db
+            } 
+            
+            // Create new Login and save if no error messages returned
+            if (passwordErrorMsg.isEmpty() && usernameErrorMsg.isEmpty()) { 
                 Login user = new Login();
 
                 Set<Role> roles = new HashSet<>();

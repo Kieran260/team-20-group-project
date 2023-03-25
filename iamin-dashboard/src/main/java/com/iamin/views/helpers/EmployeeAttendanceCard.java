@@ -65,11 +65,7 @@ public class EmployeeAttendanceCard {
         card2Header.getStyle().set("font-weight", "bold");
         card2Header.getStyle().set("font-size", "18px");
 
-
-        // TODO: 
-        // Query the table to see if the user is actually checked in currently or not and update statusLabel 
-        
-        // TODO: Determine if user is checked in and display to label
+        // retrive the person info 
         SamplePerson person = loginService.getSamplePersonByUsername(authentication.getName());
 
         String nameForCheckin;
@@ -85,21 +81,24 @@ public class EmployeeAttendanceCard {
         Optional<CheckInOut> checkOutTimeOptional = checkInOutRepository.findCheckOutTimeByPersonAndDate(person, date);
         Button checkInButton = new Button("Check In");
         Button checkOutButton = new Button("Check Out");
+        // if user checked out 
         if (checkOutTimeOptional.isPresent()) {
         	 statusLabel = new Label(nameForCheckin + ": You are checked out");
              statusLabel.getStyle().set("font-size", "16px");
+             // grey the buttons 
              checkInButton.getElement().getStyle().set("opacity", "0.5");
              checkOutButton.getElement().getStyle().set("opacity", "0.5");
 
              
         }else { 
+        	// if user checked in but did not checked out 
         	 if (checkInTimeOptional.isPresent() && !checkOutTimeOptional.isPresent()) {
                 statusLabel = new Label(nameForCheckin + ": You are checked in");
                 statusLabel.getStyle().set("font-size", "16px");
                  
                  checkInButton.getElement().getStyle().set("opacity", "0.5");
 
-             	
+             	// if user click on check out 
                  checkOutButton.addClickListener(e -> {
                      Dialog confirmDialog = new Dialog();
                      confirmDialog.setCloseOnEsc(false);
@@ -112,11 +111,10 @@ public class EmployeeAttendanceCard {
                      Button confirmButton = new Button("Yes", event -> {
                          confirmDialog.close();
 
-                         //TODO: Change LocalDateTime.now() to CheckInOut.getClockInTime();
                          LocalDateTime checkOutTime = LocalDateTime.now();
                          DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
                          String formattedTime = checkOutTime.format(formatter);
-                         
+                         // retrive the row for check in to add the ckeck out 
                          CheckInOut checkInOutObj = checkInOutRepository.findCheckInOutByPersonAndDate(person, date);
 
                          
@@ -124,7 +122,6 @@ public class EmployeeAttendanceCard {
                          checkInOutObj.setcheckOutTime();
                          checkInOutRepository.save(checkInOutObj);
                          
-                         //TODO: Log check in to database here
                          Notification.show("Success! Checked out at " + formattedTime, 3000, Position.TOP_CENTER);
                          new Page(UI.getCurrent()).reload();
                      });
@@ -143,7 +140,7 @@ public class EmployeeAttendanceCard {
                      confirmDialog.add(confirmContent);
                      confirmDialog.open();
                  });
-                 
+             // if user did not checked in 
              }else if (!checkInTimeOptional.isPresent()){
             	 checkOutButton.getElement().getStyle().set("opacity", "0.5");
              	statusLabel = new Label(nameForCheckin + ": You are currently not checked in");
@@ -161,24 +158,18 @@ public class EmployeeAttendanceCard {
                      Button confirmButton = new Button("Yes", event -> {
                          confirmDialog.close();
 
-                         //TODO: Change LocalDateTime.now() to CheckInOut.getClockInTime();
                          LocalDateTime checkOutTime = LocalDateTime.now();
                          DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
                          String formattedTime = checkOutTime.format(formatter);
 
-                         //TODO: Log check in to database here
                         CheckInOut checkIn = new CheckInOut();
 
-                      // Set the SamplePerson object
                       checkIn.setPerson(person);
 
-                      // Set the check-in time
                       checkIn.setcheckInTime();
 
-                      // Set the date
                       checkIn.setdate();
 
-                      // Save the CheckInOut instance to the database
                       checkInOutRepository.save(checkIn);
                          
                          Notification.show("Success! Checked in at " + formattedTime, 3000, Position.TOP_CENTER);
@@ -210,7 +201,6 @@ public class EmployeeAttendanceCard {
         
       
 
-        // TODO: If user is already checked out, grey out checkOutButton and disable clicking
         checkOutButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         FlexLayout buttonContainer = new FlexLayout();        
@@ -259,11 +249,13 @@ public class EmployeeAttendanceCard {
         int holidaysSelected = 0;
 
         Label holidaysRemainingLabel = new Label("You have " + holidaysRemaining + " holidays remaining");
+        TextField holidayName = new TextField("Reason for request");
+        holidayName.setAutocomplete(Autocomplete.OFF);
         DatePicker fromDate = new DatePicker("Holiday Start");
         DatePicker toDate = new DatePicker("Holiday End");
         Label holidaysSelectedLabel = new Label("Holidays Requested: " + holidaysSelected);
 
-        holidayDialogLayout.add(holidaysRemainingLabel,fromDate,toDate,holidaysSelectedLabel);
+        holidayDialogLayout.add(holidaysRemainingLabel,holidayName,fromDate,toDate,holidaysSelectedLabel);
         holidayDialog.add(holidayDialogLayout);
 
         // TODO:

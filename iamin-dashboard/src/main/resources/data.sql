@@ -1,7 +1,6 @@
 -- SamplePerson data
 INSERT INTO sample_person(id, version, first_name, last_name) VALUES (1, 1, 'John', 'Doe');
 
--- CheckInOut data
 
 -- December
 INSERT INTO check_in_out(id, version, person_id, check_in_time, check_out_time, date) VALUES (1, 1, 1, '09:00:00', '17:00:00', '2022-12-01');

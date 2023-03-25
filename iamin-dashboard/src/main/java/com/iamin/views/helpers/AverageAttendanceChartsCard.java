@@ -6,9 +6,6 @@ import com.iamin.data.entity.Login;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.select.Select;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -18,34 +15,20 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
+public class AverageAttendanceChartsCard {
 
-public class AverageAttendanceCard {
-
-    String department = "";
-    Div leftContainer = new Div();
-    Div rightContainer = new Div();
-
+    Div chartsContainer = new Div();
 
     public Div createCard(Div card, Login login) {
-        leftContainer.getStyle().set("display","flex");
-        leftContainer.getStyle().set("flex-direction","column");
-
         card.getStyle().set("display", "flex");
         card.getStyle().set("justify-content", "space-between");
 
         Styling.styleSquareBox(card);
 
-        // TODO: Add department when Khaled finished with department entity 
-        // Currently this code creates an error of ".getDepartment() is null
-        if (login != null && login.getPerson() != null) {
-            //department = login.getPerson().getDepartment().getDepartmentName();
-        }
     
         // Create Label
-        Label cardHeader = new Label("Average Attendance");
+        Label cardHeader = new Label("Last 6 Months");
         cardHeader.getStyle().set("font-weight", "bold");
         cardHeader.getStyle().set("font-size", "18px");
     
@@ -59,20 +42,10 @@ public class AverageAttendanceCard {
         averageAttendanceSpan.addClassName("average-attendance");
         averageAttendanceSpan.getStyle().set("margin-top","10px");
         averageAttendanceSpan.getStyle().set("font-size","48px");
-    
-        // Add the timePeriodSelect component and its value change listener
-        Select<String> timePeriodSelect = createTimePeriodSelect();
-        timePeriodSelect.addValueChangeListener(event -> updateAverageAttendance(event.getValue(), leftContainer));
-    
-        leftContainer.add(cardHeader, timePeriodSelect, averageAttendanceSpan, subtext);
-        //card.add(cardHeader, timePeriodSelect, averageAttendanceSpan, subtext);
-    
-        // Call updateAverageAttendance with the default time period value
-        updateAverageAttendance(timePeriodSelect.getValue(), leftContainer);
-    
 
-        rightContainer.getStyle().set("display","flex");
-        rightContainer.getStyle().set("flex-direction","column");
+        
+        chartsContainer.getStyle().set("display","flex");
+        chartsContainer.getStyle().set("flex-direction","column");
 
 
         Div barChart = createBarChart();
@@ -83,116 +56,40 @@ public class AverageAttendanceCard {
         barChartLabel.getStyle().set("color", "grey");
         barChartLabel.getStyle().set("margin-left", "10px");
 
-        rightContainer.add(barChart,barChartLabel);
-        rightContainer.getStyle().set("display","flex");
+        chartsContainer.add(cardHeader,barChart,barChartLabel);
+        chartsContainer.getStyle().set("display","flex");
 
-        card.add(leftContainer);
+        card.add(chartsContainer);
 
         return card;
     }
     
 
-    private void updateAverageAttendance(String timePeriod, Div card) {
-        LocalDate startDate;
-        LocalDate endDate = LocalDate.now();
-
-        if (timePeriod.equals("This Month")) {
-            startDate = endDate.withDayOfMonth(1);
-        } else { // "Last 30 days"
-            startDate = endDate.minusDays(30);
-        }
-
-        // TODO: Calculate average attendance for all employees in the same department as the current user
-        // This can be done using an Authentication instance similar to the DepartmentMembersCard and get
-        // the current user's department then use a for loop to iterate through all department SamplePerson's
-        // and then call the attendanceCalculator on each person_id for each SamplePerson in the for loop.
-        double averageAttendance = calculateAverageAttendance(1, startDate, endDate);
-
-        // Update the average attendance on the card
-        Span averageAttendanceSpan = (Span) card.getChildren()
-                .filter(component -> component.getClass().equals(Span.class))
-                .findFirst()
-                .orElse(null);
-
-        if (averageAttendanceSpan != null) {
-            averageAttendanceSpan.setText(String.format("%.2f%%", averageAttendance * 100));
-        }
-
-        // Calculate previous average attendance
-        double previousAverageAttendance = calculatePreviousAverageAttendance(1, startDate, endDate);
-
-        // Calculate percentage difference
-        double percentageDifference = ((averageAttendance - previousAverageAttendance) / previousAverageAttendance) * 100;
-
-        // Create the badge
-        Span badge = createBadge(percentageDifference);
-
-        // Add or update the badge on the card
-        Span existingBadge = (Span) leftContainer.getChildren()
-                .filter(component -> component.getClass().equals(Span.class) && "badge".equals(component.getId().orElse("")))
-                .findFirst()
-                .orElse(null);
-
-        if (existingBadge == null) {
-            leftContainer.add(badge);
-        } else {
-            existingBadge.getStyle().set("background-color", badge.getStyle().get("background-color") != null ? badge.getStyle().get("background-color") : "green");
-            existingBadge.getStyle().set("color", badge.getStyle().get("color") != null ? badge.getStyle().get("color") : "white");
-            existingBadge.setText(badge.getText());
-        }
-    }
-
-    private Select<String> createTimePeriodSelect() {
-        Select<String> timePeriodSelect = new Select<>();
-        timePeriodSelect.setWidth("200px");
-        timePeriodSelect.setLabel("Time Period");
-        timePeriodSelect.setItems("This Month", "Last 30 days");
-        timePeriodSelect.setValue("This Month"); // Set the default value
-        return timePeriodSelect;
-    }
-    
-    private Span createBadge(double percentageDifference) {
-        Span badge = new Span(String.format("%.1f%%", Math.abs(percentageDifference)));
-        badge.setId("badge");
-        badge.setWidth("50px");
-        badge.getStyle().set("display","inline-flex");
-        badge.getStyle().set("justify-content","center");
-
-        if (percentageDifference >= 0) {
-            badge.getStyle().set("background-color", "green");
-            badge.getStyle().set("color", "white");
-        } else {
-            badge.getStyle().set("background-color", "red");
-            badge.getStyle().set("color", "white");
-        }
-
-        badge.getStyle().set("padding", "3px 8px");
-        badge.getStyle().set("border-radius", "12px");
-        badge.getStyle().set("font-size", "14px");
-        badge.getStyle().set("margin-top", "8px");
-
-        return badge;
-    }
-
     private Div createBarChart() {
         
         LocalDate now = LocalDate.now();
         LocalDate[] monthStarts = {
+            now.minusMonths(5).withDayOfMonth(1),
+            now.minusMonths(4).withDayOfMonth(1),
             now.minusMonths(3).withDayOfMonth(1),
             now.minusMonths(2).withDayOfMonth(1),
             now.minusMonths(1).withDayOfMonth(1),
+            now.withDayOfMonth(1),
         };
         LocalDate[] monthEnds = {
             monthStarts[0].plusMonths(1).minusDays(1),
             monthStarts[1].plusMonths(1).minusDays(1),
             monthStarts[2].plusMonths(1).minusDays(1),
+            monthStarts[3].plusMonths(1).minusDays(1),
+            monthStarts[4].plusMonths(1).minusDays(1),
+            monthStarts[5].plusMonths(1).minusDays(1),
 
         };
             
-        int[] attendanceData = {89,95,92};
+        int[] attendanceData = {89,95,92,96,92,91};
 
-        String[] monthLabels = new String[3];
-        for (int i = 0; i < 3; i++) {
+        String[] monthLabels = new String[6];
+        for (int i = 0; i < 6; i++) {
             double averageAttendance = calculateAverageAttendance(1, monthStarts[i], monthEnds[i]);
             attendanceData[i] = (int) Math.round(averageAttendance * 100);
             monthLabels[i] = monthStarts[i].getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH).toUpperCase();
@@ -200,7 +97,7 @@ public class AverageAttendanceCard {
     
         Div barChartContainer = new Div();
         barChartContainer.getStyle().set("display", "flex");
-        barChartContainer.getStyle().set("gap", "20px");
+        barChartContainer.getStyle().set("gap", "10%");
         barChartContainer.getStyle().set("margin-bottom", "10px");
         barChartContainer.getStyle().set("width", "100%");
         barChartContainer.getStyle().set("height", "100%");
@@ -210,7 +107,7 @@ public class AverageAttendanceCard {
         for (int i = 0; i < attendanceData.length; i++) {
             Div bar = new Div();
             bar.getStyle().set("width", "30px");
-            bar.getStyle().set("height", attendanceData[i]/1.4 + "%");
+            bar.getStyle().set("height", attendanceData[i]/1.5 + "%");
             bar.getStyle().set("background-color", "#005eec");
             bar.getStyle().set("border-radius", "2.5px");
             bar.getStyle().set("position", "absolute");
@@ -272,7 +169,7 @@ public class AverageAttendanceCard {
        // return averageAttendance;
 
        // Remove this when connected to DB
-       return 0.96;
+       return 1.00;
     }
 
     public double calculatePreviousAverageAttendance(long person_id, LocalDate startDate, LocalDate endDate) {
@@ -281,9 +178,6 @@ public class AverageAttendanceCard {
     
         return calculateAverageAttendance(person_id, previousStartDate, previousEndDate);
     }
-    
-    
-    
     
 }
 

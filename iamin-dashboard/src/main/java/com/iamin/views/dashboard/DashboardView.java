@@ -4,6 +4,7 @@ import com.iamin.views.MainLayout;
 import com.iamin.views.helpers.EmployeeAttendanceCard;
 import com.iamin.views.helpers.EmployeesTableCard;
 import com.iamin.views.helpers.AverageAttendanceCard;
+import com.iamin.views.helpers.AverageAttendanceChartsCard;
 import com.iamin.views.helpers.CalendarCard;
 import com.iamin.views.helpers.DepartmentMembersCard;
 import com.iamin.views.helpers.Styling;
@@ -108,8 +109,9 @@ public class DashboardView extends VerticalLayout {
         // Task summary
         // Potentially add another card with employee attendance for managers only
         Div card6 = new Div();
-        Styling.styleSquareBox(card6);
-                
+        AverageAttendanceChartsCard averageAttendanceChartsCard = new AverageAttendanceChartsCard();
+        averageAttendanceChartsCard.createCard(card6,userLogin);
+
         // Notifications card - All Roles
         // Notifies Managers of requests
         // Notifies Employees of denied requests 

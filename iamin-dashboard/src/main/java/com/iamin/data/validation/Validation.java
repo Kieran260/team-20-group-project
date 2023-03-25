@@ -22,53 +22,52 @@ public class Validation {
         return (char1 >= 'a' && char1 <= 'z') || (char1 >= 'A' && char1 <= 'Z') || (char1 >= '0' && char1 <= '9');
     }
 
-
-
     public boolean usernameExists(String username) {
         return loginService.checkIfUsernameExists(username);
     }
 
     // Check that username does not already exist in table and no SQL injection
     // Check that length is 8 characters and alphanumeric
-    public String usernameValidation(String username) {
+    public boolean userNameValidation(String username) {
 
         // Check username does not already exist
-        if (usernameExists(username)) {
-            return "Username is taken";
+        if (!usernameExists(username)) {
+            return false;
         }
 
         // Check length
         if (username.length() != 8) {
-            return "Username must be exactly 8 characters in length";
+            return false;
         }
         // Check for SQL injection
         if (isSqlInjection(username)) {
-            return "Username contains a forbidden keyword";
+            return false;
         }
-        // Check alphabetic
+        // Check alphanumeric
         for (int i = 0; i < username.length(); i++) {
-            if (!Character.isAlphabetic(username.charAt(i))) {
-                return "Username must contain alphabetic characters only";
+
+            if (!isAlphaNumeric(username.charAt(i))) {
+                return false;
             }
         }
 
-        return "";
+        return true;
     }
 
     // Check password is 8+ characters and contains one number
     // Check confirmPassword is the same as password
-    public String passwordValidation(String password, String confirmPassword) {
+    public boolean passwordValidation(String password, String confirmPassword) {
 
         boolean containsDigit = false;
         boolean containsAlpha = false;
 
         // check length
         if (password.length() < 8 || password.length() > 20) {
-            return "Password must be between 8 and 20 characters long";
+            return false;
         }
         // check = confirmPassword
         if (!password.equals(confirmPassword)) {
-            return "Passwords do not match, please try again";
+            return false;
         }
 
         // Check for both letters and numbers
@@ -81,11 +80,9 @@ public class Validation {
             }
         }
 
-        // Returns error message if password does not contain both letters and numbers
-        if (!(containsAlpha && containsDigit)) {
-            return "Password must contain at least one letter and one number";
-        }
-        return "";
+        // Returns true if password contains both letters and numbers, false otherwise
+        return (containsAlpha && containsDigit);
+
     }
 
     // Check address line 1 and 2 contain only alphanumeric, space, (-,'.&'), up to

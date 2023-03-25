@@ -151,22 +151,26 @@ public class LoginView extends VerticalLayout {
             confirmPassword.setRequired(true);
 
             // Username Validation
-            String usernameErrorMsg = validation.usernameValidation(username);
-            if (!usernameErrorMsg.isEmpty()) {
-                Notification.show(usernameErrorMsg, 3000, Position.TOP_CENTER);
+            if (!validation.userNameValidation(username)) {
+                Notification.show("Username is invalid", 3000, Position.TOP_CENTER);
+                usernameField.setValue("");
+            } else if (!validation.usernameExists(username)) {
+                Notification.show("Username already exists, please try again.", 3000, Position.TOP_CENTER);
                 usernameField.setValue("");
             }
 
             // Password Validation
-            String passwordErrorMsg = validation.passwordValidation(password, confirmedPassword);
-            if (!passwordErrorMsg.isEmpty()) {
-                Notification.show(passwordErrorMsg, 3000, Position.TOP_CENTER);
+
+            if (!password.equals(confirmedPassword)) {
+                Notification.show("Passwords do not match, please try again", 3000, Position.TOP_CENTER);
                 passwordField.setValue("");
                 confirmPassword.setValue("");
-            } 
-            
-            // Create new Login and save if no error messages returned
-            if (passwordErrorMsg.isEmpty() && usernameErrorMsg.isEmpty()) { 
+                return;
+            } else if (!validation.passwordValidation(password, confirmedPassword)) {
+                Notification.show("Password is invalid", 3000, Position.TOP_CENTER);
+                passwordField.setValue("");
+                confirmPassword.setValue("");
+            } else {
                 Login user = new Login();
 
                 Set<Role> roles = new HashSet<>();

@@ -1,12 +1,18 @@
 package com.iamin.data.service;
 import com.iamin.data.entity.Login;
+import com.iamin.data.entity.SamplePerson;
+
 import java.util.Optional;
+
+import javax.persistence.EntityNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.batch.BatchProperties.Jdbc;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +51,22 @@ public class LoginService {
     public int count() {
         return (int) repository.count();
     }
+    public SamplePerson getSamplePersonByUsername(String username) {
+        Login login =  repository.findByUsername(username);
+        return login.getPerson();
+    }
+    public Optional<String> getPersonNameByUsername(String username) {
+        Login login = repository.findByUsername(username);
+        if (login == null) {
+            throw new UsernameNotFoundException("Username not found");
+        }
+        SamplePerson person = login.getPerson();
+        if (person == null) {
+            throw new EntityNotFoundException("Person not found for username");
+        }
+        return Optional.of(person.getFirstName() + " " + person.getLastName());
+    }
+
 
     public boolean checkIfUsernameExists(String username) {
         Login login = repository.findByUsername(username);

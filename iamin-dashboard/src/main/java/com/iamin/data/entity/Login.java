@@ -62,4 +62,6 @@ public class Login extends AbstractEntity  {
     public void setPerson(SamplePerson person) {
         this.person = person;
     }
+    
+
 }

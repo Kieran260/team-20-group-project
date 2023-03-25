@@ -50,7 +50,7 @@ public class AverageAttendanceCard {
         cardHeader.getStyle().set("font-size", "18px");
     
         // Create subtext Label
-        Label subtext = new Label("Compared to Previous Period");
+        Label subtext = new Label("Compared to Previous Period:");
         subtext.getStyle().set("font-size", "14px");
         subtext.getStyle().set("color", "grey");
     
@@ -212,7 +212,7 @@ public class AverageAttendanceCard {
             bar.getStyle().set("width", "30px");
             bar.getStyle().set("height", attendanceData[i]/1.4 + "%");
             bar.getStyle().set("background-color", "#005eec");
-            bar.getStyle().set("border-radius", "5px");
+            bar.getStyle().set("border-radius", "2.5px");
             bar.getStyle().set("position", "absolute");
             bar.getStyle().set("bottom", "60px");
 

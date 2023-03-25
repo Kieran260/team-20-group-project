@@ -13,6 +13,8 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import javax.annotation.security.PermitAll;
 import com.vaadin.flow.component.html.Div;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -25,8 +27,11 @@ public class DashboardView extends VerticalLayout {
 
     String currentUserName;
     String currentUserRole;
+    @Autowired
+    private final EmployeeAttendanceCard employeeAttendanceCard;
 
-    public DashboardView() {
+    public DashboardView(EmployeeAttendanceCard employeeAttendanceCard) {
+    	this.employeeAttendanceCard = employeeAttendanceCard;
         
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         getStyle().set("background-color","rgba(250, 250, 250)");
@@ -47,7 +52,6 @@ public class DashboardView extends VerticalLayout {
         // Check In / Check Out
         // Absence Request 
         Div card2 = new Div();
-        EmployeeAttendanceCard employeeAttendanceCard = new EmployeeAttendanceCard();
         employeeAttendanceCard.createCard(card2,authentication);
 
 

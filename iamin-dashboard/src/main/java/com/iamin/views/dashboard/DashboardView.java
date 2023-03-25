@@ -18,6 +18,8 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import javax.annotation.security.PermitAll;
 import com.vaadin.flow.component.html.Div;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.GrantedAuthority;
@@ -33,12 +35,16 @@ public class DashboardView extends VerticalLayout {
     String currentUserName;
     String currentUserRole;
 
+    @Autowired
+    private final EmployeeAttendanceCard employeeAttendanceCard;
+
     private final PersonFormDialog personFormDialog;
     private final LoginRepository loginRepository;
 
-    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository) {
+    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository,EmployeeAttendanceCard employeeAttendanceCard) {
         this.personFormDialog = personFormDialog;
         this.loginRepository = loginRepository;
+        this.employeeAttendanceCard = employeeAttendanceCard;
 
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -68,7 +74,6 @@ public class DashboardView extends VerticalLayout {
         // Absence Request 
         // TODO: Send absence requests to database
         Div card2 = new Div();
-        EmployeeAttendanceCard employeeAttendanceCard = new EmployeeAttendanceCard();
         employeeAttendanceCard.createCard(card2,authentication);
 
 

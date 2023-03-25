@@ -45,7 +45,7 @@ public class AverageAttendanceCard {
         }
     
         // Create Label
-        Label cardHeader = new Label("Department Attendance");
+        Label cardHeader = new Label("Average Attendance");
         cardHeader.getStyle().set("font-weight", "bold");
         cardHeader.getStyle().set("font-size", "18px");
     

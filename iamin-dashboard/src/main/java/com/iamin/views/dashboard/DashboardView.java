@@ -18,13 +18,12 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import javax.annotation.security.PermitAll;
 import com.vaadin.flow.component.html.Div;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.GrantedAuthority;
-import com.iamin.views.helpers.AverageAttendanceCard;
-import com.iamin.views.helpers.AttendanceCalculator;
 
-import org.springframework.beans.factory.annotation.Autowired;
 
 @CssImport(value = "dashboard-styles.css")
 @PageTitle("Dashboard")
@@ -36,20 +35,17 @@ public class DashboardView extends VerticalLayout {
     String currentUserName;
     String currentUserRole;
 
+    @Autowired
+    private final EmployeeAttendanceCard employeeAttendanceCard;
+
     private final PersonFormDialog personFormDialog;
     private final LoginRepository loginRepository;
 
-    @Autowired
-    private AverageAttendanceCard averageAttendanceCard;
-
-    @Autowired
-    private AttendanceCalculator attendanceCalculator;
-    
-
-    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository, AverageAttendanceCard averageAttendanceCard) {
+    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository,EmployeeAttendanceCard employeeAttendanceCard) {
         this.personFormDialog = personFormDialog;
         this.loginRepository = loginRepository;
-        this.averageAttendanceCard = averageAttendanceCard;
+        this.employeeAttendanceCard = employeeAttendanceCard;
+
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         getStyle().set("background-color","rgba(250, 250, 250)");
@@ -68,7 +64,7 @@ public class DashboardView extends VerticalLayout {
         
         // Employees Table Card - Manager View Only
         // This specifically shows all employees that are currently checked in today
-        // TODO: Show Check in / Check out times
+        // TODO: Show Check in / Check out times from database
         Div card1 = new Div();
         EmployeesTableCard employeesTableCard = new EmployeesTableCard();
         employeesTableCard.createCard(card1);
@@ -78,7 +74,6 @@ public class DashboardView extends VerticalLayout {
         // Absence Request 
         // TODO: Send absence requests to database
         Div card2 = new Div();
-        EmployeeAttendanceCard employeeAttendanceCard = new EmployeeAttendanceCard();
         employeeAttendanceCard.createCard(card2,authentication);
 
 
@@ -105,7 +100,8 @@ public class DashboardView extends VerticalLayout {
         // TODO: Show department attendance which is the same department as current user (Authentication)
         // TODO: Add a grid of employees from department which shows individual attendance
         Div card5 = new Div();
-        averageAttendanceCard.createCard(card5);
+        AverageAttendanceCard averageAttendanceCard = new AverageAttendanceCard();
+        averageAttendanceCard.createCard(card5,userLogin);
                 
         // Charts View - All Roles
         // Framework: https://vaadin.com/directory/component/apexchartsjs
@@ -133,7 +129,7 @@ public class DashboardView extends VerticalLayout {
 
         if ("ROLE_ADMIN".equals(userRole)) {
             // Add cards specific to the admin role
-            cardsContainer.add(card1,card2,card3,card5,card6);
+            cardsContainer.add(card1,card2,card3,card4,card5,card6);
         } else if ("ROLE_USER".equals(userRole)) {
             // Add cards specific to the user role
             cardsContainer.add(card2,card3,card4,card5,card6);

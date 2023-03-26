@@ -7,13 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.iamin.data.entity.Login;
 import com.iamin.data.service.SamplePersonRepository;
 import com.iamin.data.service.LoginRepository;
-
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
+import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.html.Label;
@@ -21,6 +22,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Component
 public class PersonFormDialog {
@@ -62,12 +64,13 @@ public class PersonFormDialog {
         TextField occupation = new TextField("Occupation");
         TextField jobTitle = new TextField("Job Title");
         TextField department = new TextField("Department");
+        TextField maxHolidays = new TextField("maxHolidays");
 
         // Create a date picker for date of birth
         DatePicker dateOfBirth = new DatePicker("Date of Birth");
     
         // Add the input fields to the form layout
-        formLayout.add(firstName, lastName, email, phone, dateOfBirth, address, occupation, jobTitle, department);
+        formLayout.add(firstName, lastName, email, phone, dateOfBirth, address, occupation, jobTitle, department, maxHolidays);
     
         // Create Save button
         Button saveButton = new Button("Save Details");
@@ -96,19 +99,20 @@ public class PersonFormDialog {
             // Invalid return from validation class changes valid = false
 
             if (valid == true) {
-                // Create a SamplePerson with previous values
-                // TODO: Replace hard coded with values from the textFields above.
-                // There is a type mismatch bug when using .getValue() which is preventing the information from being saved to the database.
-                SamplePerson person = new SamplePerson();
-                person.setFirstName("John");
-                person.setLastName("Doe");
-                person.setEmail("john.doe@example.com");
-                person.setPhone("1234567890");
-                person.setDateOfBirth(LocalDate.of(1980, 1, 1));
-                person.setAddress("123 Main St, Anytown, USA");
-                person.setOccupation("Software Developer");
-                person.setJobTitle("Senior Developer");
-                person.setMaxHolidays(21);
+                // TODO - make sure first name, last name, email, phone number, address, occupation, job title fields are not null
+                SamplePerson person = samplePersonRepository.findById(1L).orElse(null);
+                if (person != null) {
+                    person.setFirstName(firstName.getValue());
+                    person.setLastName(lastName.getValue());
+                    person.setEmail(email.getValue());
+                    person.setPhone(phone.getValue());
+                    person.setDateOfBirth(dateOfBirth.getValue());
+                    person.setAddress(address.getValue());
+                    person.setOccupation(occupation.getValue());
+                    person.setJobTitle(jobTitle.getValue());
+                    person.setMaxHolidays(Integer.parseInt(maxHolidays.getValue()));
+                }
+                
                 // Save the SamplePerson to the repository
                 SamplePerson savedPerson = samplePersonRepository.save(person);
 
@@ -121,6 +125,7 @@ public class PersonFormDialog {
                     // Set the SamplePerson for the Login entity and save it to the repository
                     userLogin.setPerson(savedPerson);
                     loginRepository.save(userLogin);
+                    new Page(UI.getCurrent()).reload();
                 } else {
                     // Handle the case when the userLogin is not found (e.g., show an error message)
                 }
@@ -138,5 +143,6 @@ public class PersonFormDialog {
         // Open the dialog
         dialog.open();
     }
+
     
-}
+    }

@@ -18,6 +18,7 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.textfield.Autocomplete;
@@ -330,7 +331,18 @@ public class EmployeeAttendanceCard {
         absenceName.setRequired(true);
         absenceFromDate.setRequired(true);
         absenceToDate.setRequired(true);
-        absenceDialogLayout.add(absenceName,absenceFromDate,absenceToDate);
+
+        Upload fileUpload = new Upload();
+        fileUpload.setAcceptedFileTypes("application/pdf");
+        fileUpload.setMaxFiles(1);
+        fileUpload.setMaxFileSize(10485760); // 10MB
+        fileUpload.setUploadButton(new Button("Upload PDF"));
+        fileUpload.setDropAllowed(true);
+        fileUpload.setVisible(true);
+        Label fileUploadlLabel = new Label("Upload a PDF file of your absence request");
+        fileUploadlLabel.getStyle().set("font-size", "12px");
+        fileUploadlLabel.getStyle().set("color", "grey");
+        absenceDialogLayout.add(absenceName,absenceFromDate,absenceToDate, fileUpload , fileUploadlLabel);
         absenceDialog.add(absenceDialogLayout);
 
         // TODO: 

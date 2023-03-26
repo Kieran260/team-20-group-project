@@ -1,7 +1,10 @@
 package com.iamin.views.helpers;
 import com.iamin.data.entity.CheckInOut;
+import com.iamin.data.entity.Holidays;
 import com.iamin.data.entity.SamplePerson;
 import com.iamin.data.service.CheckInOutRepository;
+import com.iamin.data.service.HolidaysRepository;
+import com.iamin.data.service.HolidaysService;
 import com.iamin.data.service.LoginService;
 import com.iamin.views.helpers.EmployeeAttendanceCard;
 import com.vaadin.flow.component.UI;
@@ -39,6 +42,10 @@ public class EmployeeAttendanceCard {
 	private LoginService loginService;
 	@Autowired
 	private CheckInOutRepository checkInOutRepository;
+    @Autowired
+    private HolidaysService holidaysService;
+
+    Integer holidaysSelected = 0;
 
 	public EmployeeAttendanceCard(LoginService loginService , CheckInOutRepository checkInOutRepository) {
         this.loginService = loginService;
@@ -242,28 +249,49 @@ public class EmployeeAttendanceCard {
         holidayDialogLayout.getStyle().set("align-items","center");
 
         holidayDialog.setHeaderTitle("Holiday Request");
-        
-        // TODO:
-        // Fetch and calculate holidays remaining for current user from database
-        int holidaysRemaining = 0;
-        int holidaysSelected = 0;
+    
+        int holidaysRemaining = holidaysService.getRemainingHolidays(person);
 
         Label holidaysRemainingLabel = new Label("You have " + holidaysRemaining + " holidays remaining");
-        TextField holidayName = new TextField("Reason for request");
-        holidayName.setAutocomplete(Autocomplete.OFF);
+        TextField holidayReason = new TextField("Reason for request");
+        holidayReason.setAutocomplete(Autocomplete.OFF);
         DatePicker fromDate = new DatePicker("Holiday Start");
         DatePicker toDate = new DatePicker("Holiday End");
+        holidayReason.setRequired(true);
+        fromDate.setRequired(true);
+        toDate.setRequired(true);
         Label holidaysSelectedLabel = new Label("Holidays Requested: " + holidaysSelected);
+        // change the holidays selected label when the date is changed 
+        fromDate.addValueChangeListener(e -> updateHolidaysSelectedLabel(fromDate, toDate, holidaysSelectedLabel, holidaysService));
+        toDate.addValueChangeListener(e -> updateHolidaysSelectedLabel(fromDate, toDate, holidaysSelectedLabel, holidaysService));
 
-        holidayDialogLayout.add(holidaysRemainingLabel,holidayName,fromDate,toDate,holidaysSelectedLabel);
+        holidayDialogLayout.add(holidaysRemainingLabel,holidayReason,fromDate,toDate,holidaysSelectedLabel);
         holidayDialog.add(holidayDialogLayout);
 
-        // TODO:
-        // Validate holidaysSelected to be LESS OR EQUAL to holidaysRemaining
-        // Validate that all fields are NOT empty when submit clicked
         Button holidaySubmitButton = new Button("Submit");
+        
         holidaySubmitButton.addClickListener(e -> {
-            
+            // check if the user has enough holidays remaining and if all fields are filled in
+            if (holidaysSelected <= holidaysRemaining && !holidayReason.isEmpty() && !fromDate.isEmpty() && !toDate.isEmpty()) {
+                Holidays holiday = new Holidays();
+                holiday.setPerson(person);
+                holiday.setReason(holidayReason.getValue());
+                holiday.setStartDate(fromDate.getValue());
+                holiday.setEndDate(toDate.getValue());
+                holiday.setTotalDays(holidaysSelected);
+                holidaysService.createHolidayRequest(holiday);
+                holidayDialog.close();
+
+                holidaysSelected = 0;
+                Notification.show("Success! Holiday request submitted", 3000, Position.TOP_CENTER);
+                new Page(UI.getCurrent()).reload();
+                // if the user has not filled in all fields
+            } else if (holidayReason.isEmpty() || fromDate.isEmpty() || toDate.isEmpty()) {
+                Notification.show("Error! Please fill in all fields", 3000, Position.TOP_CENTER);
+                // if the user does not has enough holidays remaining
+            } else {
+                Notification.show("Error! You do not have enough holidays remaining", 3000, Position.TOP_CENTER);
+            }
         });
 
         Button holidayCancelButton = new Button("Cancel", ee -> holidayDialog.close());
@@ -316,5 +344,13 @@ public class EmployeeAttendanceCard {
         absenceCard.add(card2BottomHeader,absenceButtonContainer);
         card.add(workHoursCard,absenceCard);
         return(card);
+    }
+    private void updateHolidaysSelectedLabel(DatePicker fromDate, DatePicker toDate, Label holidaysSelectedLabel, HolidaysService holidaysService) {
+        if (fromDate.getValue() != null && toDate.getValue() != null) {
+            holidaysSelected = holidaysService.calculateTotalDaysOff(fromDate.getValue(), toDate.getValue());
+            holidaysSelectedLabel.setText("Holidays Requested: " + holidaysSelected);
+        } else {
+            holidaysSelectedLabel.setText("Holidays Requested: 0");
+        }
     }
 }

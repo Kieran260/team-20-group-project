@@ -1,5 +1,5 @@
 -- SamplePerson data
-INSERT INTO sample_person(id, version, first_name, last_name) VALUES (1, 1, 'John', 'Doe');
+INSERT INTO sample_person(id, version) VALUES (1, 1);
 
 -- CheckInOut data
 

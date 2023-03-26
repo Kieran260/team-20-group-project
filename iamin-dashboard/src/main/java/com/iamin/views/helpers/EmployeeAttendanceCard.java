@@ -1,7 +1,9 @@
 package com.iamin.views.helpers;
+import com.iamin.data.entity.Absence;
 import com.iamin.data.entity.CheckInOut;
 import com.iamin.data.entity.Holidays;
 import com.iamin.data.entity.SamplePerson;
+import com.iamin.data.service.AbsenceService;
 import com.iamin.data.service.CheckInOutRepository;
 import com.iamin.data.service.HolidaysRepository;
 import com.iamin.data.service.HolidaysService;
@@ -44,6 +46,8 @@ public class EmployeeAttendanceCard {
 	private CheckInOutRepository checkInOutRepository;
     @Autowired
     private HolidaysService holidaysService;
+    @Autowired
+    private AbsenceService absenceService;
 
     Integer holidaysSelected = 0;
 
@@ -272,7 +276,7 @@ public class EmployeeAttendanceCard {
         
         holidaySubmitButton.addClickListener(e -> {
             // check if the user has enough holidays remaining and if all fields are filled in
-            if (holidaysSelected <= holidaysRemaining && !holidayReason.isEmpty() && !fromDate.isEmpty() && !toDate.isEmpty()) {
+            if (holidaysSelected <= holidaysRemaining && !holidayReason.isEmpty() && !fromDate.isEmpty() && !toDate.isEmpty() && toDate.getValue().isAfter(fromDate.getValue())) {
                 Holidays holiday = new Holidays();
                 holiday.setPerson(person);
                 holiday.setReason(holidayReason.getValue());
@@ -288,8 +292,12 @@ public class EmployeeAttendanceCard {
                 // if the user has not filled in all fields
             } else if (holidayReason.isEmpty() || fromDate.isEmpty() || toDate.isEmpty()) {
                 Notification.show("Error! Please fill in all fields", 3000, Position.TOP_CENTER);
-                // if the user does not has enough holidays remaining
-            } else {
+                // if the user has selected an invalid date range
+            } else if (!toDate.getValue().isAfter(fromDate.getValue())) {
+                Notification.show("Error! Please select a valid date range", 3000, Position.TOP_CENTER);
+            } 
+            // if the user does not has enough holidays remaining
+            else {
                 Notification.show("Error! You do not have enough holidays remaining", 3000, Position.TOP_CENTER);
             }
         });
@@ -319,6 +327,9 @@ public class EmployeeAttendanceCard {
         absenceName.setAutocomplete(Autocomplete.OFF);
         DatePicker absenceFromDate = new DatePicker("Absence Start");
         DatePicker absenceToDate = new DatePicker("Absence End");
+        absenceName.setRequired(true);
+        absenceFromDate.setRequired(true);
+        absenceToDate.setRequired(true);
         absenceDialogLayout.add(absenceName,absenceFromDate,absenceToDate);
         absenceDialog.add(absenceDialogLayout);
 
@@ -328,6 +339,23 @@ public class EmployeeAttendanceCard {
         Button absenceSubmitButton = new Button("Submit");
 
         absenceSubmitButton.addClickListener(e -> {
+            // check if all fields are filled in
+            if (!absenceName.isEmpty() && !absenceFromDate.isEmpty() && !absenceToDate.isEmpty() && absenceToDate.getValue().isAfter(absenceFromDate.getValue())) {
+                Absence absence = new Absence();
+                absence.setPerson(person);
+                absence.setAbsenceReason(absenceName.getValue());
+                absence.setStartDate(absenceFromDate.getValue());
+                absence.setEndDate(absenceToDate.getValue());
+                absenceService.createAbsenceRequest(absence);
+                absenceDialog.close();
+                Notification.show("Success! Absence request submitted", 3000, Position.TOP_CENTER);
+            } 
+            else if (!absenceToDate.getValue().isAfter(absenceFromDate.getValue())) {
+                Notification.show("Error! Please select a valid date range", 3000, Position.TOP_CENTER);
+            }
+            else {
+                Notification.show("Error! Please fill in all fields", 3000, Position.TOP_CENTER);
+            }
             
         });
 

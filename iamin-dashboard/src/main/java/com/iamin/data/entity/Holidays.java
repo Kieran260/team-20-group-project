@@ -19,8 +19,6 @@ public class Holidays extends AbstractEntity{
         private LocalDate startDate;
         private LocalDate endDate;
         private Integer totalDays;
-        
-
         private LocalDateTime dateModified;
 	    private String authorisedBy;
         private LocalDate authorisedDate;

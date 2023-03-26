@@ -253,10 +253,10 @@ public class EmployeeAttendanceCard {
         holidayDialogLayout.getStyle().set("justify-content","center");
         holidayDialogLayout.getStyle().set("align-items","center");
 
-        holidayDialog.setHeaderTitle("Holiday Request");
-    
-        int holidaysRemaining = holidaysService.getRemainingHolidays(person);
+        holidayRequestButton.addClickListener(e -> {
 
+        holidayDialog.setHeaderTitle("Holiday Request");
+        int holidaysRemaining = holidaysService.getRemainingHolidays(person);
         Label holidaysRemainingLabel = new Label("You have " + holidaysRemaining + " holidays remaining");
         TextField holidayReason = new TextField("Reason for request");
         holidayReason.setAutocomplete(Autocomplete.OFF);
@@ -267,15 +267,15 @@ public class EmployeeAttendanceCard {
         toDate.setRequired(true);
         Label holidaysSelectedLabel = new Label("Holidays Requested: " + holidaysSelected);
         // change the holidays selected label when the date is changed 
-        fromDate.addValueChangeListener(e -> updateHolidaysSelectedLabel(fromDate, toDate, holidaysSelectedLabel, holidaysService));
-        toDate.addValueChangeListener(e -> updateHolidaysSelectedLabel(fromDate, toDate, holidaysSelectedLabel, holidaysService));
+        fromDate.addValueChangeListener(x -> updateHolidaysSelectedLabel(fromDate, toDate, holidaysSelectedLabel, holidaysService));
+        toDate.addValueChangeListener(x -> updateHolidaysSelectedLabel(fromDate, toDate, holidaysSelectedLabel, holidaysService));
 
         holidayDialogLayout.add(holidaysRemainingLabel,holidayReason,fromDate,toDate,holidaysSelectedLabel);
         holidayDialog.add(holidayDialogLayout);
 
         Button holidaySubmitButton = new Button("Submit");
         
-        holidaySubmitButton.addClickListener(e -> {
+        holidaySubmitButton.addClickListener(x -> {
             // check if the user has enough holidays remaining and if all fields are filled in
             if (holidaysSelected <= holidaysRemaining && !holidayReason.isEmpty() && !fromDate.isEmpty() && !toDate.isEmpty() && toDate.getValue().isAfter(fromDate.getValue())) {
                 Holidays holiday = new Holidays();
@@ -306,11 +306,11 @@ public class EmployeeAttendanceCard {
         Button holidayCancelButton = new Button("Cancel", ee -> holidayDialog.close());
         holidayDialog.getFooter().add(holidaySubmitButton, holidayCancelButton);
        
-        holidayRequestButton.addClickListener(e -> {
-            holidayDialog.open();
+           holidayDialog.open();
+           holidaySubmitButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         });
 
-        holidaySubmitButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+      
 
 
         //================================================================================

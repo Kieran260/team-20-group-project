@@ -81,7 +81,11 @@ public class MainLayout extends AppLayout {
             nav.addItem(new AppNavItem("Manage Employees", ManageEmployeesView.class, "la la-columns"));
 
         }
+        if (accessChecker.hasAccess(ManagerTasksView.class)) {
+            nav.addItem(new AppNavItem("Manage Tasks", ManagerTasksView.class, "la la-columns"));
 
+        }
+    
         return nav;
     }
 

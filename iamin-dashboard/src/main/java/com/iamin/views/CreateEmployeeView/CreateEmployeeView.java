@@ -1,20 +1,25 @@
 package com.iamin.views.CreateEmployeeView;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.html.H1;
 import com.iamin.data.service.SamplePersonRepository;
 import com.iamin.data.Role;
+import com.iamin.data.entity.Department;
 import com.iamin.data.entity.Login;
 import com.iamin.data.entity.SamplePerson;
 import com.iamin.views.MainLayout;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
@@ -25,10 +30,12 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.notification.NotificationVariant;
+import com.iamin.data.service.DepartmentRepository;
 import com.iamin.data.service.LoginRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
@@ -45,6 +52,8 @@ public class CreateEmployeeView extends FormLayout{
     LoginRepository loginRepository;
     @Autowired
     PasswordEncoder passwordEncoder;
+    @Autowired
+    DepartmentRepository departmentRepository;
     
     //form fields
     private TextField  firstName   = new TextField();
@@ -54,44 +63,70 @@ public class CreateEmployeeView extends FormLayout{
     private DatePicker dateOfBirth = new DatePicker();
     private TextField  occupation  = new TextField();
     private TextField  jobTitle    = new TextField();
-    private TextField  department  = new TextField();
     private TextField  address     = new TextField(); 
-    Button save = new Button("Save");
     private RadioButtonGroup<String> role = new RadioButtonGroup<>();
-    
-    
+    ComboBox<String> departmentComboBox = new ComboBox<>();
+    Button save = new Button("Save");
+
     //default values
-    private String defaultPassword = "1234"; 
+    private String defaultPassword = "123456789"; 
     private Integer defaultMaxHoliday = 20;
     private String successMessage = "New employee has been added successfuly. They can access their "+ 
                                     "account under the following username:\n";
     
     //constructor
     public CreateEmployeeView() {
+        //get department options
+        if(departmentRepository != null){
+            List<Department> departments = departmentRepository.findAll();
+            List<String> deptNames = new ArrayList<String>();
+            for (Department dept : departments) {
+                deptNames.add(dept.getDepartmentName());
+            }
+            departmentComboBox.setItems(deptNames);
+        }
+        
+         
         //set role options
         role.setItems("Employee", "Manager");
         
-        //add fields to form
-        addFormItem(firstName, "First Name");
-        addFormItem(lastName, "Last Name");
-        addFormItem(phone, "Phone");
-        addFormItem(email, "Email");
-        addFormItem(dateOfBirth, "Date Of Birth");
-        addFormItem(occupation, "Occupation");
-        addFormItem(jobTitle, "Job Title");
-        addFormItem(department, "Department");
-        addFormItem(role, "Role");
-        addFormItem(address, "Address");
+        //create personal info form, add relevant fields
+        FormLayout personalInfoForm = new FormLayout();
+        personalInfoForm.addFormItem(firstName, "First Name");
+        personalInfoForm.addFormItem(lastName, "Last Name");
+        personalInfoForm.addFormItem(phone, "Phone");
+        personalInfoForm.addFormItem(email, "Email");
+        personalInfoForm.addFormItem(address, "Address");
+        personalInfoForm.addFormItem(dateOfBirth, "Date Of Birth");
         
+        //create job info form, add relevant fields
+        FormLayout jobInfoForm = new FormLayout();
+        jobInfoForm.addFormItem(occupation, "Occupation");
+        jobInfoForm.addFormItem(jobTitle, "Job Title");
+        jobInfoForm.addFormItem(role, "Role");
+        jobInfoForm.addFormItem(departmentComboBox, "Department");
+
         //add save button
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
         save.addClickShortcut(Key.ENTER);
-        add(save);
         
-        //do things when form is submitted
+        //combine the two forms
+        FormLayout miniFormsCombined = new FormLayout(personalInfoForm, jobInfoForm);
+        miniFormsCombined.setResponsiveSteps(
+            // Use one column by default
+            new ResponsiveStep("0", 1),
+            // Use two columns, if the layout's width exceeds 320px
+            new ResponsiveStep("320px", 2));
+
+        //add the save button
+        VerticalLayout mainLayout = new VerticalLayout(miniFormsCombined, save);
+        add(mainLayout);
+        //do stuff when form is submitted
         save.addClickListener(event -> {
             if(requiredFields()){
                 //TODO wrap in try-catch block
+                //do when integrating input validation
+
                 SamplePerson person = new SamplePerson();
                 person.setFirstName(firstName.getValue());
                 person.setLastName(lastName.getValue());
@@ -102,7 +137,8 @@ public class CreateEmployeeView extends FormLayout{
                 person.setOccupation(occupation.getValue());
                 person.setJobTitle(jobTitle.getValue());
                 person.setMaxHolidays(defaultMaxHoliday);
-                //TODO setDepartment
+
+                //TODO set department info -Check with Khaled
                 
                 //Save to the SamplePersonRepository
                 SamplePerson savedPerson = samplePersonRepository.save(person);
@@ -111,17 +147,22 @@ public class CreateEmployeeView extends FormLayout{
                 String generatedUsername = genUserName(firstName.getValue(), lastName.getValue());
                 Login credentials = new Login();
                 
-
+                //set role
                 Set<Role> roleChosen = new HashSet<>();
                 if(role.getValue() == "Employee") roleChosen.add(Role.USER);
                 if(role.getValue() == "Manager")  roleChosen.add(Role.ADMIN);
                 credentials.setRoles(roleChosen);
 
+                //set username
                 credentials.setUsername(generatedUsername);
-
+                
+                //set password as default pass
                 credentials.setHashedPassword(passwordEncoder.encode(defaultPassword));
 
+                //set person association 
                 credentials.setPerson(savedPerson);
+
+                //save
                 loginRepository.save(credentials);
 
                 //notify on success and show generated username
@@ -130,15 +171,33 @@ public class CreateEmployeeView extends FormLayout{
         });
         
     }
-    //TODO
+
     private String genUserName(String fName, String lName){
         /*
+         * Assumption: fName and lName are each at least
+         * three characters long 
          * Username format: 
-         *      three letters from fName
          *      three letters from lName
+         *      three letters from fName
          *      two numbers  
          */
-        return "";
+        String username = "";
+        //first three chars
+        username += lName.substring(0, 3).toLowerCase();
+        //second three chars
+        username += fName.substring(0, 3).toLowerCase();
+        //last two characters 
+        
+        //number of users with the same first six characters who
+        //are already in the system
+        long n = loginRepository.countByUsernameContaining(username);
+        
+        //n =0 -> aa, 25 -> az, 26 -> ba, and so on 
+        char firstChar = (char) ('a' + (n / 26) % 26);
+        char secondChar = (char) ('a' + n % 26);
+        
+        username += "" + firstChar + secondChar;
+        return username;
     }
 
     private boolean requiredFields() {
@@ -176,11 +235,6 @@ public class CreateEmployeeView extends FormLayout{
     
         if (jobTitle.getValue().isEmpty()) {
             errorMessage += "Job Title is required.\n";
-            valid = false;
-        }
-    
-        if (department.getValue().isEmpty()) {
-            errorMessage += "Department is required.\n";
             valid = false;
         }
     

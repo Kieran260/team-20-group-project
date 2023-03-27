@@ -1,5 +1,6 @@
 package com.iamin.data.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,5 +14,6 @@ import com.iamin.data.entity.Login;
 public interface DepartmentRepository extends JpaRepository<Department, Long> , JpaSpecificationExecutor<Login>{
     
     Optional<Department> findByDepartmentName(String departmentName);
-
+    
+    List<Department> findAll();
 }

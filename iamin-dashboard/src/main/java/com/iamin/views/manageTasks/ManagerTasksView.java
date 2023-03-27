@@ -7,6 +7,6 @@ package com.iamin.views.manageTasks;
 public class ManagerTasksView {
 
     public ManagerTasksView() {
-
+        //
     }
 }

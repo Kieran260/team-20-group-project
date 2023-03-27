@@ -3,6 +3,7 @@ package com.iamin.data.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -15,7 +16,8 @@ public class Absence extends AbstractEntity {
 
 	private String absenceReason;
 	private String authorisedBy; 
-	private Integer documentsId;
+    @Column(columnDefinition = "TEXT")
+	private String documentsURL;
     private LocalDateTime dateModified;
     private LocalDate startDate;
     private LocalDate endDate;
@@ -46,12 +48,12 @@ public class Absence extends AbstractEntity {
 	public void setAuthorisedBy(String authorisedBy) { 
 	this.authorisedBy = authorisedBy; 
 	}
-	public Integer documentsId() { 
-	return documentsId; 
+	public String documentsURL() { 
+	return documentsURL; 
 	}
 
-	public void setDocumentsId(Integer documentsId) { 
-	this.documentsId = documentsId; 
+	public void setDocumentsURL(String documentsURL) { 
+	this.documentsURL = documentsURL; 
 	}
     
 	public LocalDateTime getDateModified() {

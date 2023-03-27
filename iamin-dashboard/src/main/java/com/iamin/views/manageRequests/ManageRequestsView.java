@@ -1,4 +1,4 @@
-package com.iamin.views.ManageRequests;
+package com.iamin.views.manageRequests;
 
 import com.iamin.views.MainLayout;
 import com.iamin.views.helpers.Styling;

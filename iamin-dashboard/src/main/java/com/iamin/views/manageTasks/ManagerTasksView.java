@@ -1,6 +1,6 @@
 package com.iamin.views.manageTasks;
 
-import com.iamin.data.entity.AssignTasks;
+import com.iamin.data.entity.Tasks;
 import com.iamin.views.MainLayout;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -27,7 +27,7 @@ import javax.annotation.security.RolesAllowed;
 @RolesAllowed("ADMIN")
 public class ManagerTasksView extends HorizontalLayout{
 
-    Grid<AssignTasks> grid = new Grid<>(AssignTasks.class);
+    Grid<Tasks> grid = new Grid<>(Tasks.class, false);
 
     public ManagerTasksView() {
         addClassName("list-view");
@@ -36,6 +36,7 @@ public class ManagerTasksView extends HorizontalLayout{
         configureAssignBar();
     }
 
+    
     public void configureTasks() {
         VerticalLayout tasks = new VerticalLayout();
         tasks.setWidth("800px");
@@ -47,10 +48,20 @@ public class ManagerTasksView extends HorizontalLayout{
 
         // give grid a class name - as a referece point
         grid.addClassName("manager-assigns-tasks");
+
+        grid.addColumn("id").setAutoWidth(true);
+        grid.addColumn("description").setAutoWidth(true);
+        grid.addColumn("assignDate").setAutoWidth(true);
+        grid.addColumn("deadLine").setAutoWidth(true);
+        grid.addColumn("dateModified").setAutoWidth(true);
+        grid.addColumn("submittedDate").setAutoWidth(true);
+        grid.addColumn("completed").setAutoWidth(true);
+
         tasks.add(grid);
 
         add(tasks);
     }
+
 
     public void configureAssignBar() {
         VerticalLayout content = new VerticalLayout();

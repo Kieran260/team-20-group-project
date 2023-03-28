@@ -7,6 +7,7 @@ import com.vaadin.flow.component.html.Label;
 import java.util.ArrayList;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.grid.dataview.GridListDataView;
 
 public class RequestsTableCard {
 

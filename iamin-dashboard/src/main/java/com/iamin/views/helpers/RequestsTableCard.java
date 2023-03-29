@@ -2,72 +2,99 @@ package com.iamin.views.helpers;
 
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.data.provider.ListDataProvider;
+
 import java.util.List;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.button.Button;
 import java.util.ArrayList;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 
+// Handle absence and holiday in separate tables?
+// Pull records from DB and create Request object with important details?
+
 public class RequestsTableCard {
 
     public Div createCard(Div card) {
 
-        // Card Styles
+        // TODO: Populate "requests" with absences/holidays
+        // Order table by earliest start date
+
+        // Dummy data
+        List<Request> requests = new ArrayList<Request>();
+        Request dummyReq = new Request("John", "Doe",
+                "12-03-23", "18-03-23", "Fishing");
+
+        for (int i = 0; i < 10; i++) {
+            requests.add(dummyReq);
+        }
+
+        ListDataProvider<Request> dataProvider = new ListDataProvider<>(requests);
+
+        // Create the table and set its data provider
+        Grid<Request> requestsTable = new Grid<>();
+        requestsTable.setDataProvider(dataProvider);
+
+        // Create table header
+        Label card1Header = new Label("Employee Requests");
+        card1Header.getStyle().set("font-weight", "bold");
+        card1Header.getStyle().set("font-size", "18px");
+        card1Header.getStyle().set("margin-left", "10px");
+
+        // Styling
         card.getStyle().set("display", "flex");
         card.getStyle().set("flex-direction", "column");
         card.getStyle().set("justify-content", "space-between");
         card.getStyle().set("padding", "20px 10px");
         Styling.styleSquareBox(card);
+        requestsTable.setAllRowsVisible(true);
+        requestsTable.getStyle().set("width", "100%");
+        requestsTable.addThemeVariants(GridVariant.LUMO_NO_BORDER);
 
-        // TODO: Populate "people" with employees from same manager as department who
-        // have checked in today
-        // Order table by latest check in at the top and earliest at the bottom
-        List<Person> people = new ArrayList<Person>();
-        people.add(new Person("John", "Doe"));
-        people.add(new Person("John", "Doe"));
-        people.add(new Person("John", "Doe"));
-        people.add(new Person("John", "Doe"));
-        people.add(new Person("John", "Doe"));
-        people.add(new Person("John", "Doe"));
-        people.add(new Person("John", "Doe"));
-        people.add(new Person("John", "Doe"));
+        // Add columns to the table
+        requestsTable.addColumn(Request::getFirstName).setHeader("First Name");
+        requestsTable.addColumn(Request::getLastName).setHeader("Last Name");
+        requestsTable.addColumn(Request::getStartDate).setHeader("Start date");
+        requestsTable.addColumn(Request::getEndDate).setHeader("End date");
+        requestsTable.addColumn(Request::getReason).setHeader("Reason");
 
-        ListDataProvider<Person> dataProvider = new ListDataProvider<>(people);
+        requestsTable.addComponentColumn(request -> {
+            Button approveButton = new Button("Approve");
+            approveButton.addClickListener(event -> {
+                // HANDLE REQUEST APPROVAL HERE
+            });
+            return approveButton;
+        }).setHeader("Approve");
 
-        // Create the employeeTable and set its data provider
-        Grid<Person> employeeTable = new Grid<>();
-        employeeTable.setDataProvider(dataProvider);
+        requestsTable.addComponentColumn(request -> {
+            Button denyButton = new Button("Deny");
+            denyButton.addClickListener(event -> {
+                // HANDLE REQUEST DENIAL HERE
+            });
+            return denyButton;
+        }).setHeader("Deny");
 
-        // Add columns to the employeeTable
-        employeeTable.addColumn(Person::getFirstName).setHeader("First Name");
-        employeeTable.addColumn(Person::getLastName).setHeader("Last Name");
-        employeeTable.addColumn(Person::getCheckInTime).setHeader("Check-In Time");
-
-        // Set the height of the employeeTable to be the height of five rows,
-        // or add a scroll bar if there are more than five rows
-        int numberOfRows = Math.min(8, people.size());
-        employeeTable.setAllRowsVisible(false);
-        employeeTable.getStyle().set("overflow", "hidden");
-        employeeTable.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-
-        // Create Labels
-        Label card1Header = new Label("Employee Check-Ins");
-        card1Header.getStyle().set("font-weight", "bold");
-        card1Header.getStyle().set("font-size", "18px");
-        card1Header.getStyle().set("margin-left", "10px");
-
-        card.add(card1Header, employeeTable);
+        card.add(card1Header, requestsTable);
         return card;
     }
 
-    private static class Person {
+    private static class Request {
         private final String firstName;
         private final String lastName;
+        private final String startDate;
+        private final String endDate;
+        private final String reason;
 
-        public Person(String firstName, String lastName) {
+        public Request(String firstName, String lastName, String startDate,
+                String endDate, String reason) {
+
             this.firstName = firstName;
             this.lastName = lastName;
+            this.startDate = startDate;
+            this.endDate = endDate;
+            this.reason = reason;
+
         }
 
         public String getFirstName() {
@@ -78,8 +105,16 @@ public class RequestsTableCard {
             return lastName;
         }
 
-        public String getCheckInTime() {
-            return "9:00";
+        public String getStartDate() {
+            return startDate;
+        }
+
+        public String getEndDate() {
+            return endDate;
+        }
+
+        public String getReason() {
+            return reason;
         }
     }
 

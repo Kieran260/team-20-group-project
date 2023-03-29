@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @PageTitle("Manage Requests")
 @Route(value = "manageRequests", layout = MainLayout.class)
 @PermitAll
-public class ManageRequestsView extends VerticalLayout {
+public class ManageRequestsView extends Div {
 
     String currentUserName;
     String currentUserRole;
@@ -43,6 +43,8 @@ public class ManageRequestsView extends VerticalLayout {
         // Master Container
         Div cardsContainer = new Div();
         cardsContainer.setClassName("requestCardContainer");
+        cardsContainer.getStyle().set("height", "100%");
+        cardsContainer.getStyle().set("width", "100%");
 
         Div card = new Div();
         RequestsTableCard reqTableCard = new RequestsTableCard();

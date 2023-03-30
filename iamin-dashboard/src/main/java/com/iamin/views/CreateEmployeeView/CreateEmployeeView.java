@@ -44,18 +44,22 @@ import com.vaadin.flow.component.HasValue;
 @PageTitle("Add Employee")
 @Route(value = "AddUsers", layout= MainLayout.class)
 @RolesAllowed("ADMIN")
+public class CreateEmployeeView extends VerticalLayout {
 
-public class CreateEmployeeView extends FormLayout{
     @Autowired
     SamplePersonRepository samplePersonRepository;
+
     @Autowired
     LoginRepository loginRepository;
+
     @Autowired
     PasswordEncoder passwordEncoder;
+
     @Autowired
     DepartmentRepository departmentRepository;
     
     //form fields
+    private Label      titleLabel  = new Label("Create Employee");
     private TextField  firstName   = new TextField();
     private TextField  lastName    = new TextField();
     private TextField  phone       = new TextField();
@@ -105,10 +109,10 @@ public class CreateEmployeeView extends FormLayout{
         jobInfoForm.addFormItem(jobTitle, "Job Title");
         jobInfoForm.addFormItem(role, "Role");
         jobInfoForm.addFormItem(departmentComboBox, "Department");
-
+        
         //add save button
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
-        save.addClickShortcut(Key.ENTER);
+        save.addClickShortcut(Key.ENTER);   
         
         //combine the two forms
         FormLayout miniFormsCombined = new FormLayout(personalInfoForm, jobInfoForm);
@@ -116,10 +120,15 @@ public class CreateEmployeeView extends FormLayout{
             // Use one column by default
             new ResponsiveStep("0", 1),
             // Use two columns, if the layout's width exceeds 320px
-            new ResponsiveStep("320px", 2));
+            new ResponsiveStep("400px", 2));
 
         //add the save button
-        VerticalLayout mainLayout = new VerticalLayout(miniFormsCombined, save);
+        VerticalLayout mainLayout = new VerticalLayout(titleLabel, miniFormsCombined, save);
+        mainLayout.getStyle().set("width","100%");
+        mainLayout.getStyle().set("max-width","1000px");
+        titleLabel.getStyle().set("font-weight","bold");
+
+        
         add(mainLayout);
         //do stuff when form is submitted
         save.addClickListener(event -> {

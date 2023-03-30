@@ -96,18 +96,16 @@ public class DashboardView extends VerticalLayout {
         departmentMembersCard.createCard(card4,authentication);
 
 
-        // Department Members Attendance - Managers Only
-        // This specifically shows all employees of a department with an average department attendance
+        // Employees Average Attendance - Managers Only
+        // This specifically shows the average attendance of all employees
         // TODO: Show department attendance which is the same department as current user (Authentication)
         // TODO: Add a grid of employees from department which shows individual attendance
         Div card5 = new Div();
         AverageAttendanceCard averageAttendanceCard = new AverageAttendanceCard();
         averageAttendanceCard.createCard(card5,userLogin);
                 
-        // Charts View - All Roles
-        // Framework: https://vaadin.com/directory/component/apexchartsjs
-        // Task summary
-        // Potentially add another card with employee attendance for managers only
+        // Charts View - Managers Only
+        // Show a bar chart with the average attendance for the last 6 months
         Div card6 = new Div();
         AverageAttendanceChartsCard averageAttendanceChartsCard = new AverageAttendanceChartsCard();
         averageAttendanceChartsCard.createCard(card6,userLogin);

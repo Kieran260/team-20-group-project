@@ -175,7 +175,7 @@ public class CreateEmployeeView extends VerticalLayout {
                 loginRepository.save(credentials);
 
                 //notify on success and show generated username
-                Notification.show(successMessage+generatedUsername).setPosition(Notification.Position.MIDDLE);  
+                Notification.show(successMessage+generatedUsername).setPosition(Notification.Position.TOP_CENTER);  
             }
         });
         
@@ -249,7 +249,7 @@ public class CreateEmployeeView extends VerticalLayout {
     
         if (!valid) {
             // Display pop-up error message to user
-            Notification.show(errorMessage).setPosition(Notification.Position.MIDDLE);
+            Notification.show(errorMessage).setPosition(Notification.Position.TOP_CENTER);
         }
         return valid;
     }

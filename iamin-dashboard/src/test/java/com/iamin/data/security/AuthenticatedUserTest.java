@@ -48,7 +48,6 @@ public class AuthenticatedUserTest {
     @Before
 public void setUp() {
     authenticatedUser = new AuthenticatedUser(authenticationContext, loginRepository);
-    when(securityContext.getAuthentication()).thenReturn(authentication);
     SecurityContextHolder.setContext(securityContext);
 }
 

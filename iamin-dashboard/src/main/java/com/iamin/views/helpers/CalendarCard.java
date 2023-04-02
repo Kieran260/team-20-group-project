@@ -15,16 +15,22 @@ public class CalendarCard {
     public Div createCard(Div card) {
         Styling.styleSquareBox(card);
 
-        Label date = new Label("Daily Calendar");
+        Label date = new Label("Today");
         date.getStyle().set("font-weight", "bold");
         date.getStyle().set("font-size", "18px");
 
         Button backButton = new Button("<");
-        backButton.getStyle().set("width", "10px");
+        backButton.getStyle().set("min-width", "40px");
+        backButton.getStyle().set("max-width", "40px");
+        backButton.getStyle().set("padding", "0");
 
         Button todayButton = new Button("Today");
 
         Button forwardButton = new Button(">");
+        forwardButton.getStyle().set("min-width", "40px");
+        forwardButton.getStyle().set("max-width", "40px");
+        forwardButton.getStyle().set("padding", "0");
+
 
         Div buttonContainer = new Div();
         buttonContainer.getStyle().set("display", "flex");
@@ -44,7 +50,7 @@ public class CalendarCard {
         calendarGrid.getStyle().set("height","180px");
         calendarGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
 
-        calendarGrid.addColumn(Event::getEventName).setHeader("Event Name");
+        calendarGrid.addColumn(Event::getEventName).setHeader("Name");
         calendarGrid.addColumn(Event::getEventType).setHeader("Type");
         calendarGrid.addColumn(Event::getEventTime).setHeader("Time");
 

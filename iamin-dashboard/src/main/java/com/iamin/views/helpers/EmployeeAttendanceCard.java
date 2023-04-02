@@ -155,7 +155,7 @@ public class EmployeeAttendanceCard {
              // if user did not checked in 
              }else if (!checkInTimeOptional.isPresent()){
             	 checkOutButton.getElement().getStyle().set("opacity", "0.5");
-             	statusLabel = new Label(nameForCheckin + ": You are currently not checked in");
+             	statusLabel = new Label(nameForCheckin + ": You are not checked in");
                  statusLabel.getStyle().set("font-size", "16px");
                  
                  checkInButton.addClickListener(e -> {

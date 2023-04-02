@@ -68,7 +68,6 @@ public class DashboardView extends VerticalLayout {
             personFormDialog.showPersonFormDialog();
         }
         
-
         
 
         // Master Container
@@ -167,12 +166,6 @@ public class DashboardView extends VerticalLayout {
             }
         }
         return null;
-    }
-
-    private Authentication createMockAuthentication(String username, String role) {
-        GrantedAuthority authority = new SimpleGrantedAuthority(role);
-        Authentication authentication = new UsernamePasswordAuthenticationToken(username, "password", Collections.singletonList(authority));
-        return authentication;
     }
     
 }

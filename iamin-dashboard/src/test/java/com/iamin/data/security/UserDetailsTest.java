@@ -1,8 +1,9 @@
-package com.iamin.security;
+package com.iamin.data.security;
 
 import com.iamin.data.Role;
 import com.iamin.data.entity.Login;
 import com.iamin.data.service.LoginRepository;
+import com.iamin.security.UserDetailsServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,7 +17,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import static org.apache.tomcat.jni.User.username;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 

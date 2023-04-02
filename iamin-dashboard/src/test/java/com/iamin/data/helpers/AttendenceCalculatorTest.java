@@ -77,4 +77,6 @@ public class AttendanceCalculatorTest {
         double averageAttendance = attendanceCalculator.calculateAverageAttendance(person_id, start, finish);
 
         // Assert
-        assertEquals(4, check
+        assertEquals(4, checkInOutList.size());
+        assertEquals(4 * 8.0 / 24.0, averageAttendance, 0.01);
+}

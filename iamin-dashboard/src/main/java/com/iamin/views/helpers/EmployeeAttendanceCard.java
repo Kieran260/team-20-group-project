@@ -1,26 +1,61 @@
 package com.iamin.views.helpers;
+import com.iamin.data.entity.Absence;
+import com.iamin.data.entity.CheckInOut;
+import com.iamin.data.entity.Holidays;
+import com.iamin.data.entity.SamplePerson;
+import com.iamin.data.service.AbsenceService;
+import com.iamin.data.service.CheckInOutRepository;
+import com.iamin.data.service.HolidaysRepository;
+import com.iamin.data.service.HolidaysService;
+import com.iamin.data.service.LoginService;
 import com.iamin.views.helpers.EmployeeAttendanceCard;
-
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.textfield.Autocomplete;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Component;
+
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.LocalDate;
+
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
+import javax.persistence.EntityNotFoundException;
 
+@Component
 public class EmployeeAttendanceCard {
+	
+	@Autowired
+	private LoginService loginService;
+	@Autowired
+	private CheckInOutRepository checkInOutRepository;
+    @Autowired
+    private HolidaysService holidaysService;
+    @Autowired
+    private AbsenceService absenceService;
 
+    Integer holidaysSelected = 0;
 
+	public EmployeeAttendanceCard(LoginService loginService , CheckInOutRepository checkInOutRepository) {
+        this.loginService = loginService;
+        this.checkInOutRepository = checkInOutRepository;
+    }
     public Div createCard(Div card, Authentication authentication) {
         card.getStyle().set("display","flex");
         card.getStyle().set("flex-direction","column");
@@ -42,93 +77,142 @@ public class EmployeeAttendanceCard {
         card2Header.getStyle().set("font-weight", "bold");
         card2Header.getStyle().set("font-size", "18px");
 
+        // retrive the person info 
+        SamplePerson person = loginService.getSamplePersonByUsername(authentication.getName());
 
-        // TODO: 
-        // Change authentication.getName() to fetch the legal first and last name
-        // Query the table to see if the user is actually checked in currently or not and update statusLabel 
-        
-        // TODO: Determine if user is checked in and display to label
-        Label statusLabel = new Label(authentication.getName() + ": You are currently not checked in");
-        statusLabel.getStyle().set("font-size", "16px");
-    
+        String nameForCheckin;
+        try { Optional<String> personNameOptional = loginService.getPersonNameByUsername(authentication.getName());
+        nameForCheckin = personNameOptional.get();
+        } catch (EntityNotFoundException e) { 
+        	nameForCheckin = authentication.getName();
+        } 
+
+        LocalDate date = LocalDate.now();
+        Label statusLabel = null;
+        Optional<CheckInOut> checkInTimeOptional = checkInOutRepository.findCheckInTimeByPersonAndDate(person, date);
+        Optional<CheckInOut> checkOutTimeOptional = checkInOutRepository.findCheckOutTimeByPersonAndDate(person, date);
         Button checkInButton = new Button("Check In");
-        checkInButton.addClickListener(e -> {
-            Dialog confirmDialog = new Dialog();
-            confirmDialog.setCloseOnEsc(false);
-            confirmDialog.setCloseOnOutsideClick(false);
-
-            VerticalLayout confirmContent = new VerticalLayout();
-            Label confirmMessage = new Label("Are you sure you want to check in?");
-            confirmContent.add(confirmMessage);
-
-            Button confirmButton = new Button("Yes", event -> {
-                confirmDialog.close();
-
-                //TODO: Change LocalDateTime.now() to CheckInOut.getClockInTime();
-                LocalDateTime checkOutTime = LocalDateTime.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-                String formattedTime = checkOutTime.format(formatter);
-
-                //TODO: Log check in to database here
-                Notification.show("Success! Checked in at " + formattedTime, 3000, Position.TOP_CENTER);
-            });
-
-            Button cancelButton = new Button("No", event -> {
-                confirmDialog.close();
-            });
-
-            FlexLayout buttonLayout = new FlexLayout();
-            buttonLayout.getStyle().set("gap","20px");
-            buttonLayout.getStyle().set("margin","0 auto");
-            confirmButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-            buttonLayout.add(confirmButton,cancelButton);
-
-            confirmContent.add(buttonLayout);
-            confirmDialog.add(confirmContent);
-            confirmDialog.open();
-        });
-
-        // TODO: If user is already checked in, grey out checkInButton and disable clicking
-        checkInButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-
         Button checkOutButton = new Button("Check Out");
-        checkOutButton.addClickListener(e -> {
-            Dialog confirmDialog = new Dialog();
-            confirmDialog.setCloseOnEsc(false);
-            confirmDialog.setCloseOnOutsideClick(false);
+        // if user checked out 
+        if (checkOutTimeOptional.isPresent()) {
+        	 statusLabel = new Label(nameForCheckin + ": You are checked out");
+             statusLabel.getStyle().set("font-size", "16px");
+             // grey the buttons 
+             checkInButton.getElement().getStyle().set("opacity", "0.5");
+             checkOutButton.getElement().getStyle().set("opacity", "0.5");
 
-            VerticalLayout confirmContent = new VerticalLayout();
-            Label confirmMessage = new Label("Are you sure you want to check out?");
-            confirmContent.add(confirmMessage);
+             
+        }else { 
+        	// if user checked in but did not checked out 
+        	 if (checkInTimeOptional.isPresent() && !checkOutTimeOptional.isPresent()) {
+                statusLabel = new Label(nameForCheckin + ": You are checked in");
+                statusLabel.getStyle().set("font-size", "16px");
+                 
+                 checkInButton.getElement().getStyle().set("opacity", "0.5");
 
-            Button confirmButton = new Button("Yes", event -> {
-                confirmDialog.close();
+             	// if user click on check out 
+                 checkOutButton.addClickListener(e -> {
+                     Dialog confirmDialog = new Dialog();
+                     confirmDialog.setCloseOnEsc(false);
+                     confirmDialog.setCloseOnOutsideClick(false);
 
-                //TODO: Change LocalDateTime.now() to CheckInOut.getClockInTime();
-                LocalDateTime checkOutTime = LocalDateTime.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-                String formattedTime = checkOutTime.format(formatter);
+                     VerticalLayout confirmContent = new VerticalLayout();
+                     Label confirmMessage = new Label("Are you sure you want to check out?");
+                     confirmContent.add(confirmMessage);
 
-                //TODO: Log check in to database here
-                Notification.show("Success! Checked out at " + formattedTime, 3000, Position.TOP_CENTER);
-            });
+                     Button confirmButton = new Button("Yes", event -> {
+                         confirmDialog.close();
 
-            Button cancelButton = new Button("No", event -> {
-                confirmDialog.close();
-            });
+                         LocalDateTime checkOutTime = LocalDateTime.now();
+                         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+                         String formattedTime = checkOutTime.format(formatter);
+                         // retrive the row for check in to add the ckeck out 
+                         CheckInOut checkInOutObj = checkInOutRepository.findCheckInOutByPersonAndDate(person, date);
 
-            FlexLayout buttonLayout = new FlexLayout();
-            buttonLayout.getStyle().set("gap","20px");
-            buttonLayout.getStyle().set("margin","0 auto");
-            confirmButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-            buttonLayout.add(confirmButton,cancelButton);
+                         
 
-            confirmContent.add(buttonLayout);
-            confirmDialog.add(confirmContent);
-            confirmDialog.open();
-        });
+                         checkInOutObj.setcheckOutTime();
+                         checkInOutRepository.save(checkInOutObj);
+                         
+                         Notification.show("Success! Checked out at " + formattedTime, 3000, Position.TOP_CENTER);
+                         new Page(UI.getCurrent()).reload();
+                     });
 
-        // TODO: If user is already checked out, grey out checkOutButton and disable clicking
+                     Button cancelButton = new Button("No", event -> {
+                         confirmDialog.close();
+                     });
+
+                     FlexLayout buttonLayout = new FlexLayout();
+                     buttonLayout.getStyle().set("gap","20px");
+                     buttonLayout.getStyle().set("margin","0 auto");
+                     confirmButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+                     buttonLayout.add(confirmButton,cancelButton);
+
+                     confirmContent.add(buttonLayout);
+                     confirmDialog.add(confirmContent);
+                     confirmDialog.open();
+                 });
+             // if user did not checked in 
+             }else if (!checkInTimeOptional.isPresent()){
+            	 checkOutButton.getElement().getStyle().set("opacity", "0.5");
+             	statusLabel = new Label(nameForCheckin + ": You are not checked in");
+                 statusLabel.getStyle().set("font-size", "16px");
+                 
+                 checkInButton.addClickListener(e -> {
+                     Dialog confirmDialog = new Dialog();
+                     confirmDialog.setCloseOnEsc(false);
+                     confirmDialog.setCloseOnOutsideClick(false);
+
+                     VerticalLayout confirmContent = new VerticalLayout();
+                     Label confirmMessage = new Label("Are you sure you want to check in?");
+                     confirmContent.add(confirmMessage);
+
+                     Button confirmButton = new Button("Yes", event -> {
+                         confirmDialog.close();
+
+                         LocalDateTime checkOutTime = LocalDateTime.now();
+                         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+                         String formattedTime = checkOutTime.format(formatter);
+
+                        CheckInOut checkIn = new CheckInOut();
+
+                      checkIn.setPerson(person);
+
+                      checkIn.setcheckInTime();
+
+                      checkIn.setdate();
+
+                      checkInOutRepository.save(checkIn);
+                         
+                         Notification.show("Success! Checked in at " + formattedTime, 3000, Position.TOP_CENTER);
+                         new Page(UI.getCurrent()).reload();
+                         checkOutButton.setEnabled(true);
+                     });
+
+                     Button cancelButton = new Button("No", event -> {
+                         confirmDialog.close();
+                     });
+
+                     FlexLayout buttonLayout = new FlexLayout();
+                     buttonLayout.getStyle().set("gap","20px");
+                     buttonLayout.getStyle().set("margin","0 auto");
+                     confirmButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+                     buttonLayout.add(confirmButton,cancelButton);
+
+                     confirmContent.add(buttonLayout);
+                     confirmDialog.add(confirmContent);
+                     confirmDialog.open();
+                 });
+
+                
+             } 
+        }
+       
+       
+        checkInButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        
+      
+
         checkOutButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         FlexLayout buttonContainer = new FlexLayout();        
@@ -169,37 +253,64 @@ public class EmployeeAttendanceCard {
         holidayDialogLayout.getStyle().set("justify-content","center");
         holidayDialogLayout.getStyle().set("align-items","center");
 
-        holidayDialog.setHeaderTitle("Holiday Request");
-        
-        // TODO:
-        // Fetch and calculate holidays remaining for current user from database
-        int holidaysRemaining = 0;
-        int holidaysSelected = 0;
+        holidayRequestButton.addClickListener(e -> {
 
+        holidayDialog.setHeaderTitle("Holiday Request");
+        int holidaysRemaining = holidaysService.getRemainingHolidays(person);
         Label holidaysRemainingLabel = new Label("You have " + holidaysRemaining + " holidays remaining");
+        TextField holidayReason = new TextField("Reason for request");
+        holidayReason.setAutocomplete(Autocomplete.OFF);
         DatePicker fromDate = new DatePicker("Holiday Start");
         DatePicker toDate = new DatePicker("Holiday End");
+        holidayReason.setRequired(true);
+        fromDate.setRequired(true);
+        toDate.setRequired(true);
         Label holidaysSelectedLabel = new Label("Holidays Requested: " + holidaysSelected);
+        // change the holidays selected label when the date is changed 
+        fromDate.addValueChangeListener(x -> updateHolidaysSelectedLabel(fromDate, toDate, holidaysSelectedLabel, holidaysService));
+        toDate.addValueChangeListener(x -> updateHolidaysSelectedLabel(fromDate, toDate, holidaysSelectedLabel, holidaysService));
 
-        holidayDialogLayout.add(holidaysRemainingLabel,fromDate,toDate,holidaysSelectedLabel);
+        holidayDialogLayout.add(holidaysRemainingLabel,holidayReason,fromDate,toDate,holidaysSelectedLabel);
         holidayDialog.add(holidayDialogLayout);
 
-        // TODO:
-        // Validate holidaysSelected to be LESS OR EQUAL to holidaysRemaining
-        // Validate that all fields are NOT empty when submit clicked
         Button holidaySubmitButton = new Button("Submit");
-        holidaySubmitButton.addClickListener(e -> {
-            
+        
+        holidaySubmitButton.addClickListener(x -> {
+            // check if the user has enough holidays remaining and if all fields are filled in
+            if (holidaysSelected <= holidaysRemaining && !holidayReason.isEmpty() && !fromDate.isEmpty() && !toDate.isEmpty() && toDate.getValue().isAfter(fromDate.getValue())) {
+                Holidays holiday = new Holidays();
+                holiday.setPerson(person);
+                holiday.setReason(holidayReason.getValue());
+                holiday.setStartDate(fromDate.getValue());
+                holiday.setEndDate(toDate.getValue());
+                holiday.setTotalDays(holidaysSelected);
+                holidaysService.createHolidayRequest(holiday);
+                holidayDialog.close();
+
+                holidaysSelected = 0;
+                Notification.show("Success! Holiday request submitted", 3000, Position.TOP_CENTER);
+                new Page(UI.getCurrent()).reload();
+                // if the user has not filled in all fields
+            } else if (holidayReason.isEmpty() || fromDate.isEmpty() || toDate.isEmpty()) {
+                Notification.show("Error! Please fill in all fields", 3000, Position.TOP_CENTER);
+                // if the user has selected an invalid date range
+            } else if (!toDate.getValue().isAfter(fromDate.getValue())) {
+                Notification.show("Error! Please select a valid date range", 3000, Position.TOP_CENTER);
+            } 
+            // if the user does not has enough holidays remaining
+            else {
+                Notification.show("Error! You do not have enough holidays remaining", 3000, Position.TOP_CENTER);
+            }
         });
 
         Button holidayCancelButton = new Button("Cancel", ee -> holidayDialog.close());
         holidayDialog.getFooter().add(holidaySubmitButton, holidayCancelButton);
        
-        holidayRequestButton.addClickListener(e -> {
-            holidayDialog.open();
+           holidayDialog.open();
+           holidaySubmitButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         });
 
-        holidaySubmitButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+      
 
 
         //================================================================================
@@ -217,7 +328,21 @@ public class EmployeeAttendanceCard {
         absenceName.setAutocomplete(Autocomplete.OFF);
         DatePicker absenceFromDate = new DatePicker("Absence Start");
         DatePicker absenceToDate = new DatePicker("Absence End");
-        absenceDialogLayout.add(absenceName,absenceFromDate,absenceToDate);
+        absenceName.setRequired(true);
+        absenceFromDate.setRequired(true);
+        absenceToDate.setRequired(true);
+
+        Upload fileUpload = new Upload();
+        fileUpload.setAcceptedFileTypes("application/pdf");
+        fileUpload.setMaxFiles(1);
+        fileUpload.setMaxFileSize(10485760); // 10MB
+        fileUpload.setUploadButton(new Button("Upload PDF"));
+        fileUpload.setDropAllowed(true);
+        fileUpload.setVisible(true);
+        Label fileUploadlLabel = new Label("Upload a PDF file of your absence request");
+        fileUploadlLabel.getStyle().set("font-size", "12px");
+        fileUploadlLabel.getStyle().set("color", "grey");
+        absenceDialogLayout.add(absenceName,absenceFromDate,absenceToDate, fileUpload , fileUploadlLabel);
         absenceDialog.add(absenceDialogLayout);
 
         // TODO: 
@@ -226,6 +351,23 @@ public class EmployeeAttendanceCard {
         Button absenceSubmitButton = new Button("Submit");
 
         absenceSubmitButton.addClickListener(e -> {
+            // check if all fields are filled in
+            if (!absenceName.isEmpty() && !absenceFromDate.isEmpty() && !absenceToDate.isEmpty() && absenceToDate.getValue().isAfter(absenceFromDate.getValue())) {
+                Absence absence = new Absence();
+                absence.setPerson(person);
+                absence.setAbsenceReason(absenceName.getValue());
+                absence.setStartDate(absenceFromDate.getValue());
+                absence.setEndDate(absenceToDate.getValue());
+                absenceService.createAbsenceRequest(absence);
+                absenceDialog.close();
+                Notification.show("Success! Absence request submitted", 3000, Position.TOP_CENTER);
+            } 
+            else if (!absenceToDate.getValue().isAfter(absenceFromDate.getValue())) {
+                Notification.show("Error! Please select a valid date range", 3000, Position.TOP_CENTER);
+            }
+            else {
+                Notification.show("Error! Please fill in all fields", 3000, Position.TOP_CENTER);
+            }
             
         });
 
@@ -242,5 +384,13 @@ public class EmployeeAttendanceCard {
         absenceCard.add(card2BottomHeader,absenceButtonContainer);
         card.add(workHoursCard,absenceCard);
         return(card);
+    }
+    private void updateHolidaysSelectedLabel(DatePicker fromDate, DatePicker toDate, Label holidaysSelectedLabel, HolidaysService holidaysService) {
+        if (fromDate.getValue() != null && toDate.getValue() != null) {
+            holidaysSelected = holidaysService.calculateTotalDaysOff(fromDate.getValue(), toDate.getValue());
+            holidaysSelectedLabel.setText("Holidays Requested: " + holidaysSelected);
+        } else {
+            holidaysSelectedLabel.setText("Holidays Requested: 0");
+        }
     }
 }

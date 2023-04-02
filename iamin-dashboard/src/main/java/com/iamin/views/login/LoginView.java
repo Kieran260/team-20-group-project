@@ -30,13 +30,16 @@ import java.util.HashSet;
 @Route(value = "login")
 @AnonymousAllowed
 
-// This class displays a custom login and registration screen. A user can login using their credentials or a manager
-// can sign up to use the system. The registration is for managers only therefore every registered user is given
+// This class displays a custom login and registration screen. A user can login
+// using their credentials or a manager
+// can sign up to use the system. The registration is for managers only
+// therefore every registered user is given
 // the ADMIN role.
 //
-// Sections of code which deal with authentication are labelled with "AUTHENTICATION START" and "END" comments.
+// Sections of code which deal with authentication are labelled with
+// "AUTHENTICATION START" and "END" comments.
 public class LoginView extends VerticalLayout {
-    // TODO: 
+    // TODO:
     // Add password requirements - e.g. 8+ characters, alphanumeric, etc
     // Test password requirements
     // Test layout on all browsers and devices
@@ -44,20 +47,18 @@ public class LoginView extends VerticalLayout {
 
     // Authentication Vars
     private final AuthenticatedUser authenticatedUser;
-    
+
     @Autowired
     private LoginRepository loginRepository;
-    
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
     private Validation validation;
 
-
     // Login Vars
     private Button registerButton = new Button("Register");
-
 
     // Register Vars
     private Label registerText = new Label("Sign Up");
@@ -67,12 +68,11 @@ public class LoginView extends VerticalLayout {
     private Button signUpButton = new Button("Sign Up");
     private Button returnButton = new Button("Return to Login");
 
-
     public LoginView(AuthenticatedUser authenticatedUser) {
         // Background Styles
         getStyle().set("background-color", "#8000ff");
-        getStyle().set("width","100%");
-        getStyle().set("height","100%");
+        getStyle().set("width", "100%");
+        getStyle().set("height", "100%");
 
         // Login Items Styles
         registerButton.getStyle().set("background-color", "light-grey");
@@ -81,41 +81,33 @@ public class LoginView extends VerticalLayout {
         registerButton.getStyle().set("align-self", "center");
 
         // Register Items Styles
-        registerText.getStyle().set("font-size","24px");
-        registerText.getStyle().set("font-weight","600");
-        registerText.getStyle().set("margin-top","30px");
+        registerText.getStyle().set("font-size", "24px");
+        registerText.getStyle().set("font-weight", "600");
+        registerText.getStyle().set("margin-top", "30px");
         signUpButton.getStyle().set("background-color", "blue");
         signUpButton.getStyle().set("color", "white");
-        signUpButton.getStyle().set("background-color","#005eec");
-        signUpButton.getStyle().set("margin-top","40px");
+        signUpButton.getStyle().set("background-color", "#005eec");
+        signUpButton.getStyle().set("margin-top", "40px");
 
         usernameField.setHelperText("Username must be 8 alphabetic characters.");
         passwordField.setHelperText("Password must be at least 8 characters, at least one letter and one digit.");
 
-
-
         // Container Divs
         Div loginContainer = new Div(); // Login container Div
-        loginContainer.getStyle().set("background-color","transparent");
-       
+        loginContainer.getStyle().set("background-color", "transparent");
+
         Div registerContainer = new Div(); // Master container Div
-        registerContainer.getStyle().set("background-color","transparent");
-        
+        registerContainer.getStyle().set("background-color", "transparent");
+
         Div fieldsContainer = new Div(); // Container which contains the fields only
         fieldsContainer.getStyle().set("border", "2px solid blue");
         fieldsContainer.getStyle().set("height", "100px");
 
-
-        
-
         // Flex Layout for login screen - this controls the layout of the items inside
         FlexLayout loginLayout = new FlexLayout();
         styleLoginLayout(loginLayout);
-        
 
-
-
-    // AUTHENTICATION START: Login Form
+        // AUTHENTICATION START: Login Form
         this.authenticatedUser = authenticatedUser;
 
         LoginI18n i18n = LoginI18n.createDefault();
@@ -123,19 +115,20 @@ public class LoginView extends VerticalLayout {
         login.setAction(RouteUtil.getRoutePath(VaadinService.getCurrent().getContext(), getClass()));
         login.setForgotPasswordButtonVisible(false);
         // Add login form and buttons to login layout, then add to login container
-        loginLayout.add(login,registerButton);
+        loginLayout.add(login, registerButton);
         loginContainer.add(loginLayout);
 
-    // AUTHENTICATION END: Login Form
-    
-        // Flex Layout for register screen - this controls the layout of the items inside
+        // AUTHENTICATION END: Login Form
+
+        // Flex Layout for register screen - this controls the layout of the items
+        // inside
         FlexLayout registerLayout = new FlexLayout();
         styleRegisterLayout(registerLayout);
-        registerLayout.add(registerText,usernameField,passwordField,confirmPassword,signUpButton,returnButton);
+        registerLayout.add(registerText, usernameField, passwordField, confirmPassword, signUpButton, returnButton);
         registerContainer.add(registerLayout);
 
         // Styles for card flip animation
-        styleContainerAnimation(loginContainer,registerContainer);
+        styleContainerAnimation(loginContainer, registerContainer);
 
         // Turn card to register form when registerButton clicked
         registerButton.addClickListener(e -> {
@@ -145,11 +138,10 @@ public class LoginView extends VerticalLayout {
 
         // Turn card back to login form when returnButton clicked
         returnButton.addClickListener(e -> {
-            animationToLogin(loginContainer,registerContainer);
+            animationToLogin(loginContainer, registerContainer);
         });
-          
-          
-    // AUTHENTICATION START: Sign Up
+
+        // AUTHENTICATION START: Sign Up
         signUpButton.addClickListener(event -> {
             String username = usernameField.getValue();
             String password = passwordField.getValue();
@@ -157,24 +149,24 @@ public class LoginView extends VerticalLayout {
             usernameField.setRequired(true);
             passwordField.setRequired(true);
             confirmPassword.setRequired(true);
-          
-          
-            // Check that passwords match
-            if (!password.equals(confirmedPassword)) {
-                Notification.show("Passwords do not match, please try again", 3000, Position.TOP_CENTER);
-                passwordField.setValue("");
-                confirmPassword.setValue("");
-                return;
-            }
-        
-            if (!validation.userNameValidation(username)) {
-                Notification.show("Username is invalid", 3000, Position.TOP_CENTER);
+
+            // Username Validation
+            String usernameErrorMsg = validation.usernameValidation(username);
+            if (!usernameErrorMsg.isEmpty()) {
+                Notification.show(usernameErrorMsg, 3000, Position.TOP_CENTER);
                 usernameField.setValue("");
-            } if (!validation.passwordValidation(password,confirmedPassword)) {
-                Notification.show("Password is invalid", 3000, Position.TOP_CENTER);
+            }
+
+            // Password Validation
+            String passwordErrorMsg = validation.passwordValidation(password, confirmedPassword);
+            if (!passwordErrorMsg.isEmpty()) {
+                Notification.show(passwordErrorMsg, 3000, Position.TOP_CENTER);
                 passwordField.setValue("");
                 confirmPassword.setValue("");
-            } else {
+            } 
+            
+            // Create new Login and save if no error messages returned
+            if (passwordErrorMsg.isEmpty() && usernameErrorMsg.isEmpty()) { 
                 Login user = new Login();
 
                 Set<Role> roles = new HashSet<>();
@@ -183,14 +175,14 @@ public class LoginView extends VerticalLayout {
                 user.setUsername(username);
                 user.setHashedPassword(passwordEncoder.encode(password));
                 loginRepository.save(user);
-    
+
                 Notification.show("Account created successfully!", 3000, Position.TOP_CENTER);
                 try {
                     Thread.sleep(1000); // Sleep for 1 second (1000 milliseconds)
                 } catch (InterruptedException e) {
                     // Handle the exception
                 }
-                
+
                 // Clear fields after sign up
                 usernameField.setValue("");
                 passwordField.setValue("");
@@ -198,14 +190,14 @@ public class LoginView extends VerticalLayout {
                 usernameField.setRequired(false); // set required flag to false
                 passwordField.setRequired(false); // set required flag to false
                 confirmPassword.setRequired(false); // set required flag to false
-    
+
                 animationToLogin(loginContainer, registerContainer);
                 return;
             }
-            
+
         });
-        
-    // AUTHENTICATION END: Sign Up
+
+        // AUTHENTICATION END: Sign Up
 
         // Add final containers
         add(loginContainer);
@@ -214,30 +206,30 @@ public class LoginView extends VerticalLayout {
 
     // Styles Functions
     public void styleLoginLayout(FlexLayout loginLayout) {
-        loginLayout.getStyle().set("display","flex");
-        loginLayout.getStyle().set("flex-direction","column");
-        loginLayout.getStyle().set("justify-content","space-between");
-        loginLayout.getStyle().set("align-items","center");
+        loginLayout.getStyle().set("display", "flex");
+        loginLayout.getStyle().set("flex-direction", "column");
+        loginLayout.getStyle().set("justify-content", "space-between");
+        loginLayout.getStyle().set("align-items", "center");
         loginLayout.getStyle().set("border-radius", "10px");
         loginLayout.getStyle().set("width", "300px");
         loginLayout.getStyle().set("height", "500px");
-        loginLayout.getStyle().set("margin","15% auto");
-        loginLayout.getStyle().set("padding","25px");
+        loginLayout.getStyle().set("margin", "15% auto");
+        loginLayout.getStyle().set("padding", "25px");
         loginLayout.getStyle().set("box-shadow", "0 2px 4px rgba(0, 0, 0, 0.25)");
         loginLayout.getStyle().set("background-color", "white");
     }
 
     public void styleRegisterLayout(FlexLayout registerLayout) {
-        registerLayout.getStyle().set("display","flex");
+        registerLayout.getStyle().set("display", "flex");
         registerLayout.getStyle().set("flex-direction", "column");
-        registerLayout.getStyle().set("transform","rotateY(180deg)");
-        registerLayout.getStyle().set("-webkit-transform","rotateY(180deg)");
-        registerLayout.getStyle().set("background-color","white");
+        registerLayout.getStyle().set("transform", "rotateY(180deg)");
+        registerLayout.getStyle().set("-webkit-transform", "rotateY(180deg)");
+        registerLayout.getStyle().set("background-color", "white");
         registerLayout.getStyle().set("border-radius", "10px");
         registerLayout.getStyle().set("width", "250px");
         registerLayout.getStyle().set("height", "500px");
-        registerLayout.getStyle().set("margin","15% auto");
-        registerLayout.getStyle().set("padding","25px 50px");
+        registerLayout.getStyle().set("margin", "15% auto");
+        registerLayout.getStyle().set("padding", "25px 50px");
         registerLayout.getStyle().set("box-shadow", "0 2px 4px rgba(0, 0, 0, 0.25)");
     }
 
@@ -246,23 +238,22 @@ public class LoginView extends VerticalLayout {
         // Login Animation
         loginContainer.getStyle().set("transform-style", "preserve-3d");
         loginContainer.getStyle().set("transition", "transform 1s");
-        loginContainer.getStyle().set("backface-visibility","hidden");
-        loginContainer.getStyle().set("align-self","center");
+        loginContainer.getStyle().set("backface-visibility", "hidden");
+        loginContainer.getStyle().set("align-self", "center");
         loginContainer.getStyle().set("-webkit-transform-style", "preserve-3d");
         loginContainer.getStyle().set("-webkit-transition", "transform 1s");
         loginContainer.getStyle().set("-webkit-backface-visibility", "hidden");
-        loginContainer.getStyle().set("z-index","2");
-
+        loginContainer.getStyle().set("z-index", "2");
 
         // Register Animation
         registerContainer.getStyle().set("transform-style", "preserve-3d");
         registerContainer.getStyle().set("transition", "transform 1s");
-        registerContainer.getStyle().set("position","absolute");
-        registerContainer.getStyle().set("align-self","center");
-        registerContainer.getStyle().set("z-index","0");
+        registerContainer.getStyle().set("position", "absolute");
+        registerContainer.getStyle().set("align-self", "center");
+        registerContainer.getStyle().set("z-index", "0");
         registerContainer.getStyle().set("-webkit-transform-style", "preserve-3d");
         registerContainer.getStyle().set("-webkit-transition", "transform 1s");
-        registerContainer.getStyle().set("opacity","0");
+        registerContainer.getStyle().set("opacity", "0");
         registerContainer.setId("register-container"); // Used for JavaScript access
 
     }
@@ -275,10 +266,11 @@ public class LoginView extends VerticalLayout {
         // Delay appearance of registerContainer by 250
         // This is used to debug animation errors in Safari
         registerContainer.getElement().executeJs(
-            "setTimeout(function() {\n"
-            + "var registerContainer = document.getElementById('" + registerContainer.getId().orElse("") + "');\n"
-            + "registerContainer.style.opacity = '0';\n"
-            + "}, 300);\n");
+                "setTimeout(function() {\n"
+                        + "var registerContainer = document.getElementById('" + registerContainer.getId().orElse("")
+                        + "');\n"
+                        + "registerContainer.style.opacity = '0';\n"
+                        + "}, 300);\n");
 
         registerContainer.getStyle().set("-webkit-transform", "rotateY(0)");
         registerContainer.getStyle().set("transform", "rotateY(0deg)");
@@ -297,14 +289,15 @@ public class LoginView extends VerticalLayout {
         // Delay appearance of registerContainer by 250
         // This is used to debug animation errors in Safari
         registerContainer.getElement().executeJs(
-            "setTimeout(function() {\n"
-            + "var registerContainer = document.getElementById('" + registerContainer.getId().orElse("") + "');\n"
-            + "registerContainer.style.opacity = '1';\n"
-            + "}, 250);\n");
+                "setTimeout(function() {\n"
+                        + "var registerContainer = document.getElementById('" + registerContainer.getId().orElse("")
+                        + "');\n"
+                        + "registerContainer.style.opacity = '1';\n"
+                        + "}, 250);\n");
 
         registerContainer.getStyle().set("-webkit-transform", "rotateY(180deg)");
         registerContainer.getStyle().set("transform", "rotateY(180deg)");
-        
+
         // Change background colour transition
         getStyle().set("background-color", "#ff4d4d");
         getStyle().set("transition", "background-color 500ms linear");

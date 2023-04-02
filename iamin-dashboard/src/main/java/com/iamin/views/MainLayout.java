@@ -3,6 +3,7 @@ package com.iamin.views;
 import com.iamin.components.appnav.AppNav;
 import com.iamin.components.appnav.AppNavItem;
 import com.iamin.data.entity.Login;
+import com.iamin.data.service.LoginService;
 import com.iamin.security.AuthenticatedUser;
 import com.iamin.views.CreateEmployeeView.CreateEmployeeView;
 import com.iamin.views.dashboard.DashboardView;
@@ -27,6 +28,10 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 import java.io.ByteArrayInputStream;
 import java.util.Optional;
 
+import javax.persistence.EntityNotFoundException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 /**
  * The main view is a top-level placeholder for other views.
  */
@@ -36,10 +41,13 @@ public class MainLayout extends AppLayout {
 
     private AuthenticatedUser authenticatedUser;
     private AccessAnnotationChecker accessChecker;
+    @Autowired
+    private LoginService loginService; 
 
-    public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker) {
+    public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker , LoginService loginService) {
         this.authenticatedUser = authenticatedUser;
         this.accessChecker = accessChecker;
+        this.loginService = loginService;
         this.addClassName("main-layout");
 
         setPrimarySection(Section.DRAWER);
@@ -101,7 +109,14 @@ public class MainLayout extends AppLayout {
             MenuItem userName = userMenu.addItem("");
             Div div = new Div();
             div.add(avatar);
-            div.add(login.getUsername());
+            
+            try { Optional<String> personNameOptional = loginService.getPersonNameByUsername(login.getUsername());
+            String personName = personNameOptional.get();
+            div.add(personName);
+            } catch (EntityNotFoundException e) { 
+            	 div.add(login.getUsername());
+            
+            }
             div.add(new Icon("lumo", "dropdown"));
             div.getElement().getStyle().set("display", "flex");
             div.getElement().getStyle().set("align-items", "center");

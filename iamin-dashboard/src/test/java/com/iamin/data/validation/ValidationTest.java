@@ -19,21 +19,34 @@ public class ValidationTest {
     }
 
     @Test
-    public void testUserNameValidation() {
-        assertTrue(validation.userNameValidation("user1234"));
-        assertFalse(validation.userNameValidation("user123"));
-        assertFalse(validation.userNameValidation("user12345"));
-        assertFalse(validation.userNameValidation("user 1234"));
-        assertFalse(validation.userNameValidation("user_1234"));
+    public void testUsernameValidation() {
+        // Test for a valid username
+        assertEquals("", validation.usernameValidation("username"));
+    
+        // Test for an existing username
+        Mockito.when(mockLoginService.checkIfUsernameExists("existing")).thenReturn(true);
+        assertEquals("Username is taken", validation.usernameValidation("existing"));
+    
+        // Test for username shorter than 8 characters
+        assertEquals("Username must be exactly 8 characters in length", validation.usernameValidation("user123"));
+    
+        // Test for username longer than 8 characters
+        assertEquals("Username must be exactly 8 characters in length", validation.usernameValidation("user12345"));
+    
+        // Test for username with non-alphabetic characters
+        assertEquals("Username must contain alphabetic characters only", validation.usernameValidation("user1234"));
+    
+        // Test for username with SQL injection keywords
+        assertEquals("Username contains a forbidden keyword", validation.usernameValidation("DROPuser"));
     }
 
     @Test
     public void testPasswordValidation() {
-        assertTrue(validation.passwordValidation("password1", "password1"));
-        assertFalse(validation.passwordValidation("pass", "pass"));
-        assertFalse(validation.passwordValidation("password", "password"));
-        assertFalse(validation.passwordValidation("password1", "password2"));
-        assertFalse(validation.passwordValidation("password@", "password@"));
+        assertEquals("", validation.passwordValidation("password1", "password1"));
+        assertEquals("Password must be between 8 and 20 characters long", validation.passwordValidation("pass", "pass"));
+        assertEquals("Password must contain at least one letter and one number", validation.passwordValidation("password", "password"));
+        assertEquals("Passwords do not match, please try again", validation.passwordValidation("password1", "password2"));
+        assertEquals("Password must contain at least one letter and one number", validation.passwordValidation("password@", "password@"));
     }
 
     @Test
@@ -58,11 +71,11 @@ public class ValidationTest {
         String input1 = "Hello, <b>World!</b>";
         String expected1 = "Hello, World!";
         assertEquals(expected1, validation.sanitizeInput(input1));
-    
+
         String input2 = "Hello, <script>alert('XSS');</script>World!";
         String expected2 = "Hello, World!";
         assertEquals(expected2, validation.sanitizeInput(input2));
-    
+
         String input3 = "<p>Hello, <a href=\"https://example.com\">Example</a></p>";
         String expected3 = "Hello, Example";
         assertEquals(expected3, validation.sanitizeInput(input3));
@@ -71,6 +84,6 @@ public class ValidationTest {
     @Test
     public void testUsernameValidationWithExistingUsername() {
         Mockito.when(mockLoginService.checkIfUsernameExists("user1234")).thenReturn(true);
-        assertFalse(validation.userNameValidation("user1234"));
+        assertEquals("Username is taken", validation.usernameValidation("user1234"));
     }
 }

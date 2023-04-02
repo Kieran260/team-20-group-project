@@ -4,6 +4,7 @@ import com.iamin.views.MainLayout;
 import com.iamin.views.helpers.EmployeeAttendanceCard;
 import com.iamin.views.helpers.EmployeesTableCard;
 import com.iamin.views.helpers.AverageAttendanceCard;
+import com.iamin.views.helpers.AverageAttendanceChartsCard;
 import com.iamin.views.helpers.CalendarCard;
 import com.iamin.views.helpers.DepartmentMembersCard;
 import com.iamin.views.helpers.Styling;
@@ -16,15 +17,20 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
+
+import java.util.Collections;
+
 import javax.annotation.security.PermitAll;
 import com.vaadin.flow.component.html.Div;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.GrantedAuthority;
-import com.iamin.views.helpers.AverageAttendanceCard;
-import com.iamin.views.helpers.AttendanceCalculator;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 
 @CssImport(value = "dashboard-styles.css")
 @PageTitle("Dashboard")
@@ -36,30 +42,32 @@ public class DashboardView extends VerticalLayout {
     String currentUserName;
     String currentUserRole;
 
+    @Autowired
+    private final EmployeeAttendanceCard employeeAttendanceCard;
+
     private final PersonFormDialog personFormDialog;
     private final LoginRepository loginRepository;
 
-    @Autowired
-    private AverageAttendanceCard averageAttendanceCard;
-
-    @Autowired
-    private AttendanceCalculator attendanceCalculator;
-    
-
-    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository, AverageAttendanceCard averageAttendanceCard) {
+    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository,EmployeeAttendanceCard employeeAttendanceCard) {
         this.personFormDialog = personFormDialog;
         this.loginRepository = loginRepository;
-        this.averageAttendanceCard = averageAttendanceCard;
+        this.employeeAttendanceCard = employeeAttendanceCard;
+
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        
+
         getStyle().set("background-color","rgba(250, 250, 250)");
 
         // Checks if current user has a SamplePerson entity and if not shows a sign up dialog
         String currentUsername = authentication.getName();
+       
+        
         Login userLogin = loginRepository.findByUsername(currentUsername);
         if (userLogin != null && userLogin.getPerson() == null) {
             personFormDialog.showPersonFormDialog();
         }
+        
         
 
         // Master Container
@@ -68,7 +76,7 @@ public class DashboardView extends VerticalLayout {
         
         // Employees Table Card - Manager View Only
         // This specifically shows all employees that are currently checked in today
-        // TODO: Show Check in / Check out times
+        // TODO: Show Check in / Check out times from database
         Div card1 = new Div();
         EmployeesTableCard employeesTableCard = new EmployeesTableCard();
         employeesTableCard.createCard(card1);
@@ -78,7 +86,6 @@ public class DashboardView extends VerticalLayout {
         // Absence Request 
         // TODO: Send absence requests to database
         Div card2 = new Div();
-        EmployeeAttendanceCard employeeAttendanceCard = new EmployeeAttendanceCard();
         employeeAttendanceCard.createCard(card2,authentication);
 
 
@@ -100,20 +107,20 @@ public class DashboardView extends VerticalLayout {
         departmentMembersCard.createCard(card4,authentication);
 
 
-        // Department Members Attendance - Managers Only
-        // This specifically shows all employees of a department with an average department attendance
+        // Employees Average Attendance - Managers Only
+        // This specifically shows the average attendance of all employees
         // TODO: Show department attendance which is the same department as current user (Authentication)
         // TODO: Add a grid of employees from department which shows individual attendance
         Div card5 = new Div();
-        averageAttendanceCard.createCard(card5);
+        AverageAttendanceCard averageAttendanceCard = new AverageAttendanceCard();
+        averageAttendanceCard.createCard(card5,userLogin);
                 
-        // Charts View - All Roles
-        // Framework: https://vaadin.com/directory/component/apexchartsjs
-        // Task summary
-        // Potentially add another card with employee attendance for managers only
+        // Charts View - Managers Only
+        // Show a bar chart with the average attendance for the last 6 months
         Div card6 = new Div();
-        Styling.styleSquareBox(card6);
-                
+        AverageAttendanceChartsCard averageAttendanceChartsCard = new AverageAttendanceChartsCard();
+        averageAttendanceChartsCard.createCard(card6,userLogin);
+
         // Notifications card - All Roles
         // Notifies Managers of requests
         // Notifies Employees of denied requests 
@@ -131,13 +138,15 @@ public class DashboardView extends VerticalLayout {
         // Get user's role
         String userRole = getUserRole(authentication);
 
+        
         if ("ROLE_ADMIN".equals(userRole)) {
             // Add cards specific to the admin role
-            cardsContainer.add(card1,card2,card3,card5,card6);
+            cardsContainer.add(card1,card2,card3,card4,card5,card6);
         } else if ("ROLE_USER".equals(userRole)) {
             // Add cards specific to the user role
             cardsContainer.add(card2,card3,card4,card5,card6);
         } 
+        
 
         // All cards
 
@@ -156,5 +165,6 @@ public class DashboardView extends VerticalLayout {
         }
         return null;
     }
+    
 }
 

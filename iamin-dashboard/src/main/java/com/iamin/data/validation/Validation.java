@@ -8,7 +8,6 @@ import org.jsoup.safety.Safelist;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 @Component
 public class Validation {
     private final LoginService loginService;
@@ -23,48 +22,70 @@ public class Validation {
         return (char1 >= 'a' && char1 <= 'z') || (char1 >= 'A' && char1 <= 'Z') || (char1 >= '0' && char1 <= '9');
     }
 
-    // Check that username does not already exist in table
+
+
+    public boolean usernameExists(String username) {
+        return loginService.checkIfUsernameExists(username);
+    }
+
+    // Check that username does not already exist in table and no SQL injection
     // Check that length is 8 characters and alphanumeric
-    public boolean userNameValidation(String username) {
-    
-        if (loginService.checkIfUsernameExists(username)) {
-            return false;
+    public String usernameValidation(String username) {
+
+        // Check username does not already exist
+        if (usernameExists(username)) {
+            return "Username is taken";
         }
 
         // Check length
         if (username.length() != 8) {
-            return false;
+            return "Username must be exactly 8 characters in length";
         }
         // Check for SQL injection
         if (isSqlInjection(username)) {
-            return false;
+            return "Username contains a forbidden keyword";
         }
-        // Check alphanumeric
-        else {
-            for (int i = 0; i < username.length(); i++) {
-                if (!isAlphaNumeric(username.charAt(i))) {
-                    return false;
-                }
+        // Check alphabetic
+        for (int i = 0; i < username.length(); i++) {
+            if (!Character.isAlphabetic(username.charAt(i))) {
+                return "Username must contain alphabetic characters only";
             }
         }
-        return true;
+
+        return "";
     }
 
     // Check password is 8+ characters and contains one number
     // Check confirmPassword is the same as password
-    public boolean passwordValidation(String password, String confirmPassword) {
-        if (password.length() < 8) {
-            return false;
-        } else {
-            for (int i = 0; i < password.length(); i++) {
-                if (Character.isDigit(password.charAt(i))) {
-                    if (password.equals(confirmPassword)) {
-                        return true;
-                    }
-                }
-            }
-            return false;
+    public String passwordValidation(String password, String confirmPassword) {
+
+        boolean containsDigit = false;
+        boolean containsAlpha = false;
+
+        // check length
+        if (password.length() < 8 || password.length() > 20) {
+            return "Password must be between 8 and 20 characters long";
         }
+        // check = confirmPassword
+        if (!password.equals(confirmPassword)) {
+            return "Passwords do not match, please try again";
+        }
+
+        // Check for both letters and numbers
+        for (int i = 0; i < password.length(); i++) {
+
+            if (!containsDigit && Character.isDigit(password.charAt(i))) {
+                containsDigit = true;
+            } else if (!containsAlpha && Character.isAlphabetic(password.charAt(i))) {
+                containsAlpha = true;
+            }
+        }
+
+        // Returns error message if password does not contain both letters and numbers
+        if (!(containsAlpha && containsDigit)) {
+            return "Password must contain at least one letter and one number";
+        }
+        return "";
     }
 
     // Check address line 1 and 2 contain only alphanumeric, space, (-,'.&'), up to
@@ -105,13 +126,11 @@ public class Validation {
 
     }
 
-
-    
     // Checks for SQL injections
     public boolean isSqlInjection(String message) {
         // Common SQL injection keywords
-        String[] sqlKeywords = {"SELECT", "INSERT", "UPDATE", "DELETE", "CREATE", "DROP", "ALTER", "EXECUTE", "TRUNCATE"};
-            
+        String[] sqlKeywords = { "SELECT", "INSERT", "UPDATE", "DELETE", "CREATE", "DROP", "ALTER", "EXECUTE",
+                "TRUNCATE" };
 
         // Loop through the message and check for SQL injection keywords
         for (String keyword : sqlKeywords) {

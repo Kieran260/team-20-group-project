@@ -21,10 +21,12 @@ public class CalendarCard {
     public Div createCard(Div card) {
         Styling.styleSquareBox(card);
     
+        // Header Items
         Label date = new Label("Calendar");
         date.getStyle().set("font-weight", "bold");
         date.getStyle().set("font-size", "18px");
     
+        // Header + Button Container Items
         Button backButton = new Button("<");
         backButton.getStyle().set("min-width", "40px");
         backButton.getStyle().set("max-width", "40px");
@@ -50,6 +52,7 @@ public class CalendarCard {
             datePicker.setValue(currentValue.plusDays(1));
         });
     
+        // Button Container Configuration
         Div buttonContainer = new Div();
         buttonContainer.getStyle().set("display", "flex");
         buttonContainer.getStyle().set("gap", "5px");
@@ -59,27 +62,22 @@ public class CalendarCard {
         FlexLayout header = new FlexLayout();
         header.getStyle().set("justify-content","space-between");
         header.getStyle().set("align-items","center");
-    
         header.add(date,buttonContainer);
     
+        // Master Container
         FlexLayout calendar = new FlexLayout();
         calendar.getStyle().set("flex-direction","column");
 
-
-        // Calendar grid starts here
+        // Calendar grid configuration
         calendarGrid.getStyle().set("height","180px");
         calendarGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-
         calendarGrid.addColumn(Event::getEventName).setHeader("Name");
         calendarGrid.addColumn(Event::getEventType).setHeader("Type");
         calendarGrid.addColumn(Event::getEventTime).setHeader("Time");
         getEvents(1, LocalDate.now());
 
-
         calendar.add(calendarGrid);
         card.add(header,calendar);
-
-
 
         // Functionality for updating grid
         datePicker.addValueChangeListener(event -> {
@@ -91,6 +89,7 @@ public class CalendarCard {
     }
 
     // To be updated to fetch events when event repository is implemented
+    // TODO: Update to fetch events from database
     private void getEvents(int personId, LocalDate date) {
         System.out.println("Fetching events for personId: " + personId + " and date: " + date);
 
@@ -108,8 +107,6 @@ public class CalendarCard {
         private final String eventType;
         private final LocalTime eventTime;
 
-
-    
         public Event(String firstName, String lastName, LocalTime eventTime) {
             this.eventName = firstName;
             this.eventType = lastName;

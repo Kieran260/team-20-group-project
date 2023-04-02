@@ -17,13 +17,19 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
+
+import java.util.Collections;
+
 import javax.annotation.security.PermitAll;
 import com.vaadin.flow.component.html.Div;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.GrantedAuthority;
+
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 
 @CssImport(value = "dashboard-styles.css")
@@ -49,14 +55,19 @@ public class DashboardView extends VerticalLayout {
 
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        
+
         getStyle().set("background-color","rgba(250, 250, 250)");
 
         // Checks if current user has a SamplePerson entity and if not shows a sign up dialog
         String currentUsername = authentication.getName();
+       
+        
         Login userLogin = loginRepository.findByUsername(currentUsername);
         if (userLogin != null && userLogin.getPerson() == null) {
             personFormDialog.showPersonFormDialog();
         }
+        
         
 
         // Master Container
@@ -127,6 +138,7 @@ public class DashboardView extends VerticalLayout {
         // Get user's role
         String userRole = getUserRole(authentication);
 
+        
         if ("ROLE_ADMIN".equals(userRole)) {
             // Add cards specific to the admin role
             cardsContainer.add(card1,card2,card3,card4,card5,card6);
@@ -134,6 +146,7 @@ public class DashboardView extends VerticalLayout {
             // Add cards specific to the user role
             cardsContainer.add(card2,card3,card4,card5,card6);
         } 
+        
 
         // All cards
 
@@ -152,5 +165,6 @@ public class DashboardView extends VerticalLayout {
         }
         return null;
     }
+    
 }
 

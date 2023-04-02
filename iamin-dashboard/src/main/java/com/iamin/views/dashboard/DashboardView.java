@@ -96,7 +96,7 @@ public class DashboardView extends VerticalLayout {
         calendarCard.createCard(card3);
         
            
-        // Department Members - Employees Only
+        // Department Members - All Roles
         // This specifically shows all coworkers that are in the same department as user
         // TODO: on click, present user with employee's information including contact details and attendance
         Div card4 = new Div();
@@ -108,10 +108,15 @@ public class DashboardView extends VerticalLayout {
         // This specifically shows the average attendance of all employees
         // TODO: Show department attendance which is the same department as current user (Authentication)
         // TODO: Add a grid of employees from department which shows individual attendance
-        Div card5 = new Div();
+        Div card5a = new Div();
         AverageAttendanceCard averageAttendanceCard = new AverageAttendanceCard();
-        averageAttendanceCard.createCard(card5,userLogin);
+        averageAttendanceCard.createCard(card5a,userLogin);
                 
+        // TODO: When the above tasks are completed
+        Div card5b = new Div();
+        AverageAttendanceCard averageAttendanceCard2 = new AverageAttendanceCard();
+        averageAttendanceCard2.createCard(card5a,userLogin);
+
         // Charts View - Managers Only
         // Show a bar chart with the average attendance for the last 6 months
         Div card6 = new Div();
@@ -125,7 +130,6 @@ public class DashboardView extends VerticalLayout {
         Div card7 = new Div();
         Styling.styleSquareBox(card7);
     
-        //cardsLayout.add();
 
         // Tasks card - Employee role only
         // Shows current tasks that are not yet completed
@@ -138,10 +142,12 @@ public class DashboardView extends VerticalLayout {
         
         if ("ROLE_ADMIN".equals(userRole)) {
             // Add cards specific to the admin role
-            cardsContainer.add(card1,card2,card3,card4,card5,card6);
+            // Card 1, card 3, card 4, card 5a, card 6, card 7
+            cardsContainer.add(card1,card2,card3,card4,card5a,card6);
         } else if ("ROLE_USER".equals(userRole)) {
             // Add cards specific to the user role
-            cardsContainer.add(card2,card3,card4,card5,card6);
+            // Card 2, card 3, card 4, card 5b, card 7, card 8
+            cardsContainer.add(card2,card3,card4,card5b,card7);
         } 
         
 

@@ -1,31 +1,32 @@
 package com.iamin.security;
 
+import com.iamin.data.Role;
 import com.iamin.data.entity.Login;
 import com.iamin.data.service.LoginRepository;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.core.userdetails.UserDetails;
-
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
-
+import java.util.Optional;
+import java.util.Set;
+import static org.apache.tomcat.jni.User.username;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
-public class UserDetailsServiceImplTest {
+@RunWith(MockitoJUnitRunner.class)
+public class UserDetailsTest {
+
+    private UserDetailsServiceImpl userDetailsService;
 
     @Mock
     private LoginRepository loginRepository;
-
-    private UserDetailsServiceImpl userDetailsService;
 
     @Before
     public void setUp() {
@@ -34,39 +35,29 @@ public class UserDetailsServiceImplTest {
     }
 
     @Test
-    public void testLoadUserByUsername() {
-        // Arrange
-        String username = "testuser";
-        String hashedPassword = "testpassword";
-        List<String> roles = Arrays.asList("ADMIN", "USER");
-        Login login = new Login();
-        login.setUsername(username);
-        login.setHashedPassword(hashedPassword);
-        login.setRoles(roles);
-        when(loginRepository.findByUsername(username)).thenReturn(login);
+public void testLoadUserByUsername() {
+    Login login = new Login();
+    login.setUsername("myUsername");
+    login.setHashedPassword("myPassword");
+    Set<Role> roles = new HashSet<>();
+    roles.add(Role.ADMIN);
+    login.setRoles(roles);
 
-        // Act
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+    when(loginRepository.findByUsername("myUsername")).thenReturn(login);
 
-        // Assert
-        assertNotNull(userDetails);
-        assertEquals(username, userDetails.getUsername());
-        assertEquals(hashedPassword, userDetails.getPassword());
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        roles.forEach(role -> authorities.add(new SimpleGrantedAuthority("ROLE_" + role)));
-        assertTrue(authorities.containsAll(userDetails.getAuthorities()));
-    }
+    UserDetails userDetails = userDetailsService.loadUserByUsername("myUsername");
+
+    assertEquals("myUsername", userDetails.getUsername());
+    assertEquals("myPassword", userDetails.getPassword());
+    assertEquals(1, userDetails.getAuthorities().size());
+    assertEquals("ROLE_ADMIN", userDetails.getAuthorities().iterator().next().getAuthority());
+}
 
     @Test(expected = UsernameNotFoundException.class)
-    public void testLoadUserByUsernameThrowsException() {
-        // Arrange
-        String username = "nonexistentuser";
+    public void testLoadUserByUsernameWithInvalidUsername() {
+        String username = "testuser";
         when(loginRepository.findByUsername(username)).thenReturn(null);
-
-        // Act
         userDetailsService.loadUserByUsername(username);
-
-        // Assert
-        // Expected exception UsernameNotFoundException to be thrown
     }
+
 }

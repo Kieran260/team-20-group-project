@@ -254,9 +254,19 @@ public class EmployeeAttendanceCard {
         holidayDialogLayout.getStyle().set("align-items","center");
 
         holidayRequestButton.addClickListener(e -> {
+            holidayDialog.open();
+        });
+
 
         holidayDialog.setHeaderTitle("Holiday Request");
-        int holidaysRemaining = holidaysService.getRemainingHolidays(person);
+        int holidaysRemaining;
+
+        if (person != null) {
+            holidaysRemaining = holidaysService.getRemainingHolidays(person);
+        } else {
+
+            holidaysRemaining = 0;
+        }
         Label holidaysRemainingLabel = new Label("You have " + holidaysRemaining + " holidays remaining");
         TextField holidayReason = new TextField("Reason for request");
         holidayReason.setAutocomplete(Autocomplete.OFF);
@@ -306,10 +316,8 @@ public class EmployeeAttendanceCard {
         Button holidayCancelButton = new Button("Cancel", ee -> holidayDialog.close());
         holidayDialog.getFooter().add(holidaySubmitButton, holidayCancelButton);
        
-           holidayDialog.open();
+           
            holidaySubmitButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        });
-
       
 
 

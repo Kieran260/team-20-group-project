@@ -89,7 +89,7 @@ public class MainLayout extends AppLayout {
 
         }
         if (accessChecker.hasAccess(CreateEmployeeView.class)){
-            nav.addItem(new AppNavItem("Add Employees", CreateEmployeeView.class, "la la-columns"));
+            nav.addItem(new AppNavItem("Add Employee", CreateEmployeeView.class, "la la-columns"));
         }
         return nav;
     }

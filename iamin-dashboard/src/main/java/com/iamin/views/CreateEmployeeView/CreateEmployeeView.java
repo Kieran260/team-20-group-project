@@ -42,7 +42,7 @@ import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.HasValue;
 
 @PageTitle("Add Employee")
-@Route(value = "AddUsers", layout= MainLayout.class)
+@Route(value = "add-employee", layout= MainLayout.class)
 @RolesAllowed("ADMIN")
 public class CreateEmployeeView extends VerticalLayout {
 

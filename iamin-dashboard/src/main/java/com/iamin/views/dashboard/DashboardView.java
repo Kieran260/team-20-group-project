@@ -90,10 +90,7 @@ public class DashboardView extends VerticalLayout {
 
 
         // Calendar - All Roles
-        // Filter button to decide whether view is today's calendar, weekly or monthly
-        // Three calendar views which are interchangable by the filter button
-        // Display all events, holidays and absences
-        // First increment daily calendar
+        // Display all events, holidays and absences with respect to user role
         Div card3 = new Div();
         CalendarCard calendarCard = new CalendarCard();
         calendarCard.createCard(card3);

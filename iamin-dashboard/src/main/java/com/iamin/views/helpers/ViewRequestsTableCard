@@ -14,7 +14,7 @@ import com.vaadin.flow.component.grid.dataview.GridListDataView;
 // Handle absence and holiday in separate tables?
 // Pull records from DB and create Request object with important details?
 
-public class RequestsTableCard {
+public class ViewRequestsTableCard {
 
     public Div createCard(Div card) {
 

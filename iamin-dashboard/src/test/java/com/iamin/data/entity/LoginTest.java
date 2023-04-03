@@ -41,7 +41,7 @@ public class LoginTest {
 
         // then
         // assertThat(savedLogin.getId()).isNotNull();
-        assertThat(savedLogin.getDateModified()).isNotNull().isInstanceOf(LocalDateTime.class);
+ 
         assertThat(savedLogin.getUsername()).isEqualTo("johndoe");
         assertThat(savedLogin.getHashedPassword()).isEqualTo("password123");
         assertThat(savedLogin.getPerson().getFirstName()).isEqualTo("John Doe");

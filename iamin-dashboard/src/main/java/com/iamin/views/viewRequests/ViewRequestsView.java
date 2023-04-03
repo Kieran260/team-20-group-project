@@ -4,6 +4,7 @@ import com.iamin.views.MainLayout;
 import com.iamin.views.helpers.Styling;
 import com.iamin.data.service.AbsenceRepository;
 import com.iamin.data.service.HolidaysRepository;
+import com.iamin.views.helpers.ViewRequestsTableCard;
 
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;

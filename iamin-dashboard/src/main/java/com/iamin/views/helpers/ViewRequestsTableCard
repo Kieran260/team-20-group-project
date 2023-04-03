@@ -24,7 +24,7 @@ public class RequestsTableCard {
         // Dummy data
         List<Request> requests = new ArrayList<Request>();
         Request dummyReq = new Request("John", "Doe",
-                "12-03-23", "18-03-23", "Fishing");
+                "12-03-23", "18-03-23", "Fishing", "Yes");
 
         for (int i = 0; i < 10; i++) {
             requests.add(dummyReq);
@@ -37,7 +37,7 @@ public class RequestsTableCard {
         requestsTable.setDataProvider(dataProvider);
 
         // Create table header
-        Label card1Header = new Label("Employee Requests");
+        Label card1Header = new Label("My Requests");
         card1Header.getStyle().set("font-weight", "bold");
         card1Header.getStyle().set("font-size", "18px");
         card1Header.getStyle().set("margin-left", "10px");
@@ -58,22 +58,7 @@ public class RequestsTableCard {
         requestsTable.addColumn(Request::getStartDate).setHeader("Start date");
         requestsTable.addColumn(Request::getEndDate).setHeader("End date");
         requestsTable.addColumn(Request::getReason).setHeader("Reason");
-
-        requestsTable.addComponentColumn(request -> {
-            Button approveButton = new Button("Approve");
-            approveButton.addClickListener(event -> {
-                // HANDLE REQUEST APPROVAL HERE
-            });
-            return approveButton;
-        }).setHeader("Approve");
-
-        requestsTable.addComponentColumn(request -> {
-            Button denyButton = new Button("Deny");
-            denyButton.addClickListener(event -> {
-                // HANDLE REQUEST DENIAL HERE
-            });
-            return denyButton;
-        }).setHeader("Deny");
+        requestsTable.addColumn(Request::getApproved).setHeader("Approved");
 
         card.add(card1Header, requestsTable);
         return card;

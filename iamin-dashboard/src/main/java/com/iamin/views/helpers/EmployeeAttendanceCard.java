@@ -264,7 +264,6 @@ public class EmployeeAttendanceCard {
         if (person != null) {
             holidaysRemaining = holidaysService.getRemainingHolidays(person);
         } else {
-
             holidaysRemaining = 0;
         }
         Label holidaysRemainingLabel = new Label("You have " + holidaysRemaining + " holidays remaining");

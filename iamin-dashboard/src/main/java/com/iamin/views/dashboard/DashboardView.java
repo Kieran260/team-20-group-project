@@ -113,9 +113,9 @@ public class DashboardView extends VerticalLayout {
         averageAttendanceCard.createCard(card5a,userLogin);
                 
         // TODO: When the above tasks are completed
-        Div card5b = new Div();
-        AverageAttendanceCard averageAttendanceCard2 = new AverageAttendanceCard();
-        averageAttendanceCard2.createCard(card5a,userLogin);
+        //Div card5b = new Div();
+        //AverageAttendanceCard averageAttendanceCard2 = new AverageAttendanceCard();
+       // averageAttendanceCard2.createCard(card5a,userLogin);
 
         // Charts View - Managers Only
         // Show a bar chart with the average attendance for the last 6 months
@@ -147,7 +147,7 @@ public class DashboardView extends VerticalLayout {
         } else if ("ROLE_USER".equals(userRole)) {
             // Add cards specific to the user role
             // Card 2, card 3, card 4, card 5b, card 7, card 8
-            cardsContainer.add(card2,card3,card4,card5b,card7);
+            cardsContainer.add(card2,card3,card4,card7);
         } 
         
 

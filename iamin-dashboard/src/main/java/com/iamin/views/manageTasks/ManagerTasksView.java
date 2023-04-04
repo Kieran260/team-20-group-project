@@ -49,6 +49,8 @@ public class ManagerTasksView extends HorizontalLayout{
         this.tasksService = tasksService;
         addClassName("list-view");
 
+        splitLayout.getStyle().set("width","100%");
+
         configureTasks();
         configureAssignBar();
         add(splitLayout);
@@ -57,7 +59,7 @@ public class ManagerTasksView extends HorizontalLayout{
     
     public void configureTasks() {
         VerticalLayout tasks = new VerticalLayout();
-        tasks.setWidth("800px");
+        tasks.setWidth("80%");
 
         // give grid a class name - as a referece point
         grid.addClassName("manager-assigns-tasks");
@@ -85,7 +87,7 @@ public class ManagerTasksView extends HorizontalLayout{
 
     public void configureAssignBar() {
         VerticalLayout content = new VerticalLayout();
-        content.setWidth("200px");
+        content.setWidth("20%");
 
         Select<SamplePerson> selectEmployee = new Select<>();
         selectEmployee.setLabel("Select Employee");

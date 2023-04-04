@@ -7,6 +7,7 @@ import com.iamin.data.service.LoginService;
 import com.iamin.security.AuthenticatedUser;
 import com.iamin.views.dashboard.DashboardView;
 import com.iamin.views.manageemployees.ManageEmployeesView;
+import com.iamin.views.viewtasks.EmployeeViewTasks;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
@@ -85,6 +86,10 @@ public class MainLayout extends AppLayout {
         }
         if (accessChecker.hasAccess(ManageEmployeesView.class)) {
             nav.addItem(new AppNavItem("Manage Employees", ManageEmployeesView.class, "la la-columns"));
+
+        }
+        if (accessChecker.hasAccess(EmployeeViewTasks.class)) {
+            nav.addItem(new AppNavItem("View Tasks", EmployeeViewTasks.class, "la la-columns"));
 
         }
 

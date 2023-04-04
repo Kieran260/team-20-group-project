@@ -11,7 +11,7 @@ import javax.persistence.Table;
 
 
 @Table(name = "Tasks")
- @Entity
+@Entity
 public class Tasks extends AbstractEntity
 {
     
@@ -25,6 +25,7 @@ public class Tasks extends AbstractEntity
     private LocalDateTime dateModified;
     private LocalDate assignDate;
     private boolean completed;
+    
     public SamplePerson getPerson() {
         return person;
     }

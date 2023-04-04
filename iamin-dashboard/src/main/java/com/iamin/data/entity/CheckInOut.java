@@ -27,19 +27,19 @@ public class CheckInOut extends AbstractEntity {
     public LocalTime getcheckInTime() {
         return checkInTime;
     }
-    public void setcheckInTime(LocalTime checkInTime) {
+    public void setcheckInTime() {
         this.checkInTime = LocalTime.now();
     }
     public LocalTime getcheckOutTime() {
         return checkOutTime;
     }
-    public void setcheckOutTime(LocalTime checkOutTime) {
+    public void setcheckOutTime() {
         this.checkOutTime = LocalTime.now();
     }
     public LocalDate getdate() {
         return date;
     }
-    public void setdate(LocalDate date) {
+    public void setdate() {
         this.date = LocalDate.now();
     }
     public SamplePerson getPerson() {

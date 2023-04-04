@@ -1,5 +1,7 @@
 package com.iamin.data.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -7,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.iamin.data.entity.SamplePerson;
 import com.iamin.data.entity.Tasks;
 
 
@@ -45,4 +48,30 @@ public class TasksService {
     public void delete(Long id) {
         tasksRepository.deleteById(id);
     }
+
+    public List<Tasks> findTasksForPerson(SamplePerson person) {
+        return tasksRepository.findByPerson(person);
+    }
+
+    public List<Tasks> findTasksDueWithinHoursForPerson(SamplePerson person, int hours) {
+        LocalDateTime deadlineThreshold = LocalDateTime.now().plusHours(hours);
+        LocalDate deadlineThresholdDate = deadlineThreshold.toLocalDate();
+        return tasksRepository.findByPersonAndDeadLineBefore(person, deadlineThresholdDate);
+    }
+
+    @Transactional
+    public void addTestTasks(SamplePerson person) {
+        Tasks task1 = new Tasks();
+        task1.setPerson(person);
+        task1.setDescription("Test Task 1");
+        task1.setDeadLine(LocalDate.now().plusDays(1));
+        tasksRepository.save(task1);
+
+        Tasks task2 = new Tasks();
+        task2.setPerson(person);
+        task2.setDescription("Test Task 2");
+        task2.setDeadLine(LocalDate.now().plusDays(2));
+        tasksRepository.save(task2);
+    }
+
 }

@@ -14,12 +14,13 @@ import javax.persistence.Table;
 public class Absence extends AbstractEntity {
 
 	private String absenceReason;
-	private String authorisedBy; 
 	private Integer documentsId;
     private LocalDateTime dateModified;
     private LocalDate startDate;
     private LocalDate endDate;
     private Boolean absenceApproval;
+    private String denyReason; 
+   
     @ManyToOne
     @JoinColumn(name = "person_id")
     private SamplePerson person;
@@ -32,19 +33,12 @@ public class Absence extends AbstractEntity {
         this.person = person;
     }
 
-    public String absenceReason() { 
+    public String getAbsenceReason() { 
 	return absenceReason; 
 	}
 
 	public void setAbsenceReason(String absenceReason) { 
 	this.absenceReason = absenceReason; 
-	}
-	public String authorisedBy() { 
-	return authorisedBy; 
-	}
-
-	public void setAuthorisedBy(String authorisedBy) { 
-	this.authorisedBy = authorisedBy; 
 	}
 	public Integer documentsId() { 
 	return documentsId; 
@@ -67,7 +61,7 @@ public class Absence extends AbstractEntity {
     public void setStartDate(LocalDate startDate ) {
         this.startDate = startDate;
     }
-    public LocalDate getSendDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
     public void setEndDate(LocalDate endDate ) {
@@ -78,5 +72,12 @@ public class Absence extends AbstractEntity {
     }
     public void setAbsenceApproval(Boolean absenceApproval ) {
         this.absenceApproval = absenceApproval;
+    }
+    public String getDenyReason() {
+        return denyReason;
+    }
+
+    public void setDenyReason(String denyReason) {
+        this.denyReason = denyReason;
     }
 }

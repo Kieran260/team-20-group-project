@@ -280,7 +280,7 @@ public class EmployeeAttendanceCard {
             if (holidaysSelected <= holidaysRemaining && !holidayReason.isEmpty() && !fromDate.isEmpty() && !toDate.isEmpty() && toDate.getValue().isAfter(fromDate.getValue())) {
                 Holidays holiday = new Holidays();
                 holiday.setPerson(person);
-                holiday.setReason(holidayReason.getValue());
+                holiday.setHolidayReason(holidayReason.getValue());
                 holiday.setStartDate(fromDate.getValue());
                 holiday.setEndDate(toDate.getValue());
                 holiday.setTotalDays(holidaysSelected);

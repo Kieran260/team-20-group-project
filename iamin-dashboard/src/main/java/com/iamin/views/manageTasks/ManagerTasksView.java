@@ -97,6 +97,9 @@ public class ManagerTasksView extends HorizontalLayout{
         TextField selectText = new TextField();
         selectText.setLabel("Task Description");
         DatePicker dueDate = new DatePicker("Deadline");
+        selectEmployee.setWidthFull();
+        selectText.setWidthFull();
+        dueDate.setWidthFull();
         Button button = new Button("Assign Task", event -> {
             SamplePerson selectedPerson = selectEmployee.getValue();
             String taskDescription = selectText.getValue();
@@ -123,13 +126,7 @@ public class ManagerTasksView extends HorizontalLayout{
 
         button.setWidthFull();
 
-        // BOTTOM
-        Div progressBarLabel = new Div();
-        progressBarLabel.setText("% Assigned A Task");
-        ProgressBar progressBar = new ProgressBar();
-        progressBar.setValue(0.5);
-
-        content.add(selectEmployee, selectText, dueDate, button, progressBarLabel, progressBar);
+        content.add(selectEmployee, selectText, dueDate, button);
 
         splitLayout.addToSecondary(content);
     }

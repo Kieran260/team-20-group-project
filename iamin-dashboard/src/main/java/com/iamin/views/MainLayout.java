@@ -8,6 +8,7 @@ import com.iamin.security.AuthenticatedUser;
 import com.iamin.views.CreateEmployeeView.CreateEmployeeView;
 import com.iamin.views.dashboard.DashboardView;
 import com.iamin.views.manageemployees.ManageEmployeesView;
+import com.iamin.views.manageTasks.ManagerTasksView;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
@@ -19,6 +20,7 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Header;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.map.configuration.View;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.router.PageTitle;
@@ -88,9 +90,17 @@ public class MainLayout extends AppLayout {
             nav.addItem(new AppNavItem("Manage Employees", ManageEmployeesView.class, "la la-columns"));
 
         }
+
+        if (accessChecker.hasAccess(ManagerTasksView.class)) {
+            nav.addItem(new AppNavItem("Manage Tasks", ManagerTasksView.class, "la la-columns"));
+
+        }
+    
+
         if (accessChecker.hasAccess(CreateEmployeeView.class)){
             nav.addItem(new AppNavItem("Add Employee", CreateEmployeeView.class, "la la-columns"));
         }
+
         return nav;
     }
 

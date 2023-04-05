@@ -5,8 +5,11 @@ import com.iamin.components.appnav.AppNavItem;
 import com.iamin.data.entity.Login;
 import com.iamin.data.service.LoginService;
 import com.iamin.security.AuthenticatedUser;
+
 import com.iamin.views.dashboard.DashboardView;
 import com.iamin.views.manageemployees.ManageEmployeesView;
+import com.iamin.views.viewRequests.ViewRequestsView;
+
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
@@ -41,9 +44,10 @@ public class MainLayout extends AppLayout {
     private AuthenticatedUser authenticatedUser;
     private AccessAnnotationChecker accessChecker;
     @Autowired
-    private LoginService loginService; 
+    private LoginService loginService;
 
-    public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker , LoginService loginService) {
+    public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker,
+            LoginService loginService) {
         this.authenticatedUser = authenticatedUser;
         this.accessChecker = accessChecker;
         this.loginService = loginService;
@@ -87,6 +91,10 @@ public class MainLayout extends AppLayout {
             nav.addItem(new AppNavItem("Manage Employees", ManageEmployeesView.class, "la la-columns"));
 
         }
+        if (accessChecker.hasAccess(ViewRequestsView.class)) {
+            nav.addItem(new AppNavItem("View Requests", ViewRequestsView.class, "la la-columns"));
+
+        }
 
         return nav;
     }
@@ -99,20 +107,21 @@ public class MainLayout extends AppLayout {
             Login login = maybeUser.get();
 
             Avatar avatar = new Avatar(login.getUsername());
-       
+
             MenuBar userMenu = new MenuBar();
             userMenu.setThemeName("tertiary-inline contrast");
 
             MenuItem userName = userMenu.addItem("");
             Div div = new Div();
             div.add(avatar);
-            
-            try { Optional<String> personNameOptional = loginService.getPersonNameByUsername(login.getUsername());
-            String personName = personNameOptional.get();
-            div.add(personName);
-            } catch (EntityNotFoundException e) { 
-            	 div.add(login.getUsername());
-            
+
+            try {
+                Optional<String> personNameOptional = loginService.getPersonNameByUsername(login.getUsername());
+                String personName = personNameOptional.get();
+                div.add(personName);
+            } catch (EntityNotFoundException e) {
+                div.add(login.getUsername());
+
             }
             div.add(new Icon("lumo", "dropdown"));
             div.getElement().getStyle().set("display", "flex");

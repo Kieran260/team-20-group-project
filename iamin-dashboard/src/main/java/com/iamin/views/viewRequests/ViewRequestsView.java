@@ -12,8 +12,8 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import javax.annotation.security.PermitAll;
-import javax.smartcardio.Card;
-import javax.smartcardio.CardChannel;
+// import javax.smartcardio.Card;
+// import javax.smartcardio.CardChannel;
 
 import com.vaadin.flow.component.html.Div;
 

@@ -46,10 +46,10 @@ public class NotificationsCard {
 
         // Create a list of notifications
         List<Notification> notifications = getNotifications(login.getPerson());
-
-        // Test Tasks
-        notifications.add(new Notification("Sample Task 1", LocalDateTime.now()));
-        notifications.add(new Notification("Sample Task 2", LocalDateTime.now().plusHours(2)));
+        
+        if (notifications.size() == 0) {
+            notifications.add(new Notification("No notifications to show", LocalDateTime.now()));
+        }
     
         // Create a grid to display the list of notifications
         Grid<Notification> grid = new Grid<>();
@@ -81,7 +81,7 @@ public class NotificationsCard {
         List<Tasks> tasks = tasksService.findTasksDueWithinHoursForPerson(person, 72);        
         for (Tasks task : tasks) {
             Notification notification = new Notification(
-                "Task: " + task.getDescription(),
+                "Task due soon: " + task.getDescription(),
                 task.getDeadLine().atStartOfDay()
             );
             notifications.add(notification);
@@ -127,6 +127,7 @@ public class NotificationsCard {
                         + "  </vaadin-vertical-layout>"
                         + "</vaadin-horizontal-layout>")
                 .withProperty("description", Notification::getDescription)
-                .withProperty("dateTime", notification -> notification.getLocalDate().toString()); 
+                .withProperty("dateTime", notification -> "No notifications to show".equals(notification.getDescription()) ?
+                        "" : notification.getLocalDate().format(DateTimeFormatter.ofPattern("EEEE dd/MM")));
     }
 }

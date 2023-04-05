@@ -45,13 +45,17 @@ public class DashboardView extends VerticalLayout {
     @Autowired
     private final EmployeeAttendanceCard employeeAttendanceCard;
 
+    @Autowired
+    private final DepartmentMembersCard departmentMembersCard;
+
     private final PersonFormDialog personFormDialog;
     private final LoginRepository loginRepository;
 
-    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository,EmployeeAttendanceCard employeeAttendanceCard) {
+    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository,EmployeeAttendanceCard employeeAttendanceCard,DepartmentMembersCard departmentMembersCard) {
         this.personFormDialog = personFormDialog;
         this.loginRepository = loginRepository;
         this.employeeAttendanceCard = employeeAttendanceCard;
+        this.departmentMembersCard = departmentMembersCard;
 
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -100,7 +104,6 @@ public class DashboardView extends VerticalLayout {
         // This specifically shows all coworkers that are in the same department as user
         // TODO: on click, present user with employee's information including contact details and attendance
         Div card4 = new Div();
-        DepartmentMembersCard departmentMembersCard = new DepartmentMembersCard();
         departmentMembersCard.createCard(card4,authentication);
 
 

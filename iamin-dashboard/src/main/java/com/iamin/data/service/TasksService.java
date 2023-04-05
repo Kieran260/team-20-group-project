@@ -59,19 +59,4 @@ public class TasksService {
         return tasksRepository.findByPersonAndDeadLineBefore(person, deadlineThresholdDate);
     }
 
-    @Transactional
-    public void addTestTasks(SamplePerson person) {
-        Tasks task1 = new Tasks();
-        task1.setPerson(person);
-        task1.setDescription("Test Task 1");
-        task1.setDeadLine(LocalDate.now().plusDays(1));
-        tasksRepository.save(task1);
-
-        Tasks task2 = new Tasks();
-        task2.setPerson(person);
-        task2.setDescription("Test Task 2");
-        task2.setDeadLine(LocalDate.now().plusDays(2));
-        tasksRepository.save(task2);
-    }
-
 }

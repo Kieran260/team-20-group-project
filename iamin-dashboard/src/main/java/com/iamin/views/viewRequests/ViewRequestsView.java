@@ -12,16 +12,13 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import javax.annotation.security.PermitAll;
-// import javax.smartcardio.Card;
-// import javax.smartcardio.CardChannel;
-
 import com.vaadin.flow.component.html.Div;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 @CssImport(value = "dashboard-styles.css")
-@PageTitle("Manage Requests")
-@Route(value = "manageRequests", layout = MainLayout.class)
+@PageTitle("View Requests")
+@Route(value = "viewRequests", layout = MainLayout.class)
 @PermitAll
 public class ViewRequestsView extends Div {
 
@@ -29,7 +26,6 @@ public class ViewRequestsView extends Div {
     String currentUserRole;
 
     @Autowired
-
     private final AbsenceRepository absenceRepo;
     private final HolidaysRepository holidayRepo;
 
@@ -41,17 +37,14 @@ public class ViewRequestsView extends Div {
         getStyle().set("background-color", "rgba(250, 250, 250)");
 
         // Master Container
-        Div cardsContainer = new Div();
-        cardsContainer.setClassName("requestCardContainer");
-        cardsContainer.getStyle().set("height", "100%");
-        cardsContainer.getStyle().set("width", "100%");
+        VerticalLayout layout = new VerticalLayout();
+        layout.setSizeFull();
 
-        Div card = new Div();
-        ViewRequestsTableCard reqTableCard = new ViewRequestsTableCard();
-        reqTableCard.createCard(card);
+        // Top Table
+        ViewRequestsTableCard reqTables = new ViewRequestsTableCard();
+        Div tables = reqTables.createCard();
+        layout.add(tables);
 
-        cardsContainer.add(card);
-
-        add(cardsContainer);
+        add(layout);
     }
 }

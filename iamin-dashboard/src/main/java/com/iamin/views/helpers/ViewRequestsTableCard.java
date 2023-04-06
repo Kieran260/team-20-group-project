@@ -16,8 +16,7 @@ import com.vaadin.flow.component.grid.dataview.GridListDataView;
 
 public class ViewRequestsTableCard {
 
-    public Div createCard(Div card) {
-
+    public Div createCard() {
         // TODO: Populate "requests" with absences/holidays
         // Order table by earliest start date
 
@@ -32,36 +31,54 @@ public class ViewRequestsTableCard {
 
         ListDataProvider<Request> dataProvider = new ListDataProvider<>(requests);
 
-        // Create the table and set its data provider
-        Grid<Request> requestsTable = new Grid<>();
-        requestsTable.setDataProvider(dataProvider);
+        // Create the tables and set their data providers
+        Grid<Request> activeRequests = new Grid<>();
+        activeRequests.setDataProvider(dataProvider);
+        activeRequests.setWidth("100%");
 
-        // Create table header
-        Label card1Header = new Label("My Requests");
-        card1Header.getStyle().set("font-weight", "bold");
-        card1Header.getStyle().set("font-size", "18px");
-        card1Header.getStyle().set("margin-left", "10px");
+        Grid<Request> pastRequests = new Grid<>();
+        pastRequests.setDataProvider(dataProvider);
+        pastRequests.setWidth("100%");
 
+        // Create table headers
+        Label activeHeader = new Label("Active Requests");
+        activeHeader.getStyle().set("font-weight", "bold");
+        activeHeader.getStyle().set("font-size", "18px");
+        activeHeader.getStyle().set("margin-left", "10px");
+
+        Label pastHeader = new Label("Past Requests");
+        pastHeader.getStyle().set("font-weight", "bold");
+        pastHeader.getStyle().set("font-size", "18px");
+        pastHeader.getStyle().set("margin-left", "10px");
+
+        // Create container to hold the tables
+        Div container = new Div();
         // Styling
-        card.getStyle().set("display", "flex");
-        card.getStyle().set("flex-direction", "column");
-        card.getStyle().set("justify-content", "space-between");
-        card.getStyle().set("padding", "20px 10px");
-        Styling.styleSquareBox(card);
-        requestsTable.setAllRowsVisible(true);
-        requestsTable.getStyle().set("width", "100%");
-        requestsTable.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+        container.getStyle().set("display", "flex");
+        container.getStyle().set("flex-direction", "column");
+        container.getStyle().set("justify-content", "space-between");
+        container.getStyle().set("padding", "20px 10px");
+        Styling.styleSquareBox(container);
+        container.setWidth("100%");
+        container.setHeight("50%");
 
-        // Add columns to the table
-        requestsTable.addColumn(Request::getFirstName).setHeader("First Name");
-        requestsTable.addColumn(Request::getLastName).setHeader("Last Name");
-        requestsTable.addColumn(Request::getStartDate).setHeader("Start date");
-        requestsTable.addColumn(Request::getEndDate).setHeader("End date");
-        requestsTable.addColumn(Request::getReason).setHeader("Reason");
-        requestsTable.addColumn(Request::getApproved).setHeader("Approved");
+        // Add columns to the tables
+        activeRequests.addColumn(Request::getFirstName).setHeader("First Name");
+        activeRequests.addColumn(Request::getLastName).setHeader("Last Name");
+        activeRequests.addColumn(Request::getStartDate).setHeader("Start date");
+        activeRequests.addColumn(Request::getEndDate).setHeader("End date");
+        activeRequests.addColumn(Request::getReason).setHeader("Reason");
+        activeRequests.addColumn(Request::getApproved).setHeader("Approved");
 
-        card.add(card1Header, requestsTable);
-        return card;
+        pastRequests.addColumn(Request::getFirstName).setHeader("First Name");
+        pastRequests.addColumn(Request::getLastName).setHeader("Last Name");
+        pastRequests.addColumn(Request::getStartDate).setHeader("Start date");
+        pastRequests.addColumn(Request::getEndDate).setHeader("End date");
+        pastRequests.addColumn(Request::getReason).setHeader("Reason");
+        pastRequests.addColumn(Request::getApproved).setHeader("Approved");
+
+        container.add(activeHeader, activeRequests, pastHeader, pastRequests);
+        return container;
     }
 
     private static class Request {
@@ -108,5 +125,4 @@ public class ViewRequestsTableCard {
             return approved;
         }
     }
-
 }

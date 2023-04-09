@@ -81,4 +81,9 @@ public class LoginService {
                 .filter(login -> login.getRoles().contains(role))
                 .collect(Collectors.toList());
     }
+
+    public List<Login> findAll() {
+        return repository.findAll();
+    }
+    
 }

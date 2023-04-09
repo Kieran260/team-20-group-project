@@ -1,6 +1,7 @@
 package com.iamin.data.service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,6 +22,7 @@ public interface CheckInOutRepository extends JpaRepository<CheckInOut, Long> , 
 	 Optional<CheckInOut> findCheckOutTimeByPersonAndDate(@Param("person") SamplePerson person, @Param("date") LocalDate date);
 	 @Query("SELECT c FROM CheckInOut c WHERE c.person = :person AND c.date = :date AND c.checkInTime IS NOT NULL")
 	 CheckInOut findCheckInOutByPersonAndDate(@Param("person") SamplePerson person, @Param("date") LocalDate date);
+	 List<CheckInOut> findByDateOrderByCheckInTimeDesc(LocalDate date);
 
 
 }

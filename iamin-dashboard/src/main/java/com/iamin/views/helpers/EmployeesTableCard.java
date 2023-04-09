@@ -1,15 +1,30 @@
 package com.iamin.views.helpers;
 
+import com.iamin.data.entity.CheckInOut;
+import com.iamin.data.service.CheckInOutRepository;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import java.util.List;
+import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.vaadin.flow.component.html.Label;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.grid.GridVariant;
 
-
+@Component
 public class EmployeesTableCard {
+    
+    private CheckInOutRepository checkInOutRepository;
+
+    @Autowired
+    public EmployeesTableCard(CheckInOutRepository checkInOutRepository) {
+        this.checkInOutRepository = checkInOutRepository;
+    }
 
     public Div createCard(Div card) {
 
@@ -21,18 +36,13 @@ public class EmployeesTableCard {
         Styling.styleSquareBox(card);
 
 
-        // TODO: Populate "people" with employees from same manager as department who have checked in today
+        // TODO: Populate "people" with employees from  who have checked in today
         // Order table by latest check in at the top and earliest at the bottom
-        List<Person> people = new ArrayList<Person>();
-        people.add(new Person("John", "Doe"));
-        people.add(new Person("John", "Doe"));
-        people.add(new Person("John", "Doe"));
-        people.add(new Person("John", "Doe"));
-        people.add(new Person("John", "Doe"));
-        people.add(new Person("John", "Doe"));
-        people.add(new Person("John", "Doe"));
-        people.add(new Person("John", "Doe"));
-    
+        List<CheckInOut> todaysCheckIns = checkInOutRepository.findByDateOrderByCheckInTimeDesc(LocalDate.now());
+
+        List<Person> people = todaysCheckIns.stream()
+        .map(checkInOut -> new Person(checkInOut.getPerson().getFirstName(), checkInOut.getPerson().getLastName(), checkInOut.getcheckInTime().toString()))
+        .collect(Collectors.toList());
         ListDataProvider<Person> dataProvider = new ListDataProvider<>(people);
 
         // Create the employeeTable and set its data provider
@@ -66,11 +76,13 @@ public class EmployeesTableCard {
     private static class Person {
         private final String firstName;
         private final String lastName;
+        private final String checkInTime;
 
     
-        public Person(String firstName, String lastName) {
+        public Person(String firstName, String lastName, String checkInTime) {
             this.firstName = firstName;
             this.lastName = lastName;
+            this.checkInTime = checkInTime;
         }
     
         public String getFirstName() {
@@ -82,7 +94,7 @@ public class EmployeesTableCard {
         }
 
         public String getCheckInTime() {
-            return "9:00";
+            return checkInTime;
         }
     }
     

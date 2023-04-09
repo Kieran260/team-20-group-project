@@ -44,14 +44,15 @@ public class DashboardView extends VerticalLayout {
 
     @Autowired
     private final EmployeeAttendanceCard employeeAttendanceCard;
-
+    private final EmployeesTableCard employeesTableCard;
     private final PersonFormDialog personFormDialog;
     private final LoginRepository loginRepository;
 
-    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository,EmployeeAttendanceCard employeeAttendanceCard) {
+    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository,EmployeeAttendanceCard employeeAttendanceCard, EmployeesTableCard employeesTableCard) {
         this.personFormDialog = personFormDialog;
         this.loginRepository = loginRepository;
         this.employeeAttendanceCard = employeeAttendanceCard;
+        this.employeesTableCard = employeesTableCard;
 
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -78,7 +79,7 @@ public class DashboardView extends VerticalLayout {
         // This specifically shows all employees that are currently checked in today
         // TODO: Show Check in / Check out times from database
         Div card1 = new Div();
-        EmployeesTableCard employeesTableCard = new EmployeesTableCard();
+        //EmployeesTableCard employeesTableCard = new EmployeesTableCard();
         employeesTableCard.createCard(card1);
         
 

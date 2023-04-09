@@ -10,6 +10,7 @@ import com.iamin.views.dashboard.DashboardView;
 import com.iamin.views.manageemployees.ManageEmployeesView;
 import com.iamin.views.manageRequests.ManageRequestsView;
 import com.iamin.views.manageTasks.ManagerTasksView;
+import com.iamin.views.viewtasks.EmployeeViewTasks;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
@@ -96,6 +97,10 @@ public class MainLayout extends AppLayout {
             nav.addItem(new AppNavItem("Manage Requests", ManageRequestsView.class, "la la-columns"));
 
         }
+        if (accessChecker.hasAccess(EmployeeViewTasks.class)) {
+            nav.addItem(new AppNavItem("View Tasks", EmployeeViewTasks.class, "la la-columns"));
+
+        }
        
 
         if (accessChecker.hasAccess(ManagerTasksView.class)) {
@@ -107,6 +112,7 @@ public class MainLayout extends AppLayout {
         if (accessChecker.hasAccess(CreateEmployeeView.class)){
             nav.addItem(new AppNavItem("Add Employee", CreateEmployeeView.class, "la la-columns"));
         }
+
 
         return nav;
     }

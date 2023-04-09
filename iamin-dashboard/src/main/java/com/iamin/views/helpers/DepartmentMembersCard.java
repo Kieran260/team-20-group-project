@@ -58,7 +58,13 @@ public class DepartmentMembersCard {
         
         employeeTable.addColumn(SamplePerson::getFirstName).setHeader("First name").setAutoWidth(true);
         employeeTable.addColumn(SamplePerson::getLastName).setHeader("Last name").setAutoWidth(true);
-        employeeTable.addColumn(SamplePerson::getJobTitle).setHeader("Job Title");
+        employeeTable.addColumn(new ComponentRenderer<>(person -> {
+            Anchor emailLink = new Anchor("mailto:" + person.getEmail(), person.getEmail());
+            emailLink.getStyle().set("text-decoration", "underline");
+            emailLink.getStyle().set("color", "#0000ff"); 
+            emailLink.getStyle().set("white-space", "nowrap"); 
+            return emailLink;
+        })).setHeader("Email").setAutoWidth(true);
 
 
        

@@ -140,6 +140,7 @@ public class DashboardView extends VerticalLayout {
         // Shows current tasks that are not yet completed
         // Query from "events" database for category "tasks" that are not yet completed
         Div card8 = new Div();
+
         
         // Get user's role
         String userRole = getUserRole(authentication);

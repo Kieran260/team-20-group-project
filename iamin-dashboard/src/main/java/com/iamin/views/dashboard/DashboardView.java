@@ -81,8 +81,7 @@ public class DashboardView extends VerticalLayout {
         // This specifically shows all employees that are currently checked in today
         // TODO: Show Check in / Check out times from database
         Div card1 = new Div();
-        //EmployeesTableCard employeesTableCard = new EmployeesTableCard();
-        employeesTableCard.createCard(card1);
+        employeesTableCard.createCardBasedOnRole(card1, authentication);
         
 
         // Check In / Check Out
@@ -149,7 +148,7 @@ public class DashboardView extends VerticalLayout {
         } else if ("ROLE_USER".equals(userRole)) {
             // Add cards specific to the user role
             // Card 2, card 3, card 4, card 5b, card 7, card 8
-            cardsContainer.add(card2,card3,card4,card7);
+            cardsContainer.add(card1,card2,card3,card4,card7);
         } 
         
 

@@ -23,6 +23,7 @@ public interface CheckInOutRepository extends JpaRepository<CheckInOut, Long> , 
 	 @Query("SELECT c FROM CheckInOut c WHERE c.person = :person AND c.date = :date AND c.checkInTime IS NOT NULL")
 	 CheckInOut findCheckInOutByPersonAndDate(@Param("person") SamplePerson person, @Param("date") LocalDate date);
 	 List<CheckInOut> findByDateOrderByCheckInTimeDesc(LocalDate date);
+	 List<CheckInOut> findByPersonAndDateBetween(SamplePerson person, LocalDate startDate, LocalDate endDate);
 
 
 }

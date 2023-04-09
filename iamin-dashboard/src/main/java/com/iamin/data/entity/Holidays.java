@@ -12,10 +12,6 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "Holidays")
 public class Holidays extends AbstractEntity{
-
-
-    
-	
         private LocalDate startDate;
         private LocalDate endDate;
         private Integer totalDays;

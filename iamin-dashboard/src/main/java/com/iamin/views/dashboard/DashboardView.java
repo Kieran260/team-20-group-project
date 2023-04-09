@@ -50,16 +50,17 @@ public class DashboardView extends VerticalLayout {
     private final DepartmentMembersCard departmentMembersCard;
 
     private final NotificationsCard notificationsCard;
-
+    private final EmployeesTableCard employeesTableCard;
     private final PersonFormDialog personFormDialog;
     private final LoginRepository loginRepository;
 
-    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository,EmployeeAttendanceCard employeeAttendanceCard,DepartmentMembersCard departmentMembersCard,NotificationsCard notificationsCard) {
+    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository,EmployeeAttendanceCard employeeAttendanceCard,DepartmentMembersCard departmentMembersCard,NotificationsCard notificationsCard, EmployeesTableCard employeesTableCard) {
         this.personFormDialog = personFormDialog;
         this.loginRepository = loginRepository;
         this.employeeAttendanceCard = employeeAttendanceCard;
         this.departmentMembersCard = departmentMembersCard;
-        this.notificationsCard = notificationsCard;
+        this.notificationsCard = notificationsCard;        this.employeesTableCard = employeesTableCard;
+
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         
@@ -85,8 +86,7 @@ public class DashboardView extends VerticalLayout {
         // This specifically shows all employees that are currently checked in today
         // TODO: Show Check in / Check out times from database
         Div card1 = new Div();
-        EmployeesTableCard employeesTableCard = new EmployeesTableCard();
-        employeesTableCard.createCard(card1);
+        employeesTableCard.createCardBasedOnRole(card1, authentication);
         
 
         // Check In / Check Out
@@ -152,7 +152,7 @@ public class DashboardView extends VerticalLayout {
         } else if ("ROLE_USER".equals(userRole)) {
             // Add cards specific to the user role
             // Card 2, card 3, card 4, card 5b, card 7, card 8
-            cardsContainer.add(card2,card3,card4,card7);
+            cardsContainer.add(card1,card2,card3,card4,card7);
         } 
         
 

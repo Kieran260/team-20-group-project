@@ -2,6 +2,7 @@ package com.iamin.views.helpers;
 
 
 
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.data.provider.ListDataProvider;
@@ -11,18 +12,18 @@ import java.util.stream.Collectors;
 import com.vaadin.flow.component.html.Label;
 import java.util.ArrayList;
 import com.vaadin.flow.component.grid.GridVariant;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.iamin.data.Role;
-import com.iamin.data.entity.SamplePerson;
 import com.iamin.data.entity.Login;
 import com.iamin.data.entity.SamplePerson;
 import com.iamin.data.service.LoginService;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.vaadin.flow.component.avatar.Avatar;
+import com.vaadin.flow.component.dependency.CssImport;
 
 @Component
 public class DepartmentMembersCard {
@@ -54,14 +55,20 @@ public class DepartmentMembersCard {
         employeeTable.setItems(dataProvider);
 
         // Add columns to the employeeTable
-        employeeTable.addColumn(SamplePerson::getFirstName).setHeader("First Name");
-        employeeTable.addColumn(SamplePerson::getLastName).setHeader("Last Name");
+        
+        employeeTable.addColumn(SamplePerson::getFirstName).setHeader("First name").setAutoWidth(true);
+        employeeTable.addColumn(SamplePerson::getLastName).setHeader("Last name").setAutoWidth(true);
         employeeTable.addColumn(SamplePerson::getJobTitle).setHeader("Job Title");
+
+
+       
+              
         employeeTable.addThemeVariants(GridVariant.LUMO_NO_BORDER);
 
         card.add(cardHeader, employeeTable);
 
         return card;
     }
+
 
 }

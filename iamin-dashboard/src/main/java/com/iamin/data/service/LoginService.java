@@ -1,8 +1,11 @@
 package com.iamin.data.service;
+import com.iamin.data.Role;
 import com.iamin.data.entity.Login;
 import com.iamin.data.entity.SamplePerson;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityNotFoundException;
 
@@ -73,4 +76,9 @@ public class LoginService {
         return login != null;
     }
 
+    public List<Login> findAllByRole(Role role) {
+        return repository.findAll().stream()
+                .filter(login -> login.getRoles().contains(role))
+                .collect(Collectors.toList());
+    }
 }

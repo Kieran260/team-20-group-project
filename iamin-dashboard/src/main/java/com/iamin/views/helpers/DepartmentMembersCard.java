@@ -38,7 +38,7 @@ public class DepartmentMembersCard {
         Styling.styleSquareBox(card);
 
         // Create Label
-        Label cardHeader = new Label("Your Employees");
+        Label cardHeader = new Label("All Employees");
         cardHeader.getStyle().set("font-weight", "bold");
         cardHeader.getStyle().set("font-size", "18px");
         cardHeader.getStyle().set("margin-left","10px");

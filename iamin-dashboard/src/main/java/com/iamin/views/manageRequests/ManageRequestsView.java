@@ -18,10 +18,14 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
+import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
+
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -79,7 +83,8 @@ public class ManageRequestsView extends Div {
                     absence.getEndDate(),
                     absence.getAbsenceReason(),
                     "absence",
-                    absence.getId()));
+                    absence.getId(),
+                    absence.documentsURL()));
         }
         for (Holidays holiday : unapprovedHolidays) {
             requests.add(new Request(holiday.getPerson().getFirstName(),
@@ -88,7 +93,8 @@ public class ManageRequestsView extends Div {
                     holiday.getEndDate(),
                     holiday.getHolidayReason(),
                     "holiday",
-                    holiday.getId()));
+                    holiday.getId(),
+                    null));
         }
     
         // Order the list by start date
@@ -112,6 +118,16 @@ public class ManageRequestsView extends Div {
         requestsTable.addColumn(Request::getEndDate).setHeader("End date");
         requestsTable.addColumn(Request::getReason).setHeader("Reason");
         requestsTable.addColumn(Request::getRequestType).setHeader("Request Type");
+        requestsTable.addColumn(new ComponentRenderer<>(request -> {
+            if (request.getDocumentsURL() != null && !request.getDocumentsURL().isEmpty()) {
+                Anchor anchor = new Anchor(request.getDocumentsURL(), "View Document");
+                anchor.setTarget("_blank");
+                return anchor;
+            } else {
+                return new Div(); // Return an empty Div when there is no documentsURL
+            }
+        })).setHeader(" ");
+
 
     
         requestsTable.addComponentColumn(request -> {
@@ -195,9 +211,9 @@ public class ManageRequestsView extends Div {
         private final String reason;
         private final Long requestId;
         private final String requestType;
-
+        private final String documentsURL;
     public Request(String firstName, String lastName, LocalDate startDate,
-                   LocalDate endDate, String reason, String requestType, Long requestId) {
+                   LocalDate endDate, String reason, String requestType, Long requestId, String documentsURL ) {
 
         this.firstName = firstName;
         this.lastName = lastName;
@@ -206,8 +222,11 @@ public class ManageRequestsView extends Div {
         this.reason = reason;
         this.requestId = requestId;
         this.requestType = requestType;
+        this.documentsURL = documentsURL;
     }
-    
+        public String getDocumentsURL() {
+            return documentsURL;
+        }
         public String getFirstName() {
             return firstName;
             }

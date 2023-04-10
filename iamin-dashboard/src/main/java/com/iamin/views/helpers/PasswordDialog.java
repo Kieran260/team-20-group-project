@@ -58,6 +58,7 @@ public class PasswordDialog {
             loginRepository.save(userLogin);
             // Save the new password and close the dialog
             passwordDialog.close();
+            Notification.show("Password changed successfully", 3000, Position.TOP_CENTER);
             }
         });
 

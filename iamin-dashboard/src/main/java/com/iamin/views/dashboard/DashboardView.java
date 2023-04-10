@@ -4,12 +4,14 @@ import com.iamin.views.MainLayout;
 import com.iamin.views.helpers.EmployeeAttendanceCard;
 import com.iamin.views.helpers.EmployeesTableCard;
 import com.iamin.views.helpers.NotificationsCard;
+import com.iamin.views.helpers.PasswordDialog;
 import com.iamin.views.helpers.AverageAttendanceCard;
 import com.iamin.views.helpers.AverageAttendanceChartsCard;
 import com.iamin.views.helpers.CalendarCard;
 import com.iamin.views.helpers.DepartmentMembersCard;
 import com.iamin.views.helpers.Styling;
 import com.iamin.views.helpers.PersonFormDialog;
+
 import com.iamin.data.entity.Login;
 import com.iamin.data.service.LoginRepository;
 
@@ -31,6 +33,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 @CssImport(value = "dashboard-styles.css")
@@ -48,18 +51,24 @@ public class DashboardView extends VerticalLayout {
 
     @Autowired
     private final DepartmentMembersCard departmentMembersCard;
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     private final NotificationsCard notificationsCard;
     private final EmployeesTableCard employeesTableCard;
     private final PersonFormDialog personFormDialog;
     private final LoginRepository loginRepository;
+    private final PasswordDialog passwordDialog;
 
-    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository,EmployeeAttendanceCard employeeAttendanceCard,DepartmentMembersCard departmentMembersCard,NotificationsCard notificationsCard, EmployeesTableCard employeesTableCard) {
+    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository,EmployeeAttendanceCard employeeAttendanceCard,DepartmentMembersCard departmentMembersCard,NotificationsCard notificationsCard, EmployeesTableCard employeesTableCard,  PasswordEncoder passwordEncoder, PasswordDialog passwordDialog) {
         this.personFormDialog = personFormDialog;
         this.loginRepository = loginRepository;
         this.employeeAttendanceCard = employeeAttendanceCard;
         this.departmentMembersCard = departmentMembersCard;
-        this.notificationsCard = notificationsCard;        this.employeesTableCard = employeesTableCard;
+        this.notificationsCard = notificationsCard;       
+        this.employeesTableCard = employeesTableCard;
+        this.passwordEncoder = passwordEncoder;
+        this.passwordDialog = passwordDialog;
 
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -74,6 +83,9 @@ public class DashboardView extends VerticalLayout {
         Login userLogin = loginRepository.findByUsername(currentUsername);
         if (userLogin != null && userLogin.getPerson() == null) {
             personFormDialog.showPersonFormDialog();
+        }
+        if (userLogin != null && passwordEncoder.matches("123456789", userLogin.getHashedPassword())) {
+            passwordDialog.showPasswordChangeDialog();
         }
         
         

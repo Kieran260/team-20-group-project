@@ -1,5 +1,29 @@
 package com.iamin.views.dashboard;
-
+import com.iamin.data.entity.Login;
+import com.iamin.data.service.LoginRepository;
+import com.iamin.data.Role;
+import com.iamin.security.AuthenticatedUser;
+import com.iamin.data.validation.Validation;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.login.LoginForm;
+import com.vaadin.flow.component.login.LoginI18n;
+import com.vaadin.flow.server.VaadinService;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.textfield.PasswordField;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
+import com.vaadin.flow.router.internal.RouteUtil;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
+import com.vaadin.flow.component.notification.Notification.Position;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import java.util.Set;
+import java.util.HashSet;
 import com.iamin.views.MainLayout;
 import com.iamin.views.helpers.EmployeeAttendanceCard;
 import com.iamin.views.helpers.EmployeeTasksCard;
@@ -13,13 +37,14 @@ import com.iamin.views.helpers.Styling;
 import com.iamin.views.helpers.PersonFormDialog;
 import com.iamin.data.entity.Login;
 import com.iamin.data.service.LoginRepository;
-
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
-
 import java.util.Collections;
 
 import javax.annotation.security.PermitAll;
@@ -28,6 +53,7 @@ import com.vaadin.flow.component.html.Div;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -43,6 +69,12 @@ public class DashboardView extends VerticalLayout {
 
     String currentUserName;
     String currentUserRole;
+
+    @Autowired
+    private Validation validation;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private final EmployeeAttendanceCard employeeAttendanceCard;
@@ -76,7 +108,47 @@ public class DashboardView extends VerticalLayout {
         Login userLogin = loginRepository.findByUsername(currentUsername);
         if (userLogin != null && userLogin.getPerson() == null) {
             personFormDialog.showPersonFormDialog();
+        } 
+        
+        if (!userLogin.isPasswordSet(userLogin.getPerson())) {
+            Label headingLabel = new Label("Please set your password");
+            headingLabel.getStyle().set("font-weight","bold");
+            Dialog changePasswordDialog = new Dialog();
+            changePasswordDialog.setWidth("300px");
+        
+            PasswordField passwordField = new PasswordField("New Password");
+            PasswordField confirmPasswordField = new PasswordField("Confirm Password");
+            passwordField.setRequired(true);
+            passwordField.setHelperText("Password must be at least 8 characters, at least one letter and one digit.");
+            confirmPasswordField.setRequired(true);
+        
+            Button saveButton = new Button("Save");
+            saveButton.getStyle().set("margin-top", "10px");
+            saveButton.addClickListener(event -> {
+                String password = passwordField.getValue();
+                String confirmPassword = confirmPasswordField.getValue();
+
+                String validationResult = validation.passwordValidation(password, confirmPassword);
+                if (validationResult.isEmpty()) {
+                    // Save the new password
+                    userLogin.setHashedPassword(passwordEncoder.encode(password));
+                    userLogin.setPasswordSetFlag(true);
+                    loginRepository.save(userLogin);
+                    changePasswordDialog.close();
+                    Notification.show("Password changed successfully!",3000, Position.TOP_CENTER);
+                } else {
+                    Notification.show(validationResult,3000, Position.TOP_CENTER);
+                }
+            });
+        
+            VerticalLayout layout = new VerticalLayout(headingLabel,passwordField, confirmPasswordField, saveButton);
+            layout.setAlignItems(Alignment.CENTER);
+        
+            changePasswordDialog.add(layout);
+            changePasswordDialog.open();
         }
+
+
         
         
 

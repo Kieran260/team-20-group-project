@@ -2,6 +2,7 @@ package com.iamin.views.dashboard;
 
 import com.iamin.views.MainLayout;
 import com.iamin.views.helpers.EmployeeAttendanceCard;
+import com.iamin.views.helpers.EmployeeTasksCard;
 import com.iamin.views.helpers.EmployeesTableCard;
 import com.iamin.views.helpers.NotificationsCard;
 import com.iamin.views.helpers.AverageAttendanceCard;
@@ -50,16 +51,18 @@ public class DashboardView extends VerticalLayout {
     private final DepartmentMembersCard departmentMembersCard;
 
     private final NotificationsCard notificationsCard;
+    private final EmployeeTasksCard employeeTasksCard;
 
     private final PersonFormDialog personFormDialog;
     private final LoginRepository loginRepository;
 
-    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository,EmployeeAttendanceCard employeeAttendanceCard,DepartmentMembersCard departmentMembersCard,NotificationsCard notificationsCard) {
+    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository,EmployeeAttendanceCard employeeAttendanceCard,DepartmentMembersCard departmentMembersCard,NotificationsCard notificationsCard,EmployeeTasksCard employeeTasksCard) {
         this.personFormDialog = personFormDialog;
         this.loginRepository = loginRepository;
         this.employeeAttendanceCard = employeeAttendanceCard;
         this.departmentMembersCard = departmentMembersCard;
         this.notificationsCard = notificationsCard;
+        this.employeeTasksCard = employeeTasksCard;
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         
@@ -140,6 +143,7 @@ public class DashboardView extends VerticalLayout {
         // Shows current tasks that are not yet completed
         // Query from "events" database for category "tasks" that are not yet completed
         Div card8 = new Div();
+        employeeTasksCard.createCard(card8,userLogin);
 
         
         // Get user's role
@@ -149,11 +153,11 @@ public class DashboardView extends VerticalLayout {
         if ("ROLE_ADMIN".equals(userRole)) {
             // Add cards specific to the admin role
             // Card 1, card 3, card 4, card 5a, card 6, card 7
-            cardsContainer.add(card3,card7,card1,card2,card4,card5a);
+            cardsContainer.add(card3,card7,card1,card4,card5a,card6);
         } else if ("ROLE_USER".equals(userRole)) {
             // Add cards specific to the user role
             // Card 2, card 3, card 4, card 5b, card 7, card 8
-            cardsContainer.add(card2,card3,card4,card7);
+            cardsContainer.add(card2,card3,card4,card7,card8);
         } 
         
 

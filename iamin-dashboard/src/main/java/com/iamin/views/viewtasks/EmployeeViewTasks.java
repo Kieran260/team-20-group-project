@@ -86,7 +86,7 @@ public class EmployeeViewTasks extends VerticalLayout{
       tasksGrid.setDataProvider(dataProvider);
       tasksGrid.addColumn(Tasks::getDescription).setHeader("Description").setAutoWidth(true);
       tasksGrid.addColumn(Tasks::getAssignDate).setHeader("Assign Date").setAutoWidth(true);
-      tasksGrid.addColumn(Tasks::getDeadLine).setHeader("Dead Line").setAutoWidth(true);
+      tasksGrid.addColumn(Tasks::getDeadLine).setHeader("Deadline").setAutoWidth(true);
       tasksGrid.addColumn(Tasks::getSubmittedDate).setHeader("Submitted Date").setAutoWidth(true);
       
     Column<Tasks> completedColumn = tasksGrid.addComponentColumn(task -> {

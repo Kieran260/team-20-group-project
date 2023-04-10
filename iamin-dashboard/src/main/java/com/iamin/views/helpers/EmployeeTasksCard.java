@@ -38,6 +38,7 @@ public class EmployeeTasksCard {
 
         // Create a list of notifications
         List<Tasks> tasks = getTasks(login.getPerson());
+        
     
         // Create a grid to display the list of notifications
         Grid<Tasks> grid = new Grid<>();
@@ -85,7 +86,7 @@ public class EmployeeTasksCard {
 
     public List<Tasks> getTasks(SamplePerson person) {
         // Get tasks that are due for person
-        List<Tasks> tasks = tasksService.findTasksForPerson(person);        
+        List<Tasks> tasks = tasksService.findCompletedFalseForPerson(person);        
 
         return tasks;
     }

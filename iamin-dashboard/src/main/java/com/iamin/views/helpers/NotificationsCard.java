@@ -80,11 +80,14 @@ public class NotificationsCard {
 
         List<Tasks> tasks = tasksService.findTasksDueWithinHoursForPerson(person, 72);        
         for (Tasks task : tasks) {
-            Notification notification = new Notification(
-                "Task due soon: " + task.getDescription(),
-                task.getDeadLine().atStartOfDay()
-            );
-            notifications.add(notification);
+            if (!task.isCompleted()) {
+                Notification notification = new Notification(
+                    "Task due soon: " + task.getDescription(),
+                    task.getDeadLine().atStartOfDay()
+                );
+                notifications.add(notification);
+            }
+
         }
 
         // Fetch requests with approved or denied status for the current user

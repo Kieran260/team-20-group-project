@@ -4,6 +4,7 @@ import com.iamin.data.service.LoginRepository;
 import com.iamin.data.Role;
 import com.iamin.security.AuthenticatedUser;
 import com.iamin.data.validation.Validation;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.login.LoginI18n;
@@ -35,6 +36,7 @@ import com.iamin.views.helpers.AverageAttendanceChartsCard;
 import com.iamin.views.helpers.CalendarCard;
 import com.iamin.views.helpers.DepartmentMembersCard;
 import com.iamin.views.helpers.Styling;
+import com.iamin.views.login.LoginView;
 import com.iamin.views.helpers.PersonFormDialog;
 
 import com.iamin.data.entity.Login;
@@ -112,16 +114,18 @@ public class DashboardView extends VerticalLayout {
 
         // Checks if current user has a SamplePerson entity and if not shows a sign up dialog
         String currentUsername = authentication.getName();
-       
-        
         Login userLogin = loginRepository.findByUsername(currentUsername);
-        if (userLogin != null && userLogin.getPerson() == null) {
-            personFormDialog.showPersonFormDialog();
-        }     
-        if (userLogin != null && passwordEncoder.matches("123456789", userLogin.getHashedPassword())) {
-            passwordDialog.showPasswordChangeDialog();
+
+        try {
+            if (userLogin != null && userLogin.getPerson() == null) {
+                personFormDialog.showPersonFormDialog();
+            }
+            if (userLogin != null && passwordEncoder.matches("123456789", userLogin.getHashedPassword())) {
+                passwordDialog.showPasswordChangeDialog();
+            }
+        } catch (NullPointerException e) {
+            UI.getCurrent().navigate(LoginView.class);
         }
-        
         
 
         // Master Container

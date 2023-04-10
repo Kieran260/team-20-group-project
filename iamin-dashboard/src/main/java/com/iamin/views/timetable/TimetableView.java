@@ -27,7 +27,7 @@ import javax.annotation.security.PermitAll;
 
 @CssImport(value = "timetable-grid.css")
 @PageTitle("Timetable")
-@Route(value = "TimetableView", layout = MainLayout.class)
+@Route(value = "timetable", layout = MainLayout.class)
 @PermitAll
 public class TimetableView extends VerticalLayout {
 

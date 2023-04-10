@@ -43,7 +43,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @CssImport(value = "dashboard-styles.css")
 @PageTitle("Manage Requests")
-@Route(value = "manageRequests", layout = MainLayout.class)
+@Route(value = "manage-requests", layout = MainLayout.class)
 @RolesAllowed("ADMIN")
 public class ManageRequestsView extends Div {
 

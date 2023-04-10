@@ -70,11 +70,6 @@ public class DashboardView extends VerticalLayout {
     String currentUserName;
     String currentUserRole;
 
-    @Autowired
-    private Validation validation;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private final EmployeeAttendanceCard employeeAttendanceCard;
@@ -108,48 +103,7 @@ public class DashboardView extends VerticalLayout {
         Login userLogin = loginRepository.findByUsername(currentUsername);
         if (userLogin != null && userLogin.getPerson() == null) {
             personFormDialog.showPersonFormDialog();
-        } 
-        
-        if (!userLogin.isPasswordSet(userLogin.getPerson())) {
-            Label headingLabel = new Label("Please set your password");
-            headingLabel.getStyle().set("font-weight","bold");
-            Dialog changePasswordDialog = new Dialog();
-            changePasswordDialog.setWidth("300px");
-        
-            PasswordField passwordField = new PasswordField("New Password");
-            PasswordField confirmPasswordField = new PasswordField("Confirm Password");
-            passwordField.setRequired(true);
-            passwordField.setHelperText("Password must be at least 8 characters, at least one letter and one digit.");
-            confirmPasswordField.setRequired(true);
-        
-            Button saveButton = new Button("Save");
-            saveButton.getStyle().set("margin-top", "10px");
-            saveButton.addClickListener(event -> {
-                String password = passwordField.getValue();
-                String confirmPassword = confirmPasswordField.getValue();
-
-                String validationResult = validation.passwordValidation(password, confirmPassword);
-                if (validationResult.isEmpty()) {
-                    // Save the new password
-                    userLogin.setHashedPassword(passwordEncoder.encode(password));
-                    userLogin.setPasswordSetFlag(true);
-                    loginRepository.save(userLogin);
-                    changePasswordDialog.close();
-                    Notification.show("Password changed successfully!",3000, Position.TOP_CENTER);
-                } else {
-                    Notification.show(validationResult,3000, Position.TOP_CENTER);
-                }
-            });
-        
-            VerticalLayout layout = new VerticalLayout(headingLabel,passwordField, confirmPasswordField, saveButton);
-            layout.setAlignItems(Alignment.CENTER);
-        
-            changePasswordDialog.add(layout);
-            changePasswordDialog.open();
-        }
-
-
-        
+        }   
         
 
         // Master Container

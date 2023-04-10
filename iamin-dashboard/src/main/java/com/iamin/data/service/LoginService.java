@@ -86,4 +86,9 @@ public class LoginService {
         return repository.findAll();
     }
     
+    public List<Login> findAllPendingLogins() {
+        return repository.findAll().stream()
+                .filter(login -> login.getDateModified() == null)
+                .collect(Collectors.toList());
+    }
 }

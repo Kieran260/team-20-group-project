@@ -59,4 +59,8 @@ public class TasksService {
         return tasksRepository.findByPersonAndDeadLineBefore(person, deadlineThresholdDate);
     }
 
+    public List<Tasks> findCompletedFalseForPerson(SamplePerson person) {
+        return tasksRepository.findByPersonAndCompletedFalse(person);
+    }
+
 }

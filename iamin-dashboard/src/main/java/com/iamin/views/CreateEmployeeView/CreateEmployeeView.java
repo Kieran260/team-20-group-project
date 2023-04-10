@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
 import com.iamin.data.service.SamplePersonRepository;
 import com.iamin.data.Role;
@@ -38,6 +41,9 @@ import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.iamin.data.service.DepartmentRepository;
 import com.iamin.data.service.LoginRepository;
+import com.iamin.data.service.LoginService;
+
+import com.iamin.data.service.LoginRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.HasValue;
@@ -52,6 +58,9 @@ public class CreateEmployeeView extends VerticalLayout {
 
     @Autowired
     LoginRepository loginRepository;
+
+    @Autowired
+    LoginService loginService;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -184,8 +193,12 @@ public class CreateEmployeeView extends VerticalLayout {
         Button resetPasswordButton = new Button("Reset Password");
         resetPasswordButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
 
+        // Add a pending accounts button
+        Button pendingAccountsButton = new Button("Pending Accounts");
+        pendingAccountsButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
+
         // Add the reset password button to the mainLayout
-        HorizontalLayout buttonLayout = new HorizontalLayout(save, resetPasswordButton);
+        HorizontalLayout buttonLayout = new HorizontalLayout(save, resetPasswordButton, pendingAccountsButton);
         mainLayout.add(buttonLayout);
 
         // Add a click listener to the reset password button
@@ -215,7 +228,6 @@ public class CreateEmployeeView extends VerticalLayout {
             });
             confirmResetButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-
             // Add a "Cancel" button to close the dialog
             Button cancelResetButton = new Button("Cancel", e -> resetPasswordDialog.close());
 
@@ -238,7 +250,31 @@ public class CreateEmployeeView extends VerticalLayout {
             resetPasswordDialog.open();
         });
 
+        // Pending Accounts Button
+        pendingAccountsButton.addClickListener(event -> {
+            Dialog pendingAccountsDialog = new Dialog();
+            pendingAccountsDialog.setMaxWidth("60%");
+            pendingAccountsDialog.setMinWidth("400px");
+            pendingAccountsDialog.setWidth("600px");
 
+        
+            Grid<Accounts> pendingAccountsGrid = new Grid<>();
+        
+            List<Accounts> pendingAccounts = getPendingAccounts();
+            pendingAccountsGrid.setItems(pendingAccounts);
+        
+            pendingAccountsGrid.addColumn(Accounts::getPersonName).setHeader("Name");
+            pendingAccountsGrid.addColumn(Accounts::getUsername).setHeader("Username");
+            pendingAccountsGrid.addColumn(Accounts::getPassword).setHeader("Password"); 
+        
+            pendingAccountsDialog.add(pendingAccountsGrid);
+        
+            Button closeButton = new Button("Close", e -> pendingAccountsDialog.close());
+            closeButton.getElement().getStyle().set("margin-top", "20px");
+            pendingAccountsDialog.add(closeButton);
+        
+            pendingAccountsDialog.open();
+        });
         
     }
 
@@ -287,7 +323,7 @@ public class CreateEmployeeView extends VerticalLayout {
         if (phone.getValue().isEmpty()) {
             errorMessage += "Phone is required.\n";
             valid = false;
-        } //TO DO: integrate with validation class 
+        } //TODO: integrate with validation class 
         /*else if () {
             errorMessage += ".\n";
             valid = false;
@@ -313,6 +349,59 @@ public class CreateEmployeeView extends VerticalLayout {
             Notification.show(errorMessage).setPosition(Notification.Position.TOP_CENTER);
         }
         return valid;
+    }
+
+    public List<Accounts> getPendingAccounts() {
+        List<Login> pendingLogins = loginService.findAllPendingLogins();
+        if (!pendingLogins.isEmpty()) {
+            return pendingLogins.stream().map(login -> {
+                SamplePerson person = login.getPerson();
+                String name = person.getFirstName() + " " + person.getLastName();
+                String username = login.getUsername();
+                return new Accounts(name, username);
+            }).collect(Collectors.toList());
+        } else {
+            return new ArrayList<>();
+        }
+    }
+    
+    
+    public class Accounts {
+        private String personName;
+        private String username;
+        private String password;
+    
+        public Accounts(String personName, String username) {
+            this.personName = personName;
+            this.username = username;
+            // This is a constant value for the password as all passwords are the same for default accounts
+            this.password = "123456789";
+        }
+    
+        public String getPassword() {
+            return password;
+        }
+    
+        public void setPassword(String password) {
+            this.password = password;
+        }
+    
+        public String getPersonName() {
+            return personName;
+        }
+    
+        public void setPersonName(String personName) {
+            this.personName = personName;
+        }
+    
+        public String getUsername() {
+            return username;
+        }
+    
+        public void setUsername(String username) {
+            this.username = username;
+        }
+
     }
     
 }

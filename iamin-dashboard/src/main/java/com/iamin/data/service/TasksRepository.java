@@ -14,4 +14,5 @@ import com.iamin.data.entity.Tasks;
 public interface TasksRepository extends JpaRepository<Tasks, Long> {
     List<Tasks> findByPerson(SamplePerson person);
     List<Tasks> findByPersonAndDeadLineBefore(SamplePerson person, LocalDate deadlineThreshold);
+    List<Tasks> findByPersonAndCompletedFalse(SamplePerson person);
 }

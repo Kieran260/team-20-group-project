@@ -43,6 +43,9 @@ public class PasswordDialog {
         PasswordField confirmNewPasswordField = new PasswordField("Confirm new Password");
         Button changePasswordButton = new Button("Change Password");
 
+        newPasswordField.setHelperText("Password must be at least 8 characters, at least one letter and one digit.");
+
+
         changePasswordButton.addClickListener(event -> {
             String newPassword = newPasswordField.getValue();
             String confirmNewPassword = confirmNewPasswordField.getValue();

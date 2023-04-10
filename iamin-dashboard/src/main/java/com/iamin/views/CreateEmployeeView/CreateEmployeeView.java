@@ -28,6 +28,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -178,6 +179,62 @@ public class CreateEmployeeView extends VerticalLayout {
                 Notification.show(successMessage+generatedUsername).setPosition(Notification.Position.TOP_CENTER);  
             }
         });
+        // Add a reset password button
+        Button resetPasswordButton = new Button("Reset Password");
+        resetPasswordButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+
+        // Add the reset password button to the mainLayout
+        mainLayout.add(resetPasswordButton);
+
+        // Add a click listener to the reset password button
+        resetPasswordButton.addClickListener(event -> {
+            // Create a dialog
+            Dialog resetPasswordDialog = new Dialog();
+
+            // Add a label and a TextField for entering the username
+            Label resetPasswordLabel = new Label("Enter the existing username to reset the password:");
+            TextField usernameField = new TextField();
+            usernameField.setPlaceholder("Username");
+
+            // Add a "Yes" button to confirm the reset action
+            Button confirmResetButton = new Button("Yes", e -> {
+                String username = usernameField.getValue();
+                Login login = loginRepository.findByUsername(username);
+
+                if (login != null) {
+                    // Reset the password to "123456789"
+                    login.setHashedPassword(passwordEncoder.encode("123456789"));
+                    loginRepository.save(login);
+                    Notification.show("The password has been reset to '123456789'.").setPosition(Notification.Position.TOP_CENTER);
+                } else {
+                    Notification.show("Username not found.").setPosition(Notification.Position.TOP_CENTER);
+                }
+                resetPasswordDialog.close();
+            });
+
+            // Add a "Cancel" button to close the dialog
+            Button cancelResetButton = new Button("Cancel", e -> resetPasswordDialog.close());
+
+            // Create a layout for the buttons and add the buttons to it
+            HorizontalLayout resetPasswordButtonLayout = new HorizontalLayout();
+            resetPasswordButtonLayout.setJustifyContentMode(JustifyContentMode.CENTER);
+            resetPasswordButtonLayout.add(confirmResetButton, cancelResetButton);
+
+            // Create a VerticalLayout to organize the components
+            VerticalLayout resetPasswordLayout = new VerticalLayout();
+            resetPasswordLayout.add(resetPasswordLabel, usernameField, resetPasswordButtonLayout);
+            resetPasswordLayout.setAlignItems(Alignment.CENTER);
+            resetPasswordLayout.setSpacing(true);
+            resetPasswordLayout.setPadding(true);
+
+            // Add the VerticalLayout to the dialog
+            resetPasswordDialog.add(resetPasswordLayout);
+
+            // Open the dialog
+            resetPasswordDialog.open();
+        });
+
+
         
     }
 

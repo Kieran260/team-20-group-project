@@ -168,6 +168,7 @@ public class CreateEmployeeView extends VerticalLayout {
                 
                 //set password as default pass
                 credentials.setHashedPassword(passwordEncoder.encode(defaultPassword));
+                credentials.setPasswordSetFlag(false);
 
                 //set person association 
                 credentials.setPerson(savedPerson);

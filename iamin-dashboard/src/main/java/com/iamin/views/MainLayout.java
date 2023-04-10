@@ -8,6 +8,7 @@ import com.iamin.security.AuthenticatedUser;
 import com.iamin.views.CreateEmployeeView.CreateEmployeeView;
 import com.iamin.views.dashboard.DashboardView;
 import com.iamin.views.manageemployees.ManageEmployeesView;
+import com.iamin.views.timetable.TimetableView;
 import com.iamin.views.manageRequests.ManageRequestsView;
 import com.iamin.views.manageTasks.ManagerTasksView;
 import com.iamin.views.viewtasks.EmployeeViewTasks;
@@ -87,30 +88,30 @@ public class MainLayout extends AppLayout {
 
         if (accessChecker.hasAccess(DashboardView.class)) {
             nav.addItem(new AppNavItem("Dashboard", DashboardView.class, "la la-globe"));
-
         }
+        
         if (accessChecker.hasAccess(ManageEmployeesView.class)) {
             nav.addItem(new AppNavItem("Manage Employees", ManageEmployeesView.class, "la la-columns"));
-
         }
+
         if (accessChecker.hasAccess(ManageRequestsView.class)) {
             nav.addItem(new AppNavItem("Manage Requests", ManageRequestsView.class, "la la-columns"));
-
         }
         if (accessChecker.hasAccess(EmployeeViewTasks.class)) {
             nav.addItem(new AppNavItem("View Tasks", EmployeeViewTasks.class, "la la-columns"));
 
         }
        
-
         if (accessChecker.hasAccess(ManagerTasksView.class)) {
             nav.addItem(new AppNavItem("Manage Tasks", ManagerTasksView.class, "la la-columns"));
-
         }
-    
 
         if (accessChecker.hasAccess(CreateEmployeeView.class)){
             nav.addItem(new AppNavItem("Add Employee", CreateEmployeeView.class, "la la-columns"));
+        }
+
+        if (accessChecker.hasAccess(TimetableView.class)){
+            nav.addItem(new AppNavItem("Timetable", TimetableView.class, "la la-columns"));
         }
 
 

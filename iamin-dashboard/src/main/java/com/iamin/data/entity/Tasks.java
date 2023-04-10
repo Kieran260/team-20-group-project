@@ -15,7 +15,7 @@ import javax.persistence.Table;
 public class Tasks extends AbstractEntity
 {
     
-	
+
     @ManyToOne
 	@JoinColumn(name = "person_id")
 	private SamplePerson person;  

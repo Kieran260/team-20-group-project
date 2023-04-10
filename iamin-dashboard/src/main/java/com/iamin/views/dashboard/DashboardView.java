@@ -1,7 +1,32 @@
 package com.iamin.views.dashboard;
-
+import com.iamin.data.entity.Login;
+import com.iamin.data.service.LoginRepository;
+import com.iamin.data.Role;
+import com.iamin.security.AuthenticatedUser;
+import com.iamin.data.validation.Validation;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.login.LoginForm;
+import com.vaadin.flow.component.login.LoginI18n;
+import com.vaadin.flow.server.VaadinService;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.textfield.PasswordField;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
+import com.vaadin.flow.router.internal.RouteUtil;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
+import com.vaadin.flow.component.notification.Notification.Position;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import java.util.Set;
+import java.util.HashSet;
 import com.iamin.views.MainLayout;
 import com.iamin.views.helpers.EmployeeAttendanceCard;
+import com.iamin.views.helpers.EmployeeTasksCard;
 import com.iamin.views.helpers.EmployeesTableCard;
 import com.iamin.views.helpers.NotificationsCard;
 import com.iamin.views.helpers.PasswordDialog;
@@ -14,13 +39,14 @@ import com.iamin.views.helpers.PersonFormDialog;
 
 import com.iamin.data.entity.Login;
 import com.iamin.data.service.LoginRepository;
-
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
-
 import java.util.Collections;
 
 import javax.annotation.security.PermitAll;
@@ -29,6 +55,7 @@ import com.vaadin.flow.component.html.Div;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -46,6 +73,7 @@ public class DashboardView extends VerticalLayout {
     String currentUserName;
     String currentUserRole;
 
+
     @Autowired
     private final EmployeeAttendanceCard employeeAttendanceCard;
 
@@ -55,16 +83,21 @@ public class DashboardView extends VerticalLayout {
     PasswordEncoder passwordEncoder;
 
     private final NotificationsCard notificationsCard;
+    private final EmployeeTasksCard employeeTasksCard;
+
     private final EmployeesTableCard employeesTableCard;
+
     private final PersonFormDialog personFormDialog;
     private final LoginRepository loginRepository;
     private final PasswordDialog passwordDialog;
+
 
     public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository,EmployeeAttendanceCard employeeAttendanceCard,DepartmentMembersCard departmentMembersCard,NotificationsCard notificationsCard, EmployeesTableCard employeesTableCard,  PasswordEncoder passwordEncoder, PasswordDialog passwordDialog) {
         this.personFormDialog = personFormDialog;
         this.loginRepository = loginRepository;
         this.employeeAttendanceCard = employeeAttendanceCard;
         this.departmentMembersCard = departmentMembersCard;
+        this.employeeTasksCard = employeeTasksCard;
         this.notificationsCard = notificationsCard;       
         this.employeesTableCard = employeesTableCard;
         this.passwordEncoder = passwordEncoder;
@@ -83,7 +116,7 @@ public class DashboardView extends VerticalLayout {
         Login userLogin = loginRepository.findByUsername(currentUsername);
         if (userLogin != null && userLogin.getPerson() == null) {
             personFormDialog.showPersonFormDialog();
-        }
+        }     
         if (userLogin != null && passwordEncoder.matches("123456789", userLogin.getHashedPassword())) {
             passwordDialog.showPasswordChangeDialog();
         }
@@ -152,6 +185,8 @@ public class DashboardView extends VerticalLayout {
         // Shows current tasks that are not yet completed
         // Query from "events" database for category "tasks" that are not yet completed
         Div card8 = new Div();
+        employeeTasksCard.createCard(card8,userLogin);
+
         
         // Get user's role
         String userRole = getUserRole(authentication);
@@ -160,11 +195,11 @@ public class DashboardView extends VerticalLayout {
         if ("ROLE_ADMIN".equals(userRole)) {
             // Add cards specific to the admin role
             // Card 1, card 3, card 4, card 5a, card 6, card 7
-            cardsContainer.add(card3,card7,card1,card2,card4,card5a);
+            cardsContainer.add(card3,card7,card1,card4,card5a,card6);
         } else if ("ROLE_USER".equals(userRole)) {
             // Add cards specific to the user role
             // Card 2, card 3, card 4, card 5b, card 7, card 8
-            cardsContainer.add(card1,card2,card3,card4,card7);
+            cardsContainer.add(card2,card3,card4,card7,card8);
         } 
         
 

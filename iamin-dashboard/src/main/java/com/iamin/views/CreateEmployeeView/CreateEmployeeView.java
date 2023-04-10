@@ -124,7 +124,7 @@ public class CreateEmployeeView extends VerticalLayout {
             new ResponsiveStep("400px", 2));
 
         //add the save button
-        VerticalLayout mainLayout = new VerticalLayout(titleLabel, miniFormsCombined, save);
+        VerticalLayout mainLayout = new VerticalLayout(titleLabel, miniFormsCombined);
         mainLayout.getStyle().set("width","100%");
         mainLayout.getStyle().set("max-width","1000px");
         titleLabel.getStyle().set("font-weight","bold");
@@ -185,7 +185,8 @@ public class CreateEmployeeView extends VerticalLayout {
         resetPasswordButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
 
         // Add the reset password button to the mainLayout
-        mainLayout.add(resetPasswordButton);
+        HorizontalLayout buttonLayout = new HorizontalLayout(save, resetPasswordButton);
+        mainLayout.add(buttonLayout);
 
         // Add a click listener to the reset password button
         resetPasswordButton.addClickListener(event -> {
@@ -197,8 +198,8 @@ public class CreateEmployeeView extends VerticalLayout {
             TextField usernameField = new TextField();
             usernameField.setPlaceholder("Username");
 
-            // Add a "Yes" button to confirm the reset action
-            Button confirmResetButton = new Button("Yes", e -> {
+            // Add a "Submit" button to confirm the reset action
+            Button confirmResetButton = new Button("Submit", e -> {
                 String username = usernameField.getValue();
                 Login login = loginRepository.findByUsername(username);
 
@@ -212,6 +213,8 @@ public class CreateEmployeeView extends VerticalLayout {
                 }
                 resetPasswordDialog.close();
             });
+            confirmResetButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
 
             // Add a "Cancel" button to close the dialog
             Button cancelResetButton = new Button("Cancel", e -> resetPasswordDialog.close());

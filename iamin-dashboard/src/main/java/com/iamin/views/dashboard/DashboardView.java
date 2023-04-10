@@ -83,6 +83,7 @@ public class DashboardView extends VerticalLayout {
     PasswordEncoder passwordEncoder;
 
     private final NotificationsCard notificationsCard;
+
     private final EmployeeTasksCard employeeTasksCard;
 
     private final EmployeesTableCard employeesTableCard;
@@ -92,7 +93,7 @@ public class DashboardView extends VerticalLayout {
     private final PasswordDialog passwordDialog;
 
 
-    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository,EmployeeAttendanceCard employeeAttendanceCard,DepartmentMembersCard departmentMembersCard,NotificationsCard notificationsCard, EmployeesTableCard employeesTableCard,  PasswordEncoder passwordEncoder, PasswordDialog passwordDialog) {
+    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository,EmployeeAttendanceCard employeeAttendanceCard,DepartmentMembersCard departmentMembersCard,NotificationsCard notificationsCard, EmployeesTableCard employeesTableCard, EmployeeTasksCard employeeTasksCard, PasswordEncoder passwordEncoder, PasswordDialog passwordDialog) {
         this.personFormDialog = personFormDialog;
         this.loginRepository = loginRepository;
         this.employeeAttendanceCard = employeeAttendanceCard;

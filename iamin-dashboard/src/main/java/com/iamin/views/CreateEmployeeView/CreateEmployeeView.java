@@ -118,7 +118,6 @@ public class CreateEmployeeView extends VerticalLayout {
         jobInfoForm.addFormItem(occupation, "Occupation");
         jobInfoForm.addFormItem(jobTitle, "Job Title");
         jobInfoForm.addFormItem(role, "Role");
-        jobInfoForm.addFormItem(departmentComboBox, "Department");
         
         //add save button
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
@@ -130,14 +129,15 @@ public class CreateEmployeeView extends VerticalLayout {
             // Use one column by default
             new ResponsiveStep("0", 1),
             // Use two columns, if the layout's width exceeds 320px
-            new ResponsiveStep("400px", 2));
+            new ResponsiveStep("400px", 2)
+        );
 
         //add the save button
         VerticalLayout mainLayout = new VerticalLayout(titleLabel, miniFormsCombined);
         mainLayout.getStyle().set("width","100%");
         mainLayout.getStyle().set("max-width","1000px");
         titleLabel.getStyle().set("font-weight","bold");
-
+    
         
         add(mainLayout);
         //do stuff when form is submitted
@@ -187,6 +187,18 @@ public class CreateEmployeeView extends VerticalLayout {
 
                 //notify on success and show generated username
                 Notification.show(successMessage+generatedUsername).setPosition(Notification.Position.TOP_CENTER);  
+            
+                // Clear the form
+                firstName.clear();
+                lastName.clear();
+                phone.clear();
+                email.clear();
+                email.setInvalid(false);
+                address.clear();
+                dateOfBirth.clear();
+                occupation.clear();
+                jobTitle.clear();
+                role.clear();
             }
         });
         // Add a reset password button

@@ -1,5 +1,6 @@
 package com.iamin.views.timetable;
 
+import com.iamin.data.entity.Tasks;
 import com.iamin.views.MainLayout;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.grid.Grid;
@@ -82,7 +83,4 @@ public class TimetableView extends VerticalLayout {
             }
         }
     }
-    
-    
-    
 }

@@ -53,7 +53,7 @@ public class ManageEmployeesView extends Div implements BeforeEnterObserver {
     private TextField jobTitle;
     private TextField address;
     private TextField maxHolidays;
-    
+
     private final Button cancel = new Button("Cancel");
     private final Button save = new Button("Save");
 
@@ -86,8 +86,7 @@ public class ManageEmployeesView extends Div implements BeforeEnterObserver {
         grid.addColumn("address").setAutoWidth(true);
         grid.addColumn("maxHolidays").setAutoWidth(true);
         grid.addColumn("dateModified").setAutoWidth(true);
-        
-        
+
         grid.setItems(query -> samplePersonService.list(
                 PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
                 .stream());
@@ -119,7 +118,7 @@ public class ManageEmployeesView extends Div implements BeforeEnterObserver {
             try {
                 if (this.samplePerson == null) {
                     // TODO: Notification.show to prevent new person from being crated
-                    this.samplePerson = new SamplePerson();
+                    Notification.show("Please select an employee.");
                 }
                 binder.writeBean(this.samplePerson);
                 samplePersonService.update(this.samplePerson);
@@ -175,8 +174,7 @@ public class ManageEmployeesView extends Div implements BeforeEnterObserver {
         jobTitle = new TextField("Job Title");
         address = new TextField("Address");
         maxHolidays = new TextField("Maximum Holidays");
-        formLayout.add(firstName, lastName, email, phone, dateOfBirth, occupation, jobTitle, address,maxHolidays );
-
+        formLayout.add(firstName, lastName, email, phone, dateOfBirth, occupation, jobTitle, address, maxHolidays);
 
         editorDiv.add(formLayout);
         createButtonLayout(editorLayoutDiv);

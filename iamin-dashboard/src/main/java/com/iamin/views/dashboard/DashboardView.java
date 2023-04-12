@@ -81,6 +81,7 @@ public class DashboardView extends VerticalLayout {
 
     @Autowired
     private final DepartmentMembersCard departmentMembersCard;
+    
     @Autowired
     PasswordEncoder passwordEncoder;
 

@@ -20,6 +20,7 @@ public class Tasks extends AbstractEntity
 	@JoinColumn(name = "person_id")
 	private SamplePerson person;  
     private LocalDate submittedDate;  
+    private String title;
     private String description;
     private LocalDate deadLine;
     private LocalDateTime dateModified;
@@ -31,6 +32,12 @@ public class Tasks extends AbstractEntity
     }
     public void setPerson(SamplePerson person) {
         this.person = person;
+    }
+    public String getTitle() {
+        return title;
+    }
+    public void setTitle(String title) {
+        this.title = title;
     }
     
     public String getDescription() {

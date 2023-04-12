@@ -13,6 +13,7 @@ import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.notification.Notification;
@@ -35,12 +36,14 @@ import org.springframework.data.domain.PageRequest;
 @PageTitle("Manage Tasks")
 @Route(value = "manage-tasks", layout = MainLayout.class)
 @RolesAllowed("ADMIN")
-public class ManagerTasksView extends HorizontalLayout{
+public class ManagerTasksView extends Div {
 
     Grid<Tasks> grid = new Grid<>(Tasks.class, false);
 
     SplitLayout splitLayout = new SplitLayout();
+
     private final TasksService tasksService;
+
     @Autowired
     private SamplePersonService samplePersonService;
 
@@ -50,6 +53,7 @@ public class ManagerTasksView extends HorizontalLayout{
         addClassName("list-view");
 
         splitLayout.getStyle().set("width","100%");
+
 
         configureTasks();
         configureAssignBar();
@@ -63,12 +67,13 @@ public class ManagerTasksView extends HorizontalLayout{
 
         // give grid a class name - as a referece point
         grid.addClassName("manager-assigns-tasks");
-
+        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+        grid.setWidth("80%");
         
+        grid.addColumn("title").setAutoWidth(true);
         grid.addColumn("description").setAutoWidth(true);
         grid.addColumn("assignDate").setAutoWidth(true);
         grid.addColumn("deadLine").setAutoWidth(true);
-        grid.addColumn("dateModified").setAutoWidth(true);
         grid.addColumn("submittedDate").setAutoWidth(true);
         grid.addColumn("completed").setAutoWidth(true);
         grid.addColumn(task -> {
@@ -81,7 +86,7 @@ public class ManagerTasksView extends HorizontalLayout{
             .stream());
         tasks.add(grid);
     
-        splitLayout.addToPrimary(tasks);
+        splitLayout.addToPrimary(grid);
     }
     
 
@@ -96,20 +101,27 @@ public class ManagerTasksView extends HorizontalLayout{
         List<SamplePerson> persons = samplePersonService.getAllSamplePersons();
         selectEmployee.setItems(persons);
 
-        TextField selectText = new TextField();
-        selectText.setLabel("Task Description");
+        TextField titleField = new TextField();
+        titleField.setLabel("Task Title");
+        TextField descriptionField = new TextField();
+        descriptionField.setLabel("Task Description");
         DatePicker dueDate = new DatePicker("Deadline");
+
         selectEmployee.setWidthFull();
-        selectText.setWidthFull();
+        titleField.setWidthFull();
+        descriptionField.setWidthFull();
         dueDate.setWidthFull();
+
         Button button = new Button("Assign Task", event -> {
             SamplePerson selectedPerson = selectEmployee.getValue();
-            String taskDescription = selectText.getValue();
+            String taskDescription = descriptionField.getValue();
+            String taskTitle = titleField.getValue();
             LocalDate deadline = dueDate.getValue();
 
             if (selectedPerson != null && taskDescription != null && !taskDescription.trim().isEmpty() && deadline != null) {
                 Tasks task = new Tasks();
                 task.setPerson(selectedPerson);
+                task.setTitle(taskTitle);
                 task.setDescription(taskDescription);
                 task.setDeadLine(deadline);
                 task.setAssignDate(LocalDate.now());
@@ -118,7 +130,8 @@ public class ManagerTasksView extends HorizontalLayout{
                 tasksService.create(task);
 
                 Notification.show("Task assigned successfully.", 3000, Notification.Position.TOP_CENTER);
-                selectText.clear();
+                titleField.clear();
+                descriptionField.clear();
                 dueDate.clear();
                 grid.getDataProvider().refreshAll();
             } else {
@@ -128,7 +141,7 @@ public class ManagerTasksView extends HorizontalLayout{
 
         button.setWidthFull();
 
-        content.add(selectEmployee, selectText, dueDate, button);
+        content.add(selectEmployee,titleField,descriptionField, dueDate, button);
 
         splitLayout.addToSecondary(content);
     }

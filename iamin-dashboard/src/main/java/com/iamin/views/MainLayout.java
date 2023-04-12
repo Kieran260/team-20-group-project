@@ -88,34 +88,34 @@ public class MainLayout extends AppLayout {
         AppNav nav = new AppNav();
 
         if (accessChecker.hasAccess(DashboardView.class)) {
-            nav.addItem(new AppNavItem("Dashboard", DashboardView.class, "la la-globe"));
+            nav.addItem(new AppNavItem("Dashboard", DashboardView.class, "la la-home"));
         }
         
         if (accessChecker.hasAccess(ManageEmployeesView.class)) {
-            nav.addItem(new AppNavItem("Manage Employees", ManageEmployeesView.class, "la la-columns"));
+            nav.addItem(new AppNavItem("Manage Employees", ManageEmployeesView.class, "la la-user"));
         }
 
         if (accessChecker.hasAccess(ManageRequestsView.class)) {
-            nav.addItem(new AppNavItem("Manage Requests", ManageRequestsView.class, "la la-columns"));
+            nav.addItem(new AppNavItem("Manage Requests", ManageRequestsView.class, "la la-question-circle"));
         }
         if (accessChecker.hasAccess(EmployeeViewTasks.class)) {
-            nav.addItem(new AppNavItem("View Tasks", EmployeeViewTasks.class, "la la-columns"));
+            nav.addItem(new AppNavItem("View Tasks", EmployeeViewTasks.class, "la la-tasks"));
         }
        
         if (accessChecker.hasAccess(ManagerTasksView.class)) {
-            nav.addItem(new AppNavItem("Manage Tasks", ManagerTasksView.class, "la la-columns"));
+            nav.addItem(new AppNavItem("Manage Tasks", ManagerTasksView.class, "la la-tasks"));
         }
 
         if (accessChecker.hasAccess(ManageEventsView.class)){
-            nav.addItem(new AppNavItem("Manage Events", ManageEventsView.class, "la la-columns"));
+            nav.addItem(new AppNavItem("Manage Events", ManageEventsView.class, "la la-users"));
         }
 
         if (accessChecker.hasAccess(CreateEmployeeView.class)){
-            nav.addItem(new AppNavItem("Add Employee", CreateEmployeeView.class, "la la-columns"));
+            nav.addItem(new AppNavItem("Add Employee", CreateEmployeeView.class, "la la-user-plus"));
         }
 
         if (accessChecker.hasAccess(TimetableView.class)){
-            nav.addItem(new AppNavItem("Timetable", TimetableView.class, "la la-columns"));
+            nav.addItem(new AppNavItem("Timetable", TimetableView.class, "la la-calendar"));
         }
 
         

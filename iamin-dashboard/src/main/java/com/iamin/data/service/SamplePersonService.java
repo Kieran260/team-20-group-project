@@ -1,6 +1,8 @@
 package com.iamin.data.service;
 
 import com.iamin.data.entity.SamplePerson;
+
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,5 +41,7 @@ public class SamplePersonService {
     public int count() {
         return (int) repository.count();
     }
-
+    public List<SamplePerson> getAllSamplePersons() {
+        return repository.findAll();
+    }
 }

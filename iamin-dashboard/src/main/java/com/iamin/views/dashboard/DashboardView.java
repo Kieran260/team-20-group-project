@@ -1,29 +1,68 @@
 package com.iamin.views.dashboard;
-
+import com.iamin.data.entity.Login;
+import com.iamin.data.service.LoginRepository;
+import com.iamin.data.Role;
+import com.iamin.security.AuthenticatedUser;
+import com.iamin.data.validation.Validation;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.login.LoginForm;
+import com.vaadin.flow.component.login.LoginI18n;
+import com.vaadin.flow.server.VaadinService;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.textfield.PasswordField;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
+import com.vaadin.flow.router.internal.RouteUtil;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
+import com.vaadin.flow.component.notification.Notification.Position;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import java.util.Set;
+import java.util.HashSet;
 import com.iamin.views.MainLayout;
 import com.iamin.views.helpers.EmployeeAttendanceCard;
+import com.iamin.views.helpers.EmployeeTasksCard;
 import com.iamin.views.helpers.EmployeesTableCard;
+import com.iamin.views.helpers.NotificationsCard;
+import com.iamin.views.helpers.PasswordDialog;
 import com.iamin.views.helpers.AverageAttendanceCard;
 import com.iamin.views.helpers.AverageAttendanceChartsCard;
 import com.iamin.views.helpers.CalendarCard;
 import com.iamin.views.helpers.DepartmentMembersCard;
 import com.iamin.views.helpers.Styling;
+import com.iamin.views.login.LoginView;
 import com.iamin.views.helpers.PersonFormDialog;
+
 import com.iamin.data.entity.Login;
 import com.iamin.data.service.LoginRepository;
-
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
+import java.util.Collections;
+
 import javax.annotation.security.PermitAll;
 import com.vaadin.flow.component.html.Div;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 @CssImport(value = "dashboard-styles.css")
@@ -36,26 +75,57 @@ public class DashboardView extends VerticalLayout {
     String currentUserName;
     String currentUserRole;
 
+
     @Autowired
     private final EmployeeAttendanceCard employeeAttendanceCard;
 
+    @Autowired
+    private final DepartmentMembersCard departmentMembersCard;
+    
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
+    private final NotificationsCard notificationsCard;
+
+    private final EmployeeTasksCard employeeTasksCard;
+
+    private final EmployeesTableCard employeesTableCard;
+
     private final PersonFormDialog personFormDialog;
     private final LoginRepository loginRepository;
+    private final PasswordDialog passwordDialog;
 
-    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository,EmployeeAttendanceCard employeeAttendanceCard) {
+
+    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository,EmployeeAttendanceCard employeeAttendanceCard,DepartmentMembersCard departmentMembersCard,NotificationsCard notificationsCard, EmployeesTableCard employeesTableCard, EmployeeTasksCard employeeTasksCard, PasswordEncoder passwordEncoder, PasswordDialog passwordDialog) {
         this.personFormDialog = personFormDialog;
         this.loginRepository = loginRepository;
         this.employeeAttendanceCard = employeeAttendanceCard;
+        this.departmentMembersCard = departmentMembersCard;
+        this.employeeTasksCard = employeeTasksCard;
+        this.notificationsCard = notificationsCard;       
+        this.employeesTableCard = employeesTableCard;
+        this.passwordEncoder = passwordEncoder;
+        this.passwordDialog = passwordDialog;
 
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        
+
         getStyle().set("background-color","rgba(250, 250, 250)");
 
         // Checks if current user has a SamplePerson entity and if not shows a sign up dialog
         String currentUsername = authentication.getName();
         Login userLogin = loginRepository.findByUsername(currentUsername);
-        if (userLogin != null && userLogin.getPerson() == null) {
-            personFormDialog.showPersonFormDialog();
+
+        try {
+            if (userLogin != null && userLogin.getPerson() == null) {
+                personFormDialog.showPersonFormDialog();
+            }
+            if (userLogin != null && passwordEncoder.matches("123456789", userLogin.getHashedPassword())) {
+                passwordDialog.showPasswordChangeDialog();
+            }
+        } catch (NullPointerException e) {
+            UI.getCurrent().navigate(LoginView.class);
         }
         
 
@@ -67,8 +137,7 @@ public class DashboardView extends VerticalLayout {
         // This specifically shows all employees that are currently checked in today
         // TODO: Show Check in / Check out times from database
         Div card1 = new Div();
-        EmployeesTableCard employeesTableCard = new EmployeesTableCard();
-        employeesTableCard.createCard(card1);
+        employeesTableCard.createCardBasedOnRole(card1, authentication);
         
 
         // Check In / Check Out
@@ -79,35 +148,34 @@ public class DashboardView extends VerticalLayout {
 
 
         // Calendar - All Roles
-        // Filter button to decide whether view is today's calendar, weekly or monthly
-        // Three calendar views which are interchangable by the filter button
-        // Display all events, holidays and absences
-        // First increment daily calendar
+        // Display all events, holidays and absences with respect to user role
         Div card3 = new Div();
         CalendarCard calendarCard = new CalendarCard();
         calendarCard.createCard(card3);
         
            
-        // Department Members - Employees Only
+        // Department Members - All Roles
         // This specifically shows all coworkers that are in the same department as user
         // TODO: on click, present user with employee's information including contact details and attendance
         Div card4 = new Div();
-        DepartmentMembersCard departmentMembersCard = new DepartmentMembersCard();
         departmentMembersCard.createCard(card4,authentication);
 
 
-        // Department Members Attendance - Managers Only
-        // This specifically shows all employees of a department with an average department attendance
+        // Employees Average Attendance - Managers Only
+        // This specifically shows the average attendance of all employees
         // TODO: Show department attendance which is the same department as current user (Authentication)
         // TODO: Add a grid of employees from department which shows individual attendance
-        Div card5 = new Div();
+        Div card5a = new Div();
         AverageAttendanceCard averageAttendanceCard = new AverageAttendanceCard();
-        averageAttendanceCard.createCard(card5,userLogin);
+        averageAttendanceCard.createCard(card5a,userLogin);
                 
-        // Charts View - All Roles
-        // Framework: https://vaadin.com/directory/component/apexchartsjs
-        // Task summary
-        // Potentially add another card with employee attendance for managers only
+        // TODO: When the above tasks are completed
+        //Div card5b = new Div();
+        //AverageAttendanceCard averageAttendanceCard2 = new AverageAttendanceCard();
+       // averageAttendanceCard2.createCard(card5a,userLogin);
+
+        // Charts View - Managers Only
+        // Show a bar chart with the average attendance for the last 6 months
         Div card6 = new Div();
         AverageAttendanceChartsCard averageAttendanceChartsCard = new AverageAttendanceChartsCard();
         averageAttendanceChartsCard.createCard(card6,userLogin);
@@ -117,25 +185,29 @@ public class DashboardView extends VerticalLayout {
         // Notifies Employees of denied requests 
         // When notification click, it moves to the necessary view
         Div card7 = new Div();
-        Styling.styleSquareBox(card7);
-    
-        //cardsLayout.add();
+        notificationsCard.createCard(card7,userLogin);
 
         // Tasks card - Employee role only
         // Shows current tasks that are not yet completed
         // Query from "events" database for category "tasks" that are not yet completed
         Div card8 = new Div();
+        employeeTasksCard.createCard(card8,userLogin);
+
         
         // Get user's role
         String userRole = getUserRole(authentication);
 
+        
         if ("ROLE_ADMIN".equals(userRole)) {
             // Add cards specific to the admin role
-            cardsContainer.add(card1,card2,card3,card4,card5,card6);
+            // Card 1, card 3, card 4, card 5a, card 6, card 7
+            cardsContainer.add(card3,card7,card1,card4,card5a,card6);
         } else if ("ROLE_USER".equals(userRole)) {
             // Add cards specific to the user role
-            cardsContainer.add(card2,card3,card4,card5,card6);
+            // Card 2, card 3, card 4, card 5b, card 7, card 8
+            cardsContainer.add(card2,card3,card4,card7,card8);
         } 
+        
 
         // All cards
 
@@ -154,5 +226,6 @@ public class DashboardView extends VerticalLayout {
         }
         return null;
     }
+    
 }
 

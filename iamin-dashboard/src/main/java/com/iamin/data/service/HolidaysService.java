@@ -7,6 +7,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 @Service
@@ -63,6 +64,12 @@ public class HolidaysService {
         }
         return totalHolidays - usedHolidays;
     }
-    
+    public List<Holidays> findAllUnapproved() {
+        return holidaysRepository.findAllUnapproved();
+    }
+
+    public Optional<Holidays> findById(Long requestId) {
+        return holidaysRepository.findById(requestId);
+    }
 
 }

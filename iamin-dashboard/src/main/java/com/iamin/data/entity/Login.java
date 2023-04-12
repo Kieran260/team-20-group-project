@@ -28,7 +28,8 @@ public class Login extends AbstractEntity  {
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<Role> role;    
-    private LocalDateTime dateModified;    
+    private LocalDateTime dateModified;
+    private Boolean passwordSet;    
     
     public String getUsername() {
         return username;
@@ -62,6 +63,11 @@ public class Login extends AbstractEntity  {
     public void setPerson(SamplePerson person) {
         this.person = person;
     }
-    
+    public Boolean isPasswordSet(SamplePerson person) {
+    	return passwordSet;
+    }
+    public void setPasswordSetFlag(Boolean passwordSet) {
+    	this.passwordSet = passwordSet;
+    }
 
 }

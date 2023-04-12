@@ -28,26 +28,23 @@ public class ViewRequestsTableCard {
         List<Request> activeRequestsList = new ArrayList<>();
         List<Request> pastRequestsList = new ArrayList<>();
 
-        Request dummyReq = new Request("John", "Doe",
-                "12-03-23", "18-03-23", "Fishing", true);
-
-        Request dummyReq2 = new Request("John", "Doe",
-                "12-03-23", "18-03-23", "frolicking", false);
-
         for (int i = 0; i < 10; i++) {
             String approved = (i % 2 == 0) ? "Yes" : "No";
-            requests.add(new Request("John", "Doe", "12-03-23", "18-03-23", "Fishing", approved));
+            activeRequestsList.add(new Request("John", "Doe", "12-03-23", "18-03-23", "Fishing", approved));
+            pastRequestsList.add(new Request("John", "Doe", "12-03-23", "18-03-23", "Fishing", approved));
+
         }
 
-        ListDataProvider<Request> dataProvider = new ListDataProvider<>(requests);
+        ListDataProvider<Request> activeDataProvider = new ListDataProvider<>(activeRequestsList);
+        ListDataProvider<Request> pastDataProvider = new ListDataProvider<>(pastRequestsList);
 
         // Create the tables and set their data providers
         Grid<Request> activeRequests = new Grid<>();
-        activeRequests.setDataProvider(activeRequestsList);
+        activeRequests.setDataProvider(activeDataProvider);
         activeRequests.setWidth("100%");
 
         Grid<Request> pastRequests = new Grid<>();
-        pastRequests.setDataProvider(pastRequestsList);
+        pastRequests.setDataProvider(pastDataProvider);
         pastRequests.setWidth("100%");
 
         // Create table headers
@@ -110,10 +107,10 @@ public class ViewRequestsTableCard {
         private final String startDate;
         private final String endDate;
         private final String reason;
-        private final boolean approved;
+        private final String approved;
 
         public Request(String firstName, String lastName, String startDate,
-                String endDate, String reason, Boolean approved) {
+                String endDate, String reason, String approved) {
 
             this.firstName = firstName;
             this.lastName = lastName;
@@ -143,7 +140,7 @@ public class ViewRequestsTableCard {
             return reason;
         }
 
-        public Boolean isApproved() {
+        public String isApproved() {
             return approved;
         }
     }

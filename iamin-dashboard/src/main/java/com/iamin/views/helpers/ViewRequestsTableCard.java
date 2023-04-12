@@ -50,21 +50,28 @@ public class ViewRequestsTableCard {
         Label activeHeader = new Label("Active Requests");
         activeHeader.getStyle().set("font-weight", "bold");
         activeHeader.getStyle().set("font-size", "18px");
+        activeHeader.getStyle().set("margin-bottom", "10px");
+        activeHeader.getStyle().set("margin-top", "10px");
         activeHeader.getStyle().set("margin-left", "10px");
+
 
         Label pastHeader = new Label("Past Requests");
         pastHeader.getStyle().set("font-weight", "bold");
         pastHeader.getStyle().set("font-size", "18px");
+        pastHeader.getStyle().set("margin-bottom", "10px");
+        pastHeader.getStyle().set("margin-top", "10px");
         pastHeader.getStyle().set("margin-left", "10px");
+
 
         // Create container to hold the tables
         Div container = new Div();
+        
         // Styling
         container.getStyle().set("display", "flex");
         container.getStyle().set("flex-direction", "column");
         container.getStyle().set("justify-content", "space-between");
-        container.getStyle().set("padding", "20px 10px");
-        Styling.styleSquareBox(container);
+        container.getStyle().set("gap", "10px");
+
         container.setWidth("100%");
         container.setHeight("50%");
 

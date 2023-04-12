@@ -12,6 +12,8 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
+
 import com.vaadin.flow.component.html.Div;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @CssImport(value = "dashboard-styles.css")
 @PageTitle("View Requests")
 @Route(value = "viewRequests", layout = MainLayout.class)
-@PermitAll
+@RolesAllowed("USER")
 public class ViewRequestsView extends Div {
 
     String currentUserName;

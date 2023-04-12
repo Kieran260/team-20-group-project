@@ -30,7 +30,7 @@ public class ViewRequestsTableCard {
 
         for (int i = 0; i < 10; i++) {
             String approved = (i % 2 == 0) ? "Yes" : "No";
-            activeRequestsList.add(new Request("John", "Doe", "12-03-23", "18-03-23", "Fishing", approved));
+            activeRequestsList.add(new Request("John", "Doe", "12-03-23", "18-03-23", "Fishing", "Pending"));
             pastRequestsList.add(new Request("John", "Doe", "12-03-23", "18-03-23", "Fishing", approved));
 
         }
@@ -76,7 +76,7 @@ public class ViewRequestsTableCard {
         activeRequests.addColumn(Request::getStartDate).setHeader("Start date");
         activeRequests.addColumn(Request::getEndDate).setHeader("End date");
         activeRequests.addColumn(Request::getReason).setHeader("Reason");
-        activeRequests.addColumn(new ComponentRenderer<>(Request::getApprovedComponent)).setHeader("Approved");
+        activeRequests.addColumn(Request::isApproved).setHeader("Approved");
 
         pastRequests.addColumn(Request::getFirstName).setHeader("First Name");
         pastRequests.addColumn(Request::getLastName).setHeader("Last Name");

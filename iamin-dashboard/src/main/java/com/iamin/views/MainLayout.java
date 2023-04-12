@@ -5,6 +5,9 @@ import com.iamin.components.appnav.AppNavItem;
 import com.iamin.data.entity.Login;
 import com.iamin.data.service.LoginService;
 import com.iamin.security.AuthenticatedUser;
+import com.iamin.views.dashboard.DashboardView;
+import com.iamin.views.manageemployees.ManageEmployeesView;
+import com.iamin.views.viewRequests.ViewRequestsView;
 import com.iamin.views.CreateEmployeeView.CreateEmployeeView;
 import com.iamin.views.ManageEvents.ManageEventsView;
 import com.iamin.views.dashboard.DashboardView;
@@ -112,6 +115,10 @@ public class MainLayout extends AppLayout {
 
         if (accessChecker.hasAccess(CreateEmployeeView.class)){
             nav.addItem(new AppNavItem("Add Employee", CreateEmployeeView.class, "la la-user-plus"));
+        }
+        if (accessChecker.hasAccess(ViewRequestsView.class)) {
+            nav.addItem(new AppNavItem("View Requests", ViewRequestsView.class, "la la-columns"));
+
         }
 
         if (accessChecker.hasAccess(TimetableView.class)){

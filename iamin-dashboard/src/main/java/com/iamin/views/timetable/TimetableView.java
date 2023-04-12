@@ -2,36 +2,27 @@ package com.iamin.views.timetable;
 
 import com.iamin.data.entity.Login;
 import com.iamin.data.entity.SamplePerson;
-import com.iamin.data.entity.Tasks;
 import com.iamin.data.service.LoginRepository;
 import com.iamin.views.MainLayout;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Paragraph;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexWrap;
-import com.vaadin.flow.component.splitlayout.SplitLayout;
-import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -68,11 +59,25 @@ public class TimetableView extends VerticalLayout {
     
         // Create a Button with the current week of the year as its text
         Button weekButton = new Button("Week " + Calendar.getInstance().get(Calendar.WEEK_OF_YEAR));
+        int currentWeekNumber = Integer.parseInt(weekButton.getText().substring(5));
+        initTimetableGrid(currentWeekNumber);
 
 
         // Set the button's styles
         weekButton.getStyle().set("max-width", "150px");
         weekButton.getStyle().set("min-width", "40px");
+
+        weekButton.addClickListener(event -> {
+            // Parse the current week number from the button's text
+            int currentWeek = Calendar.getInstance().get(Calendar.WEEK_OF_YEAR);
+        
+            // Update the button's text with the new week number
+            weekButton.setText("Week " + currentWeek);
+
+            remove(timetableGrid);
+            timetableGrid = initTimetableGrid(currentWeek);
+            add(timetableGrid);
+        });
 
         backButton.addClickListener(event -> {
             // Parse the current week number from the button's text
@@ -83,6 +88,10 @@ public class TimetableView extends VerticalLayout {
         
             // Update the button's text with the new week number
             weekButton.setText("Week " + newWeek);
+
+            remove(timetableGrid);
+            timetableGrid = initTimetableGrid(newWeek);
+            add(timetableGrid);
         });
     
         Button forwardButton = new Button(">");
@@ -99,24 +108,30 @@ public class TimetableView extends VerticalLayout {
         
             // Update the button's text with the new week number
             weekButton.setText("Week " + newWeek);
+
+            remove(timetableGrid);
+            timetableGrid = initTimetableGrid(newWeek);
+            add(timetableGrid);
         });
 
         headerLayout.add(backButton,weekButton,forwardButton);
 
         setSizeFull();
-        initTimetableGrid();
+        timetableGrid = initTimetableGrid(currentWeekNumber);
         add(headerLayout);
         add(timetableGrid);
     }
     
-    private void initTimetableGrid() {
-        timetableGrid = new FlexLayout();
-        timetableGrid.addClassName("timetable-grid");
-        timetableGrid.setFlexWrap(FlexWrap.WRAP);
-    
+    private FlexLayout initTimetableGrid(int selectedWeekNumber) {
+        FlexLayout newTimetableGrid = new FlexLayout();
+        newTimetableGrid.addClassName("timetable-grid");
+        newTimetableGrid.setFlexWrap(FlexWrap.WRAP);
+
+        // Calculate the start of the current week (Monday)
         LocalDate today = LocalDate.now();
-        LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - 1); // Get Monday of the current week
-    
+        LocalDate startOfYear = LocalDate.of(today.getYear(), Month.JANUARY, 1);
+        LocalDate startOfWeek = startOfYear.plusWeeks(selectedWeekNumber - 1).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        
         String[][] contentMatrix = createMatrix(5, 9);
     
         // Fill the content matrix with events
@@ -166,11 +181,11 @@ public class TimetableView extends VerticalLayout {
     
                 cell.add(content);
     
-                timetableGrid.add(cell);
+                newTimetableGrid.add(cell);
             }
         }
+        return newTimetableGrid;
     }
-    
 
     public String[][] createMatrix(int columns, int rows) {
         String[][] matrix = new String[rows][columns];
@@ -183,7 +198,6 @@ public class TimetableView extends VerticalLayout {
         return matrix;
     }
 
-    
     private void mapEventsToMatrix(List<Event> events, String[][] matrix) {
         LocalDate today = LocalDate.now();
         LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - 1); // Get Monday of the current week
@@ -200,10 +214,6 @@ public class TimetableView extends VerticalLayout {
             }
         }
     }
-    
-    
-    
-    
     
     private List<Event> getEvents() {
         // Retrieve the list of Event objects from the database or another source
@@ -269,5 +279,4 @@ public class TimetableView extends VerticalLayout {
             this.description = description;
         }
     }
-
 }

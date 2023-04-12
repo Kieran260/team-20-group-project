@@ -75,7 +75,7 @@ public class ManageEmployeesView extends Div implements BeforeEnterObserver {
 
         add(splitLayout);
 
-        // Configure Grid
+        // Configure 
         grid.addColumn("firstName").setAutoWidth(true);
         grid.addColumn("lastName").setAutoWidth(true);
         grid.addColumn("email").setAutoWidth(true);

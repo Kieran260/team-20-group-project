@@ -26,3 +26,6 @@ application.properties
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+
+# Ignore firebase sdk
+iamin-381803-firebase-adminsdk-avmmx-343d35756d

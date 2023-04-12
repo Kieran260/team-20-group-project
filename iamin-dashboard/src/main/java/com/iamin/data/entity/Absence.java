@@ -3,6 +3,7 @@ package com.iamin.data.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -14,12 +15,14 @@ import javax.persistence.Table;
 public class Absence extends AbstractEntity {
 
 	private String absenceReason;
-	private String authorisedBy; 
-	private Integer documentsId;
+    @Column(columnDefinition = "TEXT")
+	private String documentsURL;
     private LocalDateTime dateModified;
     private LocalDate startDate;
     private LocalDate endDate;
     private Boolean absenceApproval;
+    private String denyReason; 
+   
     @ManyToOne
     @JoinColumn(name = "person_id")
     private SamplePerson person;
@@ -32,26 +35,20 @@ public class Absence extends AbstractEntity {
         this.person = person;
     }
 
-    public String absenceReason() { 
+    public String getAbsenceReason() { 
 	return absenceReason; 
 	}
 
 	public void setAbsenceReason(String absenceReason) { 
 	this.absenceReason = absenceReason; 
 	}
-	public String authorisedBy() { 
-	return authorisedBy; 
+	
+	public String documentsURL() { 
+	return documentsURL; 
 	}
 
-	public void setAuthorisedBy(String authorisedBy) { 
-	this.authorisedBy = authorisedBy; 
-	}
-	public Integer documentsId() { 
-	return documentsId; 
-	}
-
-	public void setDocumentsId(Integer documentsId) { 
-	this.documentsId = documentsId; 
+	public void setDocumentsURL(String documentsURL) { 
+	this.documentsURL = documentsURL; 
 	}
     
 	public LocalDateTime getDateModified() {
@@ -67,7 +64,7 @@ public class Absence extends AbstractEntity {
     public void setStartDate(LocalDate startDate ) {
         this.startDate = startDate;
     }
-    public LocalDate getSendDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
     public void setEndDate(LocalDate endDate ) {
@@ -78,5 +75,12 @@ public class Absence extends AbstractEntity {
     }
     public void setAbsenceApproval(Boolean absenceApproval ) {
         this.absenceApproval = absenceApproval;
+    }
+    public String getDenyReason() {
+        return denyReason;
+    }
+
+    public void setDenyReason(String denyReason) {
+        this.denyReason = denyReason;
     }
 }

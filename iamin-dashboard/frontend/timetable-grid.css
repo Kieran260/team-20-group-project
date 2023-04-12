@@ -1,0 +1,18 @@
+.timetable-grid {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.grid-cell {
+    flex: 1 0 calc(100% / 6 - 2px);
+    min-height: 50px;
+    box-sizing: border-box;
+    border: 0.25px solid lightgrey;
+    padding: 5px;
+}
+
+.timetable-grid {
+    border: 0.25px solid lightgrey;
+    height: 90%;
+}

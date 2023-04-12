@@ -12,31 +12,19 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "Holidays")
 public class Holidays extends AbstractEntity{
-
-
-    
-	
         private LocalDate startDate;
         private LocalDate endDate;
         private Integer totalDays;
         private LocalDateTime dateModified;
-	    private String authorisedBy;
-        private LocalDate authorisedDate;
-        private String deniedBy;
-        private String deniedReason;
-        private String reason;
+        private String holidayReason;
+        private Boolean holidaysApproval;
+        private String denyReason; 
 
      
         @ManyToOne
         @JoinColumn(name = "person_id")
         private SamplePerson person;
 
-        public String getReason() {
-            return reason;
-        }
-        public void setReason(String reason) {
-            this.reason = reason;
-        }
 
         public LocalDate getStartDate() {
             return startDate;
@@ -63,32 +51,6 @@ public class Holidays extends AbstractEntity{
         public void updateDateModified() {
             this.dateModified = LocalDateTime.now();
         }
-        public String getAuthorisedBy() {
-            return authorisedBy;
-        }
-        public void setAuthorisedBy(String authorisedBy) {
-            this.authorisedBy = authorisedBy;
-        }
-        
-        public LocalDate getAuthorisedDate() {
-            return authorisedDate;
-        }
-        public void setAuthorisedDate(LocalDate authorisedDate) {
-            this.authorisedDate = authorisedDate;
-        }
-        public String getDeniedBy() {
-            return deniedBy;
-        }
-        public void setDeniedBy(String deniedBy) {
-            this.deniedBy = deniedBy;
-        }
-        
-        public String getDeniedReason() {
-            return deniedReason;
-        }
-        public void setDeniedReason(String deniedReason) {
-            this.deniedReason = deniedReason;
-        }
         public SamplePerson getPerson() {
             return person;
         }
@@ -96,5 +58,22 @@ public class Holidays extends AbstractEntity{
         public void setPerson(SamplePerson person) {
             this.person = person;
         }
-    
+        public String getHolidayReason() {
+            return holidayReason;
+        }
+        public void setHolidayReason(String holidayReason) {
+            this.holidayReason = holidayReason;
+        }
+        public Boolean getHolidaysApproval() {
+            return holidaysApproval;
+        }
+        public void setHolidaysApproval(Boolean holidaysApproval) {
+            this.holidaysApproval = holidaysApproval;
+        }
+        public String getDenyReason() {
+            return denyReason;
+        }
+        public void setDenyReason(String denyReason) {
+            this.denyReason = denyReason;
+        }
 }

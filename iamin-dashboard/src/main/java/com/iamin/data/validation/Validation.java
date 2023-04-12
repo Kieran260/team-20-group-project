@@ -22,8 +22,6 @@ public class Validation {
         return (char1 >= 'a' && char1 <= 'z') || (char1 >= 'A' && char1 <= 'Z') || (char1 >= '0' && char1 <= '9');
     }
 
-
-
     public boolean usernameExists(String username) {
         return loginService.checkIfUsernameExists(username);
     }

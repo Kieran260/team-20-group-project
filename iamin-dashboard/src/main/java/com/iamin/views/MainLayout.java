@@ -6,6 +6,7 @@ import com.iamin.data.entity.Login;
 import com.iamin.data.service.LoginService;
 import com.iamin.security.AuthenticatedUser;
 import com.iamin.views.CreateEmployeeView.CreateEmployeeView;
+import com.iamin.views.ManageEvents.ManageEventsView;
 import com.iamin.views.dashboard.DashboardView;
 import com.iamin.views.manageemployees.ManageEmployeesView;
 import com.iamin.views.timetable.TimetableView;
@@ -99,11 +100,14 @@ public class MainLayout extends AppLayout {
         }
         if (accessChecker.hasAccess(EmployeeViewTasks.class)) {
             nav.addItem(new AppNavItem("View Tasks", EmployeeViewTasks.class, "la la-columns"));
-
         }
        
         if (accessChecker.hasAccess(ManagerTasksView.class)) {
             nav.addItem(new AppNavItem("Manage Tasks", ManagerTasksView.class, "la la-columns"));
+        }
+
+        if (accessChecker.hasAccess(ManageEventsView.class)){
+            nav.addItem(new AppNavItem("Manage Events", ManageEventsView.class, "la la-columns"));
         }
 
         if (accessChecker.hasAccess(CreateEmployeeView.class)){
@@ -113,6 +117,8 @@ public class MainLayout extends AppLayout {
         if (accessChecker.hasAccess(TimetableView.class)){
             nav.addItem(new AppNavItem("Timetable", TimetableView.class, "la la-columns"));
         }
+
+        
 
 
         return nav;

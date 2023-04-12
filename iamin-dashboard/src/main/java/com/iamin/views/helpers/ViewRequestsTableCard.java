@@ -76,7 +76,7 @@ public class ViewRequestsTableCard {
         activeRequests.addColumn(Request::getStartDate).setHeader("Start date");
         activeRequests.addColumn(Request::getEndDate).setHeader("End date");
         activeRequests.addColumn(Request::getReason).setHeader("Reason");
-        activeRequests.addColumn(Request::isApproved).setHeader("Approved");
+        activeRequests.addColumn(new ComponentRenderer<>(Request::getApprovedComponent)).setHeader("Approved");
 
         pastRequests.addColumn(Request::getFirstName).setHeader("First Name");
         pastRequests.addColumn(Request::getLastName).setHeader("Last Name");
@@ -95,9 +95,12 @@ public class ViewRequestsTableCard {
             if ("Yes".equals(approved)) {
                 icon = new Icon(VaadinIcon.CHECK);
                 icon.getStyle().set("color", "green");
-            } else {
+            } else if ("No".equals(approved)) {
                 icon = new Icon(VaadinIcon.CLOSE);
                 icon.getStyle().set("color", "red");
+            } else {
+                icon = new Icon(VaadinIcon.QUESTION);
+                icon.getStyle().set("color", "black");
             }
             return icon;
         }

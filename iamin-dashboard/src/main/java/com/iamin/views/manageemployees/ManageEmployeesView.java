@@ -1,12 +1,22 @@
 package com.iamin.views.manageemployees;
 
+
+import java.util.Optional;
+
+
+import javax.annotation.security.RolesAllowed;
+
+
+import com.iamin.data.entity.Login;
 import com.iamin.data.entity.SamplePerson;
+import com.iamin.data.service.LoginRepository;
 import com.iamin.data.service.SamplePersonService;
 import com.iamin.views.MainLayout;
+
+
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -20,24 +30,35 @@ import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.binder.BeanValidationBinder;
-import com.vaadin.flow.data.binder.ValidationException;
-import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
-import java.util.Optional;
-import javax.annotation.security.RolesAllowed;
+import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.binder.ValidationException;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @PageTitle("Manage Employees")
 @Route(value = "manage-employees/:samplePersonID?/:action?(edit)", layout = MainLayout.class)
 @RolesAllowed("ADMIN")
 @Uses(Icon.class)
 public class ManageEmployeesView extends Div implements BeforeEnterObserver {
+    
+    @Autowired
+    LoginRepository loginRepository;
+
+    //setup for BeforeEnter observer method
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    Login userLogin;
+    String currentUsername = authentication.getName();
+    //end setup
 
     private final String SAMPLEPERSON_ID = "samplePersonID";
     private final String SAMPLEPERSON_EDIT_ROUTE_TEMPLATE = "manage-employees/%s/edit";
@@ -140,6 +161,19 @@ public class ManageEmployeesView extends Div implements BeforeEnterObserver {
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
+        //Checks if current user has a SamplePerson entity and if not shows a sign up dialog
+        try{
+            userLogin = loginRepository.findByUsername(currentUsername);
+        }catch(Exception e){
+            userLogin = null;
+        }
+        // Check your condition and redirect if necessary
+        boolean Redirect = (userLogin != null && userLogin.getPerson() == null);
+        if (Redirect) {
+            UI.getCurrent().getPage().executeJs("location.href = 'dashboard'");
+        }
+        //end check
+
         Optional<Long> samplePersonId = event.getRouteParameters().get(SAMPLEPERSON_ID).map(Long::parseLong);
         if (samplePersonId.isPresent()) {
             Optional<SamplePerson> samplePersonFromBackend = samplePersonService.get(samplePersonId.get());

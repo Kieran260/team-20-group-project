@@ -5,46 +5,53 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+
 import javax.annotation.security.RolesAllowed;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
-import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
-import com.vaadin.flow.component.html.H1;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+
 import com.iamin.data.service.SamplePersonRepository;
 import com.iamin.data.Role;
 import com.iamin.data.entity.Department;
 import com.iamin.data.entity.Login;
 import com.iamin.data.entity.SamplePerson;
 import com.iamin.views.MainLayout;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.iamin.data.service.DepartmentRepository;
+import com.iamin.data.service.LoginRepository;
+import com.iamin.data.validation.Validation;
+
+
+import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
-import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.Key;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.Notification.Position;
-import com.vaadin.flow.component.notification.NotificationVariant;
-import com.iamin.data.service.DepartmentRepository;
-import com.iamin.data.service.LoginRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
-import com.vaadin.flow.component.HasValue;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
 
 @PageTitle("Add Employee")
 @Route(value = "add-employee", layout= MainLayout.class)
 @RolesAllowed("ADMIN")
-public class CreateEmployeeView extends VerticalLayout {
+public class CreateEmployeeView extends VerticalLayout implements BeforeEnterObserver{
+
+    
 
     @Autowired
     SamplePersonRepository samplePersonRepository;
@@ -58,6 +65,25 @@ public class CreateEmployeeView extends VerticalLayout {
     @Autowired
     DepartmentRepository departmentRepository;
     
+    // Checks if current user has a SamplePerson entity and if not shows a sign up dialog
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    Login userLogin;
+    String currentUsername = authentication.getName();
+    
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        try{
+            userLogin = loginRepository.findByUsername(currentUsername);
+        }catch(Exception e){
+            userLogin = null;
+        }
+        // Check your condition and redirect if necessary
+        boolean Redirect = (userLogin != null && userLogin.getPerson() == null);
+        if (Redirect) {
+            UI.getCurrent().getPage().executeJs("location.href = 'dashboard'");
+        }
+    }
+
     //form fields
     private Label      titleLabel  = new Label("Create Employee");
     private TextField  firstName   = new TextField();
@@ -216,25 +242,38 @@ public class CreateEmployeeView extends VerticalLayout {
         if (firstName.getValue().isEmpty()) {
             errorMessage += "First Name is required.\n";
             valid = false;
+        }else if(Validation.isSqlInjection(firstName.getValue())){
+            errorMessage += "First Name must not contain SQL injections.\n";
+            valid = false;
+        }else if(!Validation.isAlpha(firstName.getValue())){
+            errorMessage += "First Name must contain alphabetic characters only.\n";
+            valid = false;
         }
     
         if (lastName.getValue().isEmpty()) {
             errorMessage += "Last Name is required.\n";
+            valid = false;
+        }else if(Validation.isSqlInjection(lastName.getValue())){
+            errorMessage += "Last Name must not contain SQL injections.\n";
+            valid = false;
+        }else if(!Validation.isAlpha(lastName.getValue())){
+            errorMessage += "Last Name must contain alphabetic characters only.\n";
             valid = false;
         }
     
         if (phone.getValue().isEmpty()) {
             errorMessage += "Phone is required.\n";
             valid = false;
-        } //TO DO: integrate with validation class 
-        /*else if () {
-            errorMessage += ".\n";
+        } else if (!Validation.phoneValidation(phone.getValue())) {
+            errorMessage += "Invalid phone format.\n";
             valid = false;
-        }*/
+        }
     
         if (dateOfBirth.getValue() == null) {
             errorMessage += "Date Of Birth is required.\n";
             valid = false;
+        }else if(!Validation.isAtLeast18YearsAgo(dateOfBirth.getValue()) || Validation.isAfterCurrentDate(dateOfBirth.getValue())){
+            errorMessage += "Employee must be at least 18 years old.\n";
         }
     
         if (occupation.getValue().isEmpty()) {
@@ -246,10 +285,19 @@ public class CreateEmployeeView extends VerticalLayout {
             errorMessage += "Job Title is required.\n";
             valid = false;
         }
+        //TODO validate address -talk with Jamie
     
         if (!valid) {
             // Display pop-up error message to user
-            Notification.show(errorMessage).setPosition(Notification.Position.TOP_CENTER);
+            Notification notification = new Notification();
+            Div messageDiv = new Div();
+            messageDiv.getStyle().set("white-space", "pre-wrap");
+            messageDiv.setText(errorMessage);
+            notification.add(messageDiv);
+            notification.setPosition(Notification.Position.TOP_CENTER);
+            notification.setDuration(3000);
+            notification.open();
+            
         }
         return valid;
     }

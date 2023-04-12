@@ -5,6 +5,7 @@ import com.iamin.data.service.LoginRepository;
 import com.iamin.data.Role;
 import com.iamin.security.AuthenticatedUser;
 import com.iamin.data.validation.Validation;
+import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.login.LoginI18n;
@@ -195,6 +196,14 @@ public class LoginView extends VerticalLayout {
                 return;
             }
 
+        });
+        
+        //if user clicks enter after filling-in confirmPassword field, simulate
+        //clicking on signUpButton
+        confirmPassword.addKeyPressListener(Key.ENTER, event -> {
+            if (Key.ENTER.equals(event.getKey())){
+                signUpButton.click();
+            }
         });
 
         // AUTHENTICATION END: Sign Up

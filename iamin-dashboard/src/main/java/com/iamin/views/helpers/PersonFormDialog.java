@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.iamin.data.entity.Login;
 import com.iamin.data.service.SamplePersonRepository;
+import com.iamin.data.validation.Validation;
 import com.iamin.data.service.LoginRepository;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -15,8 +16,10 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.page.Page;
+import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -55,15 +58,15 @@ public class PersonFormDialog {
         );
     
         // Create text fields for first name, last name, email, phone number, address, occupation, job title and department
-        Label welcomeLabel = new Label("Welcome to IAMIN Manager. Please enter your personal details to finish signing up.");
-        TextField firstName = new TextField("First Name");
-        TextField lastName = new TextField("Last Name");
-        TextField email = new TextField("Email");
-        TextField phone = new TextField("Phone Number");
-        TextField address = new TextField("Address");
-        TextField occupation = new TextField("Occupation");
-        TextField jobTitle = new TextField("Job Title");
-        TextField department = new TextField("Department");
+        Label welcomeLabel    = new Label("Welcome to IAMIN Manager. Please enter your personal details to finish signing up.");
+        TextField firstName   = new TextField("First Name");
+        TextField lastName    = new TextField("Last Name");
+        EmailField email      = new EmailField("Email");
+        TextField phone       = new TextField("Phone Number");
+        TextField address     = new TextField("Address");
+        TextField occupation  = new TextField("Occupation");
+        TextField jobTitle    = new TextField("Job Title");
+        TextField department  = new TextField("Department");
         TextField maxHolidays = new TextField("maxHolidays");
 
         // Create a date picker for date of birth
@@ -96,10 +99,59 @@ public class PersonFormDialog {
             // DO NOT validate occupation, department, job title as we will add these as a drop-down menu in later increment
             
             boolean valid = true;
+            String errorMessage = "";
+        
+            if (firstName.getValue().isEmpty()) {
+                errorMessage += "First Name is required.\n";
+                valid = false;
+            }else if(Validation.isSqlInjection(firstName.getValue())){
+                errorMessage += "First Name must not contain SQL injections.\n";
+                valid = false;
+            }else if(!Validation.isAlpha(firstName.getValue())){
+                errorMessage += "First Name must contain alphabetic characters only.\n";
+                valid = false;
+            }
+        
+            if (lastName.getValue().isEmpty()) {
+                errorMessage += "Last Name is required.\n";
+                valid = false;
+            }else if(Validation.isSqlInjection(lastName.getValue())){
+                errorMessage += "Last Name must not contain SQL injections.\n";
+                valid = false;
+            }else if(!Validation.isAlpha(lastName.getValue())){
+                errorMessage += "Last Name must contain alphabetic characters only.\n";
+                valid = false;
+            }
+        
+            if (phone.getValue().isEmpty()) {
+                errorMessage += "Phone is required.\n";
+                valid = false;
+            } else if (!Validation.phoneValidation(phone.getValue())) {
+                errorMessage += "Invalid phone format.\n";
+                valid = false;
+            }
+        
+            if (dateOfBirth.getValue() == null) {
+                errorMessage += "Date Of Birth is required.\n";
+                valid = false;
+            }else if(!Validation.isAtLeast18YearsAgo(dateOfBirth.getValue()) || Validation.isAfterCurrentDate(dateOfBirth.getValue())){
+                errorMessage += "Employee must be at least 18 years old.\n";
+            }
+        
+            if (occupation.getValue().isEmpty()) {
+                errorMessage += "Occupation is required.\n";
+                valid = false;
+            }
+        
+            if (jobTitle.getValue().isEmpty()) {
+                errorMessage += "Job Title is required.\n";
+                valid = false;
+            }
+            //TODO validate address -talk with Jamie
+
             // Invalid return from validation class changes valid = false
 
-            if (valid == true) {
-                // TODO - make sure first name, last name, email, phone number, address, occupation, job title fields are not null
+            if (valid) {
                 SamplePerson person = samplePersonRepository.findById(1L).orElse(null);
                 if (person != null) {
                     person.setFirstName(firstName.getValue());
@@ -128,6 +180,7 @@ public class PersonFormDialog {
                     new Page(UI.getCurrent()).reload();
                 } else {
                     // Handle the case when the userLogin is not found (e.g., show an error message)
+                    
                 }
 
                 System.out.println("DEBUG INFORMATION FOR CURRENT USER LOGIN");
@@ -136,13 +189,23 @@ public class PersonFormDialog {
                 System.out.println("First name of CURRENT USER LOGGED IN: " + userLogin.getPerson().getFirstName());
                 Notification.show("Data saved");
                 dialog.close();
+            }else{
+                // Display pop-up error message to user
+                Notification notification = new Notification();
+                Div messageDiv = new Div();
+                messageDiv.getStyle().set("white-space", "pre-wrap");
+                messageDiv.setText(errorMessage);
+                notification.add(messageDiv);
+                notification.setPosition(Notification.Position.TOP_CENTER);
+                notification.setDuration(3000);
+                notification.open();
             }
             
         });
     
         // Open the dialog
         dialog.open();
+        
     }
-
     
-    }
+}

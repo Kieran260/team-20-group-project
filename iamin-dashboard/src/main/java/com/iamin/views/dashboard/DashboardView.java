@@ -1,5 +1,8 @@
 package com.iamin.views.dashboard;
 
+import javax.annotation.security.PermitAll;
+
+
 import com.iamin.views.MainLayout;
 import com.iamin.views.helpers.EmployeeAttendanceCard;
 import com.iamin.views.helpers.EmployeesTableCard;
@@ -12,23 +15,18 @@ import com.iamin.views.helpers.PersonFormDialog;
 import com.iamin.data.entity.Login;
 import com.iamin.data.service.LoginRepository;
 
+
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 
-import java.util.Collections;
-
-import javax.annotation.security.PermitAll;
-import com.vaadin.flow.component.html.Div;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 

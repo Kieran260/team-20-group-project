@@ -1,14 +1,17 @@
 package com.iamin.views;
 
+
 import com.iamin.components.appnav.AppNav;
 import com.iamin.components.appnav.AppNavItem;
-import com.iamin.data.entity.Login;
-import com.iamin.data.service.LoginService;
 import com.iamin.security.AuthenticatedUser;
 import com.iamin.views.CreateEmployeeView.CreateEmployeeView;
 import com.iamin.views.dashboard.DashboardView;
 import com.iamin.views.manageemployees.ManageEmployeesView;
-import com.iamin.views.manageTasks.ManagerTasksView;
+import com.iamin.views.ManageTasks.ManagerTasksView;
+import com.iamin.data.entity.Login;
+import com.iamin.data.service.LoginService;
+
+
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
@@ -20,14 +23,13 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Header;
 import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.map.configuration.View;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-import java.io.ByteArrayInputStream;
+
+
 import java.util.Optional;
 
 import javax.persistence.EntityNotFoundException;

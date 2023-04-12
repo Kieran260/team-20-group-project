@@ -1,10 +1,14 @@
 package com.iamin.data.validation;
 
 import org.jsoup.Jsoup;
+
 import com.iamin.data.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.jsoup.safety.Safelist;
+
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,7 +26,10 @@ public class Validation {
         return (char1 >= 'a' && char1 <= 'z') || (char1 >= 'A' && char1 <= 'Z') || (char1 >= '0' && char1 <= '9');
     }
 
-
+    public static boolean isAlpha(String myStr){
+        String regex = "^[a-zA-Z]+$";
+        return (myStr != null) && myStr.matches(regex);
+    }
 
     public boolean usernameExists(String username) {
         return loginService.checkIfUsernameExists(username);
@@ -92,7 +99,7 @@ public class Validation {
     // 100 chars
     // Check city contains letters and spaces only, up to 50 chars
     // Check postcode in format AB1 0AA, EH10 4BF, W1A 0AX, M1 1AE etc
-    public boolean addressValidation(String addressLine1, String addressLine2, String city, String postcode) {
+    public static boolean addressValidation(String addressLine1, String addressLine2, String city, String postcode) {
 
         String ADDRESS_REGEX = "^[\\w\\s\\-,'/\\.&]{1,100}$";
         String CITY_REGEX = "^[A-Za-z\\s]{1,50}$";
@@ -115,7 +122,7 @@ public class Validation {
     // Checks phone number is in one of the below formats:
     // (123) 456-7890, (123)-456-7890, 123-456-7890, 123.456.7890, 1234567890, 01234
     // 435467
-    public boolean phoneValidation(String phoneNumber) {
+    public static boolean phoneValidation(String phoneNumber) {
 
         String PHONE_REGEX = "^(\\(?\\d{3}\\)?[\\s.-]?){1,2}\\d{3}[\\s.-]?\\d{4}$";
 
@@ -127,10 +134,10 @@ public class Validation {
     }
 
     // Checks for SQL injections
-    public boolean isSqlInjection(String message) {
+    public static boolean isSqlInjection(String message) {
         // Common SQL injection keywords
         String[] sqlKeywords = { "SELECT", "INSERT", "UPDATE", "DELETE", "CREATE", "DROP", "ALTER", "EXECUTE",
-                "TRUNCATE" };
+                "TRUNCATE", "ALERT", "AND", "OR", "UNION" };
 
         // Loop through the message and check for SQL injection keywords
         for (String keyword : sqlKeywords) {
@@ -138,16 +145,41 @@ public class Validation {
                 return true;
             }
         }
+
+        //check for SQL sytax markers 
+        if (message.contains(";") || message.contains("--") || message.contains("/*")) {
+            return true;
+        }
+
         // No SQL injection keywords found
         return false;
     }
 
     // Function to sanitize inputs
-    public String sanitizeInput(String input) {
+    public static String sanitizeInput(String input) {
         // Remove any HTML tags and attributes from the input using Jsoup
         String sanitized = Jsoup.clean(input, Safelist.none());
         // Return the sanitized input
         return sanitized;
+    }
+
+    //function to check date is not in the past
+    public static boolean isAfterCurrentDate(LocalDate inputDate) {
+        LocalDate curDate = LocalDate.now();
+        //compare input date to current date
+        return inputDate.isAfter(curDate);
+    }
+
+    //function to check DOB is at least 18 years ago
+    //Note: this function can be fooled if the date is in the future; 
+    //use with !isAfterCurrentDate() 
+    public static boolean isAtLeast18YearsAgo(LocalDate inputDate) {
+        LocalDate curDate = LocalDate.now();
+        //calculate period between two dates
+        Period period = Period.between(inputDate, curDate);
+        
+        //check period is at least 18 years 
+        return period.getYears() >= 18;
     }
 
 }

@@ -13,8 +13,8 @@ import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
+import com.iamin.views.helpers.RequestDialog;
+import com.iamin.views.helpers.Request;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.component.Component;
 
@@ -27,11 +27,18 @@ public class ViewRequestsTableCard {
         // Dummy data
         List<Request> activeRequestsList = new ArrayList<>();
         List<Request> pastRequestsList = new ArrayList<>();
+        RequestDialog reqDialog = new RequestDialog();
 
         for (int i = 0; i < 10; i++) {
             String approved = (i % 2 == 0) ? "Yes" : "No";
-            activeRequestsList.add(new Request("John", "Doe", "12-03-23", "18-03-23", "Fishing", "Pending"));
-            pastRequestsList.add(new Request("John", "Doe", "12-03-23", "18-03-23", "Fishing", approved));
+            activeRequestsList.add(new Request("John", "Doe", "12-03-23", "18-03-23", "Pending", "Pending", "Pending",
+                    "Holiday", "Fishing", "Pending", "Pending"));
+            pastRequestsList.add(new Request("John", "Doe", "12-03-23", "18-03-23", "poor excuse", "Mr Smith", "N/A",
+                    "Holiday", "Fishing", "No", "No"));
+            activeRequestsList.add(new Request("John", "Doe", "12-03-23", "18-03-23", "Pending", "Pending", "Pending",
+                    "Absence", "Fishing", "Pending", "Pending"));
+            pastRequestsList.add(new Request("John", "Doe", "12-03-23", "18-03-23", "N/A", "Mr Smith", "12-02-23",
+                    "Absence", "Fishing", "Yes", "Yes"));
 
         }
 
@@ -75,6 +82,7 @@ public class ViewRequestsTableCard {
         activeRequests.addColumn(Request::getLastName).setHeader("Last Name");
         activeRequests.addColumn(Request::getStartDate).setHeader("Start date");
         activeRequests.addColumn(Request::getEndDate).setHeader("End date");
+        activeRequests.addColumn(Request::getType).setHeader("Type");
         activeRequests.addColumn(Request::getReason).setHeader("Reason");
         activeRequests.addColumn(new ComponentRenderer<>(Request::getApprovedComponent)).setHeader("Approved");
 
@@ -82,81 +90,27 @@ public class ViewRequestsTableCard {
         pastRequests.addColumn(Request::getLastName).setHeader("Last Name");
         pastRequests.addColumn(Request::getStartDate).setHeader("Start date");
         pastRequests.addColumn(Request::getEndDate).setHeader("End date");
+        pastRequests.addColumn(Request::getType).setHeader("Type");
         pastRequests.addColumn(Request::getReason).setHeader("Reason");
         pastRequests.addColumn(new ComponentRenderer<>(Request::getApprovedComponent)).setHeader("Approved");
 
-        // when a row is selected or deselected, populate form
+        // when a row is selected show dialog
         activeRequests.asSingleSelect().addValueChangeListener(event -> {
-
-            // show dialog here
+            Request selectedRequest = event.getValue();
+            if (selectedRequest != null) {
+                reqDialog.showRequestDialog(selectedRequest);
+            }
         });
 
         pastRequests.asSingleSelect().addValueChangeListener(event -> {
-
-            // show dialog here
+            Request selectedRequest = event.getValue();
+            if (selectedRequest != null) {
+                reqDialog.showRequestDialog(selectedRequest);
+            }
         });
 
         container.add(activeHeader, activeRequests, pastHeader, pastRequests);
         return container;
-    }
-
-    private static class Request {
-        public Component getApprovedComponent() {
-            Icon icon;
-            if ("Yes".equals(approved)) {
-                icon = new Icon(VaadinIcon.CHECK);
-                icon.getStyle().set("color", "green");
-            } else if ("No".equals(approved)) {
-                icon = new Icon(VaadinIcon.CLOSE);
-                icon.getStyle().set("color", "red");
-            } else {
-                icon = new Icon(VaadinIcon.QUESTION);
-                icon.getStyle().set("color", "black");
-            }
-            return icon;
-        }
-
-        private final String firstName;
-        private final String lastName;
-        private final String startDate;
-        private final String endDate;
-        private final String reason;
-        private final String approved;
-
-        public Request(String firstName, String lastName, String startDate,
-                String endDate, String reason, String approved) {
-
-            this.firstName = firstName;
-            this.lastName = lastName;
-            this.startDate = startDate;
-            this.endDate = endDate;
-            this.reason = reason;
-            this.approved = approved;
-        }
-
-        public String getFirstName() {
-            return firstName;
-        }
-
-        public String getLastName() {
-            return lastName;
-        }
-
-        public String getStartDate() {
-            return startDate;
-        }
-
-        public String getEndDate() {
-            return endDate;
-        }
-
-        public String getReason() {
-            return reason;
-        }
-
-        public String isApproved() {
-            return approved;
-        }
     }
 
 }

@@ -85,7 +85,7 @@ public class EmployeesTableCard {
         
 
         // Create Labels
-        Label card1Header = new Label("Employee Check-Ins");
+        Label card1Header = new Label("Today's Arrivals");
         card1Header.getStyle().set("font-weight", "bold");
         card1Header.getStyle().set("font-size", "18px");
         card1Header.getStyle().set("margin-left","10px");

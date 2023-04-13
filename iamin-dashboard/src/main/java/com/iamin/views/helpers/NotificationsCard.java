@@ -123,7 +123,7 @@ public class NotificationsCard {
         for (Tasks task : tasks) {
             if (!task.isCompleted()) {
                 Notification notification = new Notification(
-                    "Task due soon: " + task.getDescription(),
+                    "Task due soon: " + task.getTitle(),
                     task.getDeadLine().atStartOfDay()
                 );
                 notifications.add(notification);

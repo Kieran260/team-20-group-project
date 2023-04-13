@@ -85,6 +85,17 @@ public class ViewRequestsTableCard {
         pastRequests.addColumn(Request::getReason).setHeader("Reason");
         pastRequests.addColumn(new ComponentRenderer<>(Request::getApprovedComponent)).setHeader("Approved");
 
+        // when a row is selected or deselected, populate form
+        activeRequests.asSingleSelect().addValueChangeListener(event -> {
+
+            // show dialog here
+        });
+
+        pastRequests.asSingleSelect().addValueChangeListener(event -> {
+
+            // show dialog here
+        });
+
         container.add(activeHeader, activeRequests, pastHeader, pastRequests);
         return container;
     }

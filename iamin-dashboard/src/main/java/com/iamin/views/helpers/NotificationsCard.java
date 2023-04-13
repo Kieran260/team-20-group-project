@@ -1,5 +1,6 @@
 package com.iamin.views.helpers;
 
+import com.iamin.data.Role;
 import com.iamin.data.entity.Absence;
 import com.iamin.data.entity.Events;
 import com.iamin.data.entity.Holidays;
@@ -8,6 +9,7 @@ import com.iamin.data.entity.SamplePerson;
 import com.iamin.data.entity.Tasks;
 import com.iamin.data.service.AbsenceService;
 import com.iamin.data.service.EventService;
+import com.iamin.data.service.HolidaysRepository;
 import com.iamin.data.service.HolidaysService;
 import com.iamin.data.service.TasksService;
 
@@ -20,8 +22,10 @@ import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
@@ -37,21 +41,33 @@ import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
 
 @Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class NotificationsCard {
 
-    @Autowired
     private TasksService tasksService;
 
-    @Autowired
     private AbsenceService absenceService;
 
-    @Autowired
     private HolidaysService holidaysService;
+    private final HolidaysRepository holidaysRepository;
 
-    @Autowired
+
     private EventService eventService;
 
+    Login login;
+
+    @Autowired
+    public NotificationsCard (TasksService tasksService,AbsenceService absenceService,HolidaysService holidaysService,EventService eventService, HolidaysRepository holidaysRepository) {
+        this.tasksService = tasksService;
+        this.absenceService = absenceService;
+        this.holidaysService = holidaysService;
+        this.eventService = eventService;
+        this.holidaysRepository = holidaysRepository;
+    }
+
     public Div createCard(Div card, Login login) {
+        this.login = login;
+
         Styling.styleSquareBox(card);
 
         // Labels
@@ -157,6 +173,30 @@ public class NotificationsCard {
                 notifications.add(notification);
             }
         }
+
+
+        // Fetch holidays not yet approved if user role admin
+        // TODO: Fix this
+        try {
+            if (login.getRoles().contains(Role.ADMIN)) {
+                List<Holidays> holidayRequests = holidaysService.findAllUnapproved();
+                System.out.println(holidayRequests.size());
+                for (Holidays holiday : holidayRequests) {
+                    Boolean approvalStatus = holiday.getHolidaysApproval();
+                    if (approvalStatus == false) {
+                        Notification notification = new Notification(
+                            "New holiday request from " + holiday.getPerson().getFirstName() + " " + holiday.getPerson().getLastName(),
+                            holiday.getDateModified().toLocalDate().atStartOfDay()
+                        );
+                        notifications.add(notification);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error: No holiday requests found");
+        }
+        
+
 
     
 

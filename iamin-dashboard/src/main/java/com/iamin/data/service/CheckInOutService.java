@@ -1,5 +1,9 @@
 package com.iamin.data.service;
 import com.iamin.data.entity.CheckInOut;
+import com.iamin.data.entity.SamplePerson;
+
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.batch.BatchProperties.Jdbc;
@@ -43,4 +47,12 @@ public class CheckInOutService{
         return (int) repository.count();
     }
 
+    public List<CheckInOut> findByPersonAndDateBetween(SamplePerson person, LocalDate startDate, LocalDate endDate) {
+        return repository.findByPersonAndDateBetween(person, startDate, endDate);
+    }
+
+    public List<CheckInOut> findByDateBetween(LocalDate startDate, LocalDate endDate) {
+        return repository.findByDateBetween(startDate, endDate);
+    }
+    
 }

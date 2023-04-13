@@ -27,7 +27,7 @@ import javax.persistence.PersistenceContext;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class AverageAttendanceCard {
+public class EmployeeAverageAttendanceCard {
 
     String department = "";
     Div leftContainer = new Div();
@@ -38,7 +38,7 @@ public class AverageAttendanceCard {
     private CheckInOutService checkInOutService;
 
     @Autowired
-    public AverageAttendanceCard(CheckInOutService checkInOutService) {
+    public EmployeeAverageAttendanceCard(CheckInOutService checkInOutService) {
         this.checkInOutService = checkInOutService;
     }
 
@@ -54,10 +54,13 @@ public class AverageAttendanceCard {
 
 
         // Create Label
-        Label cardHeader = new Label("Average Staff Attendance");
+        Label cardHeader = new Label("Average Attendance");
         cardHeader.getStyle().set("font-weight", "bold");
         cardHeader.getStyle().set("font-size", "18px");
 
+
+
+    
         // Create subtext Label
         Label subtext = new Label("Compared to Previous Period:");
         subtext.getStyle().set("font-size", "14px");
@@ -96,7 +99,10 @@ public class AverageAttendanceCard {
             startDate = endDate.minusDays(30);
         }
 
-        double averageAttendance = calculateAverageAttendance(startDate, endDate);
+        double averageAttendance = calculateAverageAttendance(
+            userLogin.getPerson() != null ? userLogin.getPerson() : new SamplePerson(),
+            startDate, 
+            endDate);
 
         // Update the average attendance on the card
         Span averageAttendanceSpan = (Span) card.getChildren()
@@ -172,17 +178,17 @@ public class AverageAttendanceCard {
     }
     
     
-    public double calculateAverageAttendance(LocalDate start,LocalDate finish) {
+    public double calculateAverageAttendance(SamplePerson person,LocalDate start,LocalDate finish) {
 
         List<CheckInOut> checkInOutList = Collections.emptyList();
 
+        // Query the checkInOut table to retrieve all the records for the given person_id for the dates provided
         try {
-            checkInOutList = checkInOutService.findByDateBetween(start, finish);
+            checkInOutList = checkInOutService.findByPersonAndDateBetween(person, start, finish);
             System.out.println(checkInOutList);
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage()); 
         }
-        
     
         int totalDaysAttended = 0;
         for (CheckInOut checkInOut : checkInOutList) {
@@ -212,7 +218,7 @@ public class AverageAttendanceCard {
         LocalDate previousStartDate = startDate.minusDays(ChronoUnit.DAYS.between(startDate, endDate));
         LocalDate previousEndDate = endDate.minusDays(ChronoUnit.DAYS.between(startDate, endDate));
     
-        return calculateAverageAttendance(previousStartDate, previousEndDate);
+        return calculateAverageAttendance(person, previousStartDate, previousEndDate);
     }
     
     

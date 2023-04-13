@@ -38,7 +38,7 @@ public class EventService {
     
     public void deleteEvent(Long eventId) {
         eventRepository.deleteById(eventId);
-    }
+    }    
 
     public List<SamplePerson> getAttendees(Long eventId) {
         Optional<Events> optionalEvent = eventRepository.findById(eventId);
@@ -52,4 +52,5 @@ public class EventService {
     public Page<Events> list(Pageable pageable) {
         return eventRepository.findAll(pageable);
     }
+
 }

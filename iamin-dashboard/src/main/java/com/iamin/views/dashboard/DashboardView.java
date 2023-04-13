@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.HashSet;
 import com.iamin.views.MainLayout;
 import com.iamin.views.helpers.EmployeeAttendanceCard;
+import com.iamin.views.helpers.EmployeeAverageAttendanceCard;
 import com.iamin.views.helpers.EmployeeTasksCard;
 import com.iamin.views.helpers.EmployeesTableCard;
 import com.iamin.views.helpers.NotificationsCard;
@@ -82,6 +83,11 @@ public class DashboardView extends VerticalLayout {
     @Autowired
     private final DepartmentMembersCard departmentMembersCard;
     
+    private final EmployeeAverageAttendanceCard employeeAverageAttendanceCard;
+
+    private final AverageAttendanceCard averageAttendanceCard;
+
+
     @Autowired
     PasswordEncoder passwordEncoder;
 
@@ -96,7 +102,7 @@ public class DashboardView extends VerticalLayout {
     private final PasswordDialog passwordDialog;
 
 
-    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository,EmployeeAttendanceCard employeeAttendanceCard,DepartmentMembersCard departmentMembersCard,NotificationsCard notificationsCard, EmployeesTableCard employeesTableCard, EmployeeTasksCard employeeTasksCard, PasswordEncoder passwordEncoder, PasswordDialog passwordDialog) {
+    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository,EmployeeAttendanceCard employeeAttendanceCard,DepartmentMembersCard departmentMembersCard,NotificationsCard notificationsCard, EmployeesTableCard employeesTableCard, EmployeeTasksCard employeeTasksCard, PasswordEncoder passwordEncoder, PasswordDialog passwordDialog,AverageAttendanceCard averageAttendanceCard,EmployeeAverageAttendanceCard employeeAverageAttendanceCard) {
         this.personFormDialog = personFormDialog;
         this.loginRepository = loginRepository;
         this.employeeAttendanceCard = employeeAttendanceCard;
@@ -106,7 +112,8 @@ public class DashboardView extends VerticalLayout {
         this.employeesTableCard = employeesTableCard;
         this.passwordEncoder = passwordEncoder;
         this.passwordDialog = passwordDialog;
-
+        this.averageAttendanceCard = averageAttendanceCard;
+        this.employeeAverageAttendanceCard = employeeAverageAttendanceCard;
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         
@@ -166,13 +173,11 @@ public class DashboardView extends VerticalLayout {
         // TODO: Show department attendance which is the same department as current user (Authentication)
         // TODO: Add a grid of employees from department which shows individual attendance
         Div card5a = new Div();
-        AverageAttendanceCard averageAttendanceCard = new AverageAttendanceCard();
         averageAttendanceCard.createCard(card5a,userLogin);
                 
         // TODO: When the above tasks are completed
-        //Div card5b = new Div();
-        //AverageAttendanceCard averageAttendanceCard2 = new AverageAttendanceCard();
-       // averageAttendanceCard2.createCard(card5a,userLogin);
+        Div card5b = new Div();
+        employeeAverageAttendanceCard.createCard(card5b,userLogin);
 
         // Charts View - Managers Only
         // Show a bar chart with the average attendance for the last 6 months
@@ -205,7 +210,7 @@ public class DashboardView extends VerticalLayout {
         } else if ("ROLE_USER".equals(userRole)) {
             // Add cards specific to the user role
             // Card 2, card 3, card 4, card 5b, card 7, card 8
-            cardsContainer.add(card2,card3,card4,card7,card8);
+            cardsContainer.add(card2,card3,card4,card7,card5b,card8);
         } 
         
 

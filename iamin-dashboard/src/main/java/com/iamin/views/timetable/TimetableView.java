@@ -7,11 +7,13 @@ import com.iamin.data.service.EventService;
 import com.iamin.data.entity.SamplePerson;
 import com.iamin.data.service.LoginRepository;
 import com.iamin.views.MainLayout;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
@@ -145,14 +147,11 @@ public class TimetableView extends VerticalLayout {
         LocalDate startOfWeek = startOfYear.plusWeeks(selectedWeekNumber - 1).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
 
         
-        String[][] contentMatrix = createMatrix(5, 9);
+        Events[][] contentMatrix = createMatrix(5, 9);
     
-        // Fill the content matrix with events
+        // Fill the content matrix with the selected week's events
         List<Events> events = getEvents(startOfWeek);
-        mapEventsToMatrix(events, contentMatrix);
-        for (String[] row : contentMatrix) {
-            System.out.println(Arrays.toString(row));
-        }
+        mapEventsToMatrix(events, contentMatrix, startOfWeek);
     
         // Create 6x10 grid cells
         for (int row = 0; row < 10; row++) {
@@ -176,9 +175,9 @@ public class TimetableView extends VerticalLayout {
                     content.getStyle().set("font-weight", "bold"); // Make the text bold for other cellsn
                 } else if (row >= 1 && row <= 9 && col >= 1 && col <= 5) {
                     // Add content to the cells in rows 1 to 9 and columns 1 to 5 from the content matrix
-                    String cellContent = contentMatrix[row - 1][col - 1];
-                    if (!cellContent.isEmpty()) {
-                        content = new Paragraph(cellContent);
+                    Events cellContent = contentMatrix[row - 1][col - 1];
+                    if (cellContent.getEventTitle() != null) {
+                        content = new Paragraph(cellContent.getEventTitle());
                         cell.getStyle().set("transition", "background-color 0.2s");
                         cell.getElement().executeJs("this.classList.add('hoverable')");
 
@@ -188,10 +187,18 @@ public class TimetableView extends VerticalLayout {
                             dialog.setWidth("300px");
 
                             VerticalLayout dialogLayout = new VerticalLayout();
-                            dialogLayout.add(new H3(cellContent));
+                            dialogLayout.add(new H3(cellContent.getEventTitle()));
+                            dialogLayout.add(new Label(cellContent.getEventDescription()));
+                            dialogLayout.add(new Label("Time: " + cellContent.getEventTime()));
+                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE dd MMMM");
+                            String formattedDate = cellContent.getEventDate().format(formatter);
+                            dialogLayout.add(new Label("Date: " + formattedDate));
+                            dialogLayout.add(new Label("Location: " + cellContent.getEventLocation()));
 
                             HorizontalLayout buttonLayout = new HorizontalLayout();
                             Button closeButton = new Button("Close", ev -> dialog.close());
+                            buttonLayout.getStyle().set("margin", "0 auto");
+                            buttonLayout.getStyle().set("margin-top", "10px");
                             buttonLayout.add(closeButton);
                             dialogLayout.add(buttonLayout);
 
@@ -220,21 +227,18 @@ public class TimetableView extends VerticalLayout {
         return newTimetableGrid;
     }
 
-    public String[][] createMatrix(int columns, int rows) {
-        String[][] matrix = new String[rows][columns];
+    public Events[][] createMatrix(int columns, int rows) {
+        Events[][] matrix = new Events[rows][columns];
     
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
-                matrix[i][j] = "";
+                matrix[i][j] = new Events();
             }
         }
         return matrix;
     }
 
-    private void mapEventsToMatrix(List<Events> events, String[][] matrix) {
-        LocalDate today = LocalDate.now();
-        LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - 1); // Get Monday of the current week
-    
+    private void mapEventsToMatrix(List<Events> events, Events[][] matrix, LocalDate startOfWeek) {
         for (Events event : events) {
             LocalDate eventDate = event.getEventDate();
             LocalTime eventTime = event.getEventTime();
@@ -243,10 +247,11 @@ public class TimetableView extends VerticalLayout {
             int row = eventTime.getHour() - 8; // Assuming 9:00 is row 1, so 9:00 minus 8 equals 1
     
             if (row >= 1 && row <= 9 && col >= 1 && col <= 5) {
-                matrix[row - 1][col - 1] = event.getEventDescription(); 
+                matrix[row - 1][col - 1] = event; 
             }
         }
     }
+    
     
     private List<Events> getEvents(LocalDate startOfWeek) {
         // Retrieve the list of Events objects from the database or another source

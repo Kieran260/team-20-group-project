@@ -3,6 +3,7 @@ package com.iamin.data.entity;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,18 +14,16 @@ public class Events extends AbstractEntity {
     private String eventTitle;
     private String eventDescription;
     private LocalDate eventDate;
-    private LocalDateTime eventTime;
+    private LocalTime eventTime;
     private String eventType;
     private String eventLocation;
-
-    
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "event_person",
             joinColumns = @JoinColumn(name = "event_id"),
             inverseJoinColumns = @JoinColumn(name = "person_id")
     )
-    private List<SamplePerson> attendees = new ArrayList<>();
+    private List<SamplePerson> attendees = new ArrayList<>();    
 
     public String getEventTitle() {
         return eventTitle;
@@ -50,11 +49,11 @@ public class Events extends AbstractEntity {
         this.eventDate = eventDate;
     }
 
-    public LocalDateTime getEventTime() {
+    public LocalTime getEventTime() {
         return eventTime;
     }
 
-    public void setEventTime(LocalDateTime eventTime) {
+    public void setEventTime(LocalTime eventTime) {
         this.eventTime = eventTime;
     }
 

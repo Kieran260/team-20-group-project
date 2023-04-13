@@ -6,6 +6,8 @@ import com.iamin.data.entity.Events;
 import com.iamin.data.entity.SamplePerson;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class EventService {
@@ -41,5 +43,13 @@ public class EventService {
     public List<SamplePerson> getAttendees(Long eventId) {
         Optional<Events> optionalEvent = eventRepository.findById(eventId);
         return optionalEvent.map(Events::getAttendees).orElse(null);
+    }
+
+    public List<Events> findByAttendees_Id(Long personId) {
+        return eventRepository.findByAttendees_Id(personId);
+    }
+
+    public Page<Events> list(Pageable pageable) {
+        return eventRepository.findAll(pageable);
     }
 }

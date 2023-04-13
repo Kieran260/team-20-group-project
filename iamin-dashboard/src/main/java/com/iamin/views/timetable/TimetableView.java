@@ -1,14 +1,24 @@
 package com.iamin.views.timetable;
 
+import com.iamin.data.entity.Events;
 import com.iamin.data.entity.Login;
+import com.iamin.data.entity.SamplePerson;
+import com.iamin.data.service.EventService;
 import com.iamin.data.entity.SamplePerson;
 import com.iamin.data.service.LoginRepository;
 import com.iamin.views.MainLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexWrap;
 import com.vaadin.flow.router.PageTitle;
@@ -39,12 +49,14 @@ import javax.annotation.security.PermitAll;
 public class TimetableView extends VerticalLayout {
 
     private final LoginRepository loginRepository;
+    private final EventService eventService;
 
 
     private FlexLayout timetableGrid;
 
-    public TimetableView(LoginRepository loginRepository) {
+    public TimetableView(LoginRepository loginRepository, EventService eventService) {
         this.loginRepository = loginRepository;
+        this.eventService = eventService;
 
         FlexLayout headerLayout = new FlexLayout();
         headerLayout.getStyle().set("display", "flex");
@@ -135,7 +147,7 @@ public class TimetableView extends VerticalLayout {
         String[][] contentMatrix = createMatrix(5, 9);
     
         // Fill the content matrix with events
-        List<Event> events = getEvents();
+        List<Events> events = getEvents(startOfWeek);
         mapEventsToMatrix(events, contentMatrix);
         for (String[] row : contentMatrix) {
             System.out.println(Arrays.toString(row));
@@ -155,15 +167,36 @@ public class TimetableView extends VerticalLayout {
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE dd/MM");
                     String formattedDate = dayOfWeek.format(formatter);
                     content = new Paragraph(formattedDate);
+                    content.getStyle().set("font-weight", "bold"); // Make the text bold for other cells
                 // Display the hour labels in the first column
                 } else if (col == 0 && row > 0) {
                     int hour = 8 + row; // Start at 9:00 and increment per hour
                     content = new Paragraph(hour + ":00");
+                    content.getStyle().set("font-weight", "bold"); // Make the text bold for other cellsn
                 } else if (row >= 1 && row <= 9 && col >= 1 && col <= 5) {
                     // Add content to the cells in rows 1 to 9 and columns 1 to 5 from the content matrix
                     String cellContent = contentMatrix[row - 1][col - 1];
                     if (!cellContent.isEmpty()) {
                         content = new Paragraph(cellContent);
+                        cell.getStyle().set("transition", "background-color 0.2s");
+                        cell.getElement().executeJs("this.classList.add('hoverable')");
+
+                        // Make cell clickable and open a dialog
+                        cell.addClickListener(e -> {
+                            Dialog dialog = new Dialog();
+                            dialog.setWidth("300px");
+
+                            VerticalLayout dialogLayout = new VerticalLayout();
+                            dialogLayout.add(new H3(cellContent));
+
+                            HorizontalLayout buttonLayout = new HorizontalLayout();
+                            Button closeButton = new Button("Close", ev -> dialog.close());
+                            buttonLayout.add(closeButton);
+                            dialogLayout.add(buttonLayout);
+
+                            dialog.add(dialogLayout);
+                            dialog.open();
+                        });
                     } else {
                         content = new Paragraph("");
                     }
@@ -173,7 +206,6 @@ public class TimetableView extends VerticalLayout {
                 }
     
                 content.getStyle().set("margin", "0");
-                content.getStyle().set("font-weight", "bold"); // Make the text bold
                 content.getStyle().set("display", "flex"); // Center the text horizontally
                 content.getStyle().set("justify-content", "center");
                 content.getStyle().set("align-items", "center"); // Center the text vertically
@@ -198,85 +230,48 @@ public class TimetableView extends VerticalLayout {
         return matrix;
     }
 
-    private void mapEventsToMatrix(List<Event> events, String[][] matrix) {
+    private void mapEventsToMatrix(List<Events> events, String[][] matrix) {
         LocalDate today = LocalDate.now();
         LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - 1); // Get Monday of the current week
     
-        for (Event event : events) {
-            LocalDate eventDate = event.getDate();
-            LocalTime eventTime = event.getTime();
+        for (Events event : events) {
+            LocalDate eventDate = event.getEventDate();
+            LocalTime eventTime = event.getEventTime();
     
             int col = (int) ChronoUnit.DAYS.between(startOfWeek, eventDate) + 1;
             int row = eventTime.getHour() - 8; // Assuming 9:00 is row 1, so 9:00 minus 8 equals 1
     
             if (row >= 1 && row <= 9 && col >= 1 && col <= 5) {
-                matrix[row - 1][col - 1] = event.getDescription(); 
+                matrix[row - 1][col - 1] = event.getEventDescription(); 
             }
         }
     }
     
-    private List<Event> getEvents() {
-        // Retrieve the list of Event objects from the database or another source
+    private List<Events> getEvents(LocalDate startOfWeek) {
+        // Retrieve the list of Events objects from the database or another source
         // Replace this with your actual implementation
-        
+    
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUsername = authentication.getName();
         Login userLogin = loginRepository.findByUsername(currentUsername);
-
+    
         SamplePerson person = userLogin.getPerson();
-
-        // Get the dates for the current week (Monday to Friday)
-        LocalDate today = LocalDate.now();
-        LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - DayOfWeek.MONDAY.getValue());
+    
+        // Get the dates for the given week (Monday to Friday)
         List<LocalDate> weekDates = IntStream.range(0, 5)
                 .mapToObj(startOfWeek::plusDays)
                 .collect(Collectors.toList());
-
-        List<Event> events = new ArrayList<>();
+    
         // Get events for person and dates
+        List<Events> events = eventService.findByAttendees_Id(person.getId());
     
-        // Add some fake events
-        events.add(new Event(LocalDate.now().plusDays(1), LocalTime.of(10, 0), "Meeting"));
-        events.add(new Event(LocalDate.now().plusDays(2), LocalTime.of(12, 0), "Lunch"));
-        events.add(new Event(LocalDate.now().plusDays(3), LocalTime.of(14, 0), "Presentation"));
-        events.add(new Event(LocalDate.now().plusDays(4), LocalTime.of(16, 0), "Workshop"));
+        // Filter the list of Events objects to only include events in the specified week
+        List<Events> filteredEvents = events.stream()
+                .filter(event -> weekDates.contains(event.getEventDate()))
+                .collect(Collectors.toList());
     
-        return events;
+        return filteredEvents;
     }
-
-    public class Event {
-        private LocalDate date;
-        private LocalTime time;
-        private String description;
     
-        public Event(LocalDate date, LocalTime time, String description) {
-            this.date = date;
-            this.time = time;
-            this.description = description;
-        }
     
-        public LocalDate getDate() {
-            return date;
-        }
-    
-        public void setDate(LocalDate date) {
-            this.date = date;
-        }
-    
-        public LocalTime getTime() {
-            return time;
-        }
-    
-        public void setTime(LocalTime time) {
-            this.time = time;
-        }
-    
-        public String getDescription() {
-            return description;
-        }
-    
-        public void setDescription(String description) {
-            this.description = description;
-        }
-    }
 }

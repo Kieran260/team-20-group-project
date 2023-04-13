@@ -16,3 +16,7 @@
     border: 0.25px solid lightgrey;
     height: 90%;
 }
+
+.hoverable:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}

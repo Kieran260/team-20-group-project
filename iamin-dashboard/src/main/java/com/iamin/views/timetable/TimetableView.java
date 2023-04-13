@@ -141,8 +141,9 @@ public class TimetableView extends VerticalLayout {
 
         // Calculate the start of the current week (Monday)
         LocalDate today = LocalDate.now();
-        LocalDate startOfYear = LocalDate.of(today.getYear(), Month.JANUARY, 1);
+        LocalDate startOfYear = LocalDate.of(today.getYear(), Month.JANUARY, 1).with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
         LocalDate startOfWeek = startOfYear.plusWeeks(selectedWeekNumber - 1).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+
         
         String[][] contentMatrix = createMatrix(5, 9);
     

@@ -149,7 +149,7 @@ public class ManageEventsView extends Div {
         eventType.setWidthFull();
         eventLocation.setWidthFull();
     
-        Button button = new Button("Create Event", event -> {
+        Button saveButton = new Button("Create Event", event -> {
             SamplePerson selectedAttendee = selectAttendee.getValue();
             String title = eventTitle.getValue();
             String description = eventDescription.getValue();
@@ -188,10 +188,9 @@ public class ManageEventsView extends Div {
                 Notification.show("Please fill all required fields.", 3000, Notification.Position.TOP_CENTER);
             }
         });
-    
-        button.setWidthFull();
-    
-        content.add(selectAttendee, eventTitle, eventDescription, eventDate, eventTime, eventType, eventLocation, button);
+        saveButton.setWidthFull();
+
+        content.add(selectAttendee, eventTitle, eventDescription, eventDate, eventTime, eventType, eventLocation, saveButton);
     
         splitLayout.addToSecondary(content);
     }

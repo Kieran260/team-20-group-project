@@ -167,17 +167,33 @@ public class TimetableView extends VerticalLayout {
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE dd/MM");
                     String formattedDate = dayOfWeek.format(formatter);
                     content = new Paragraph(formattedDate);
-                    content.getStyle().set("font-weight", "bold"); // Make the text bold for other cells
+                    content.getStyle().set("color", "black");
+
+
+                    // Format to highlight current time 
+                    if (dayOfWeek.equals(LocalDate.now())) {
+                        content.getStyle().set("font-weight", "bold");
+                        content.getStyle().set("color", "#275CE3");
+                    }
+
                 // Display the hour labels in the first column
                 } else if (col == 0 && row > 0) {
                     int hour = 8 + row; // Start at 9:00 and increment per hour
                     content = new Paragraph(hour + ":00");
-                    content.getStyle().set("font-weight", "bold"); // Make the text bold for other cellsn
+                    content.getStyle().set("color", "black");
+
+                    // Format to highlight current time
+                    if (hour == LocalTime.now().getHour()) {
+                        content.getStyle().set("font-weight", "bold");
+                        content.getStyle().set("color", "#275CE3");
+                    }
+
                 } else if (row >= 1 && row <= 9 && col >= 1 && col <= 5) {
                     // Add content to the cells in rows 1 to 9 and columns 1 to 5 from the content matrix
                     Events cellContent = contentMatrix[row - 1][col - 1];
                     if (cellContent.getEventTitle() != null) {
                         content = new Paragraph(cellContent.getEventTitle());
+                        content.getStyle().set("color", "black");
                         cell.getStyle().set("transition", "background-color 0.2s");
                         cell.getElement().executeJs("this.classList.add('hoverable')");
 

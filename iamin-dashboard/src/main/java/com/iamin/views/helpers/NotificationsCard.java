@@ -1,8 +1,14 @@
 package com.iamin.views.helpers;
 
+import com.iamin.data.entity.Absence;
+import com.iamin.data.entity.Events;
+import com.iamin.data.entity.Holidays;
 import com.iamin.data.entity.Login;
 import com.iamin.data.entity.SamplePerson;
 import com.iamin.data.entity.Tasks;
+import com.iamin.data.service.AbsenceService;
+import com.iamin.data.service.EventService;
+import com.iamin.data.service.HolidaysService;
 import com.iamin.data.service.TasksService;
 
 import java.time.LocalDate;
@@ -10,6 +16,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +42,15 @@ public class NotificationsCard {
     @Autowired
     private TasksService tasksService;
 
+    @Autowired
+    private AbsenceService absenceService;
+
+    @Autowired
+    private HolidaysService holidaysService;
+
+    @Autowired
+    private EventService eventService;
+
     public Div createCard(Div card, Login login) {
         Styling.styleSquareBox(card);
 
@@ -45,7 +61,13 @@ public class NotificationsCard {
         title.getStyle().set("margin-bottom","10px");
 
         // Create a list of notifications
-        List<Notification> notifications = getNotifications(login.getPerson());
+        List<Notification> notifications = Collections.emptyList();
+
+        try {
+            notifications = getNotifications(login.getPerson());
+        } catch (Exception e) {
+            System.out.println("Error: No notifications found");
+        }
         
         if (notifications.size() == 0) {
             notifications.add(new Notification("No notifications to show", LocalDateTime.now()));
@@ -73,11 +95,30 @@ public class NotificationsCard {
     }
 
     public List<Notification> getNotifications(SamplePerson person) {
+        // TODO: Fix events and add dismiss button.
+
+
         List<Notification> notifications = new ArrayList<>();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM");
+
+
+        
         // Get events of all types except tasks that are happening within 24 hours
-
+        // TODO: Not working
+        /* 
+        List<Events> events = eventService.findEventsWithinHoursForPerson(person, 24);
+        for (Events event : events) {      
+            LocalDateTime eventDateTime = event.getEventDate().atTime(event.getEventTime());
+            Notification notification = new Notification(
+                "You have an event: " + event.getEventTitle(),
+                eventDateTime
+            );
+            notifications.add(notification);
+        }
+        */
+        
+        
         // Get tasks that are due within 72 hours
-
         List<Tasks> tasks = tasksService.findTasksDueWithinHoursForPerson(person, 72);        
         for (Tasks task : tasks) {
             if (!task.isCompleted()) {
@@ -87,10 +128,37 @@ public class NotificationsCard {
                 );
                 notifications.add(notification);
             }
-
         }
 
-        // Fetch requests with approved or denied status for the current user
+        // Fetch absences with approved or denied status for the current person
+        List<Absence> absences = absenceService.getAbsencesForPerson(person);
+        for (Absence absence : absences) {
+            Boolean approvalStatus = absence.getAbsenceApproval();
+            if (approvalStatus != null && absence.getEndDate().isAfter(LocalDate.now())) {
+                String status = approvalStatus ? "approved" : "denied";
+                Notification notification = new Notification(
+                    "Absence request for " + absence.getStartDate().format(dateFormatter) + " to " + absence.getEndDate().format(dateFormatter) + " has been " + status,
+                    absence.getDateModified().toLocalDate().atStartOfDay()
+                );
+                notifications.add(notification);
+            }
+        }
+
+        // Fetch holidays with approved or denied status for the current person
+        List<Holidays> holidays = holidaysService.getHolidaysForPerson(person);
+        for (Holidays holiday : holidays) {
+            Boolean approvalStatus = holiday.getHolidaysApproval();
+            if (approvalStatus != null && holiday.getEndDate().isAfter(LocalDate.now())) {
+                String status = approvalStatus ? "approved" : "denied";
+                Notification notification = new Notification(
+                    "Holiday request for " + holiday.getStartDate().format(dateFormatter) + " to " + holiday.getEndDate().format(dateFormatter) + " has been " + status,
+                    holiday.getDateModified().toLocalDate().atStartOfDay()
+                );
+                notifications.add(notification);
+            }
+        }
+
+    
 
         // Sort notifications by requests first, then date and time for all events
 

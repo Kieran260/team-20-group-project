@@ -54,7 +54,7 @@ public class AverageAttendanceCard {
 
 
         // Create Label
-        Label cardHeader = new Label("Average Staff Attendance");
+        Label cardHeader = new Label("Average Attendance");
         cardHeader.getStyle().set("font-weight", "bold");
         cardHeader.getStyle().set("font-size", "18px");
 
@@ -148,20 +148,16 @@ public class AverageAttendanceCard {
         badge.getStyle().set("display","inline-flex");
         badge.getStyle().set("justify-content","center");
     
-        if (Double.isInfinite(percentageDifference) || Double.isNaN(percentageDifference)) {
-            badge.setText("0%");
+
+        badge.setText(String.format("%.1f%%", Math.abs(percentageDifference)));
+        if (percentageDifference >= 0) {
             badge.getStyle().set("background-color", "green");
             badge.getStyle().set("color", "white");
         } else {
-            badge.setText(String.format("%.1f%%", Math.abs(percentageDifference)));
-            if (percentageDifference >= 0) {
-                badge.getStyle().set("background-color", "green");
-                badge.getStyle().set("color", "white");
-            } else {
-                badge.getStyle().set("background-color", "red");
-                badge.getStyle().set("color", "white");
-            }
+            badge.getStyle().set("background-color", "red");
+            badge.getStyle().set("color", "white");
         }
+        
     
         badge.getStyle().set("padding", "3px 8px");
         badge.getStyle().set("border-radius", "12px");

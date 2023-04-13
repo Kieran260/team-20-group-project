@@ -83,4 +83,5 @@ public class Absence extends AbstractEntity {
     public void setDenyReason(String denyReason) {
         this.denyReason = denyReason;
     }
+
 }

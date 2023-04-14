@@ -201,7 +201,7 @@ public class DocumentUploadView extends Div {
                 document.setDocumentUrl(fileUrl[0]);
                 document.setUploadDate(LocalDate.now());
                 document.setSubmitDate(datePicker.getValue());
-                document.setSigned(true);
+                document.setSigned(false);
         
                 Set<SamplePerson> selectedEmployees = employeeList.getSelectedItems();
                 for (SamplePerson employee : selectedEmployees) {

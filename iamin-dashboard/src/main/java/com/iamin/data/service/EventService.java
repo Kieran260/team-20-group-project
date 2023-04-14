@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import com.iamin.data.entity.Events;
 import com.iamin.data.entity.SamplePerson;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -72,4 +73,16 @@ public class EventService {
     
         return eventsWithinHours;
     }    
+
+    public List<Events> findEventsForDate(SamplePerson person, LocalDate date) {
+        List<Events> eventsForPerson = findByAttendees_Id(person.getId());
+        List<Events> eventsForDate = new ArrayList<>();
+        for (Events event : eventsForPerson) {
+            if (event.getEventDate().equals(date)) {
+                eventsForDate.add(event);
+            }
+        }
+    
+        return eventsForDate;
+    }
 }

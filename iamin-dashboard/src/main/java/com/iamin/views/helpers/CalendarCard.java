@@ -15,6 +15,7 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 
 import com.iamin.data.entity.Events;
 import com.iamin.data.entity.Login;
+import com.iamin.data.entity.SamplePerson;
 import com.iamin.data.service.EventService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -93,7 +94,7 @@ public class CalendarCard {
         calendarGrid.addColumn(CalendarItem::getItemName).setHeader("Name");
         calendarGrid.addColumn(CalendarItem::getItemType).setHeader("Type");
         calendarGrid.addColumn(CalendarItem::getItemTime).setHeader("Time");
-        getEvents(1, LocalDate.now());
+        getEvents(login.getPerson(), LocalDate.now());
 
         calendar.add(calendarGrid);
         card.add(header,calendar);
@@ -101,31 +102,31 @@ public class CalendarCard {
         // Functionality for updating grid
         datePicker.addValueChangeListener(event -> {
             LocalDate selectedDate = datePicker.getValue();
-            getEvents(login.getPerson().getId(), selectedDate); 
+            getEvents(login.getPerson(), selectedDate); 
         });
 
         return card;
     }
 
     // To be updated to fetch events from repository
-    private void getEvents(long personId, LocalDate date) {
+    private void getEvents(SamplePerson person, LocalDate date) {
         List<CalendarItem> calendarItems = new ArrayList<>();
-
-
         
         // Get events
-        /* 
-        List<Events> events = eventService.getEventsByDate(personId, dateTime);
-        for (Events event : events) {
-            if (event.getEventTime() != null) {
-                CalendarItem item = new CalendarItem(
-                    event.getEventTitle(), 
-                    event.getEventType(), 
-                    event.getEventTime());
-                calendarItems.add(item);
-            }
-        }    
-        */    
+        if (person != null) {
+            List<Events> events = eventService.findEventsForDate(person, date);
+            for (Events event : events) {
+                if (event.getEventTime() != null) {
+                    CalendarItem item = new CalendarItem(
+                        event.getEventTitle(), 
+                        event.getEventType(), 
+                        event.getEventTime());
+                    calendarItems.add(item);
+                }
+            }          
+        }
+  
+           
 
         calendarGrid.setItems(calendarItems); 
     }

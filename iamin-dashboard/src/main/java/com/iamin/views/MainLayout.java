@@ -4,9 +4,16 @@ package com.iamin.views;
 import com.iamin.components.appnav.AppNav;
 import com.iamin.components.appnav.AppNavItem;
 import com.iamin.security.AuthenticatedUser;
+import com.iamin.views.dashboard.DashboardView;
+import com.iamin.views.login.LoginView;
+import com.iamin.views.manageemployees.ManageEmployeesView;
+import com.iamin.views.viewRequests.ViewRequestsView;
 import com.iamin.views.CreateEmployeeView.CreateEmployeeView;
+import com.iamin.views.ManageEvents.ManageEventsView;
 import com.iamin.views.dashboard.DashboardView;
 import com.iamin.views.manageemployees.ManageEmployeesView;
+
+
 import com.iamin.views.ManageTasks.ManagerTasksView;
 import com.iamin.data.entity.Login;
 import com.iamin.data.service.LoginService;
@@ -32,9 +39,14 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 
 import java.util.Optional;
 
+
 import javax.persistence.EntityNotFoundException;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * The main view is a top-level placeholder for other views.
@@ -45,10 +57,12 @@ public class MainLayout extends AppLayout {
 
     private AuthenticatedUser authenticatedUser;
     private AccessAnnotationChecker accessChecker;
-    @Autowired
-    private LoginService loginService; 
 
-    public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker , LoginService loginService) {
+    @Autowired
+    private LoginService loginService;
+
+    public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker,
+            LoginService loginService) {
         this.authenticatedUser = authenticatedUser;
         this.accessChecker = accessChecker;
         this.loginService = loginService;
@@ -71,6 +85,23 @@ public class MainLayout extends AppLayout {
 
     private void addDrawerContent() {
         H1 appName = new H1("IAMIN");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // Get user's role and set the app name accordingly
+        String userRole = getUserRole(authentication);
+        
+        // Try to get the user's name from the database and catch the exception if the user is not found
+        try {
+            if ("ROLE_ADMIN".equals(userRole)) {
+                appName = new H1("IAMIN Manager");
+    
+            } else if ("ROLE_USER".equals(userRole)) {
+                appName = new H1("IAMIN Employee");
+            } 
+        } catch (NullPointerException e) {
+            UI.getCurrent().navigate(LoginView.class);
+        }
+
         appName.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
         Header header = new Header(appName);
 
@@ -85,23 +116,42 @@ public class MainLayout extends AppLayout {
         AppNav nav = new AppNav();
 
         if (accessChecker.hasAccess(DashboardView.class)) {
-            nav.addItem(new AppNavItem("Dashboard", DashboardView.class, "la la-globe"));
-
+            nav.addItem(new AppNavItem("Dashboard", DashboardView.class, "la la-home"));
         }
+        
         if (accessChecker.hasAccess(ManageEmployeesView.class)) {
-            nav.addItem(new AppNavItem("Manage Employees", ManageEmployeesView.class, "la la-columns"));
-
+            nav.addItem(new AppNavItem("Manage Employees", ManageEmployeesView.class, "la la-user"));
         }
 
+        if (accessChecker.hasAccess(ManageRequestsView.class)) {
+            nav.addItem(new AppNavItem("Manage Requests", ManageRequestsView.class, "la la-question-circle"));
+        }
+        if (accessChecker.hasAccess(EmployeeViewTasks.class)) {
+            nav.addItem(new AppNavItem("View Tasks", EmployeeViewTasks.class, "la la-tasks"));
+        }
+       
         if (accessChecker.hasAccess(ManagerTasksView.class)) {
-            nav.addItem(new AppNavItem("Manage Tasks", ManagerTasksView.class, "la la-columns"));
-
+            nav.addItem(new AppNavItem("Manage Tasks", ManagerTasksView.class, "la la-tasks"));
         }
-    
+
+        if (accessChecker.hasAccess(ManageEventsView.class)){
+            nav.addItem(new AppNavItem("Manage Events", ManageEventsView.class, "la la-users"));
+        }
 
         if (accessChecker.hasAccess(CreateEmployeeView.class)){
-            nav.addItem(new AppNavItem("Add Employee", CreateEmployeeView.class, "la la-columns"));
+            nav.addItem(new AppNavItem("Add Employee", CreateEmployeeView.class, "la la-user-plus"));
         }
+        if (accessChecker.hasAccess(ViewRequestsView.class)) {
+            nav.addItem(new AppNavItem("View Requests", ViewRequestsView.class, "la la-question-circle"));
+
+        }
+
+        if (accessChecker.hasAccess(TimetableView.class)){
+            nav.addItem(new AppNavItem("Timetable", TimetableView.class, "la la-calendar"));
+        }
+
+        
+
 
         return nav;
     }
@@ -114,20 +164,21 @@ public class MainLayout extends AppLayout {
             Login login = maybeUser.get();
 
             Avatar avatar = new Avatar(login.getUsername());
-       
+
             MenuBar userMenu = new MenuBar();
             userMenu.setThemeName("tertiary-inline contrast");
 
             MenuItem userName = userMenu.addItem("");
             Div div = new Div();
             div.add(avatar);
-            
-            try { Optional<String> personNameOptional = loginService.getPersonNameByUsername(login.getUsername());
-            String personName = personNameOptional.get();
-            div.add(personName);
-            } catch (EntityNotFoundException e) { 
-            	 div.add(login.getUsername());
-            
+
+            try {
+                Optional<String> personNameOptional = loginService.getPersonNameByUsername(login.getUsername());
+                String personName = personNameOptional.get();
+                div.add(personName);
+            } catch (EntityNotFoundException e) {
+                div.add(login.getUsername());
+
             }
             div.add(new Icon("lumo", "dropdown"));
             div.getElement().getStyle().set("display", "flex");
@@ -156,5 +207,17 @@ public class MainLayout extends AppLayout {
     private String getCurrentPageTitle() {
         PageTitle title = getContent().getClass().getAnnotation(PageTitle.class);
         return title == null ? "" : title.value();
+    }
+
+    private String getUserRole(Authentication authentication) {
+        if (authentication != null && authentication.getAuthorities() != null) {
+            for (GrantedAuthority authority : authentication.getAuthorities()) {
+                String role = authority.getAuthority();
+                if (role != null && role.startsWith("ROLE_")) {
+                    return role;
+                }
+            }
+        }
+        return null;
     }
 }

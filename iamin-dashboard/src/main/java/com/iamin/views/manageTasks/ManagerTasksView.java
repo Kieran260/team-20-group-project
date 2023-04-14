@@ -42,6 +42,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 @PageTitle("Manage Tasks")
 @Route(value = "manage-tasks", layout = MainLayout.class)
 @RolesAllowed("ADMIN")
+
 public class ManagerTasksView extends HorizontalLayout implements BeforeEnterObserver{
 
     @Autowired
@@ -68,7 +69,9 @@ public class ManagerTasksView extends HorizontalLayout implements BeforeEnterObs
     Grid<Tasks> grid = new Grid<>(Tasks.class, false);
 
     SplitLayout splitLayout = new SplitLayout();
+
     private final TasksService tasksService;
+
     @Autowired
     private SamplePersonService samplePersonService;
 
@@ -76,6 +79,9 @@ public class ManagerTasksView extends HorizontalLayout implements BeforeEnterObs
         this.samplePersonService = samplePersonService;
         this.tasksService = tasksService;
         addClassName("list-view");
+
+        splitLayout.getStyle().set("width","100%");
+
 
         configureTasks();
         configureAssignBar();
@@ -85,16 +91,17 @@ public class ManagerTasksView extends HorizontalLayout implements BeforeEnterObs
     
     public void configureTasks() {
         VerticalLayout tasks = new VerticalLayout();
-        tasks.setWidth("800px");
+        tasks.setWidth("80%");
 
         // give grid a class name - as a referece point
         grid.addClassName("manager-assigns-tasks");
-
+        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+        grid.setWidth("80%");
         
+        grid.addColumn("title").setAutoWidth(true);
         grid.addColumn("description").setAutoWidth(true);
         grid.addColumn("assignDate").setAutoWidth(true);
         grid.addColumn("deadLine").setAutoWidth(true);
-        grid.addColumn("dateModified").setAutoWidth(true);
         grid.addColumn("submittedDate").setAutoWidth(true);
         grid.addColumn("completed").setAutoWidth(true);
         grid.addColumn(task -> {
@@ -107,13 +114,13 @@ public class ManagerTasksView extends HorizontalLayout implements BeforeEnterObs
             .stream());
         tasks.add(grid);
     
-        splitLayout.addToPrimary(tasks);
+        splitLayout.addToPrimary(grid);
     }
     
 
     public void configureAssignBar() {
         VerticalLayout content = new VerticalLayout();
-        content.setWidth("200px");
+        content.setWidth("20%");
 
         Select<SamplePerson> selectEmployee = new Select<>();
         selectEmployee.setLabel("Select Employee");
@@ -122,15 +129,21 @@ public class ManagerTasksView extends HorizontalLayout implements BeforeEnterObs
         List<SamplePerson> persons = samplePersonService.getAllSamplePersons();
         selectEmployee.setItems(persons);
 
-        TextField selectText = new TextField();
-        selectText.setLabel("Task Description");
+        TextField titleField = new TextField();
+        titleField.setLabel("Task Title");
+        TextField descriptionField = new TextField();
+        descriptionField.setLabel("Task Description");
         DatePicker dueDate = new DatePicker("Deadline");
+
         selectEmployee.setWidthFull();
-        selectText.setWidthFull();
+        titleField.setWidthFull();
+        descriptionField.setWidthFull();
         dueDate.setWidthFull();
+
         Button button = new Button("Assign Task", event -> {
             SamplePerson selectedPerson = selectEmployee.getValue();
-            String taskDescription = selectText.getValue();
+            String taskDescription = descriptionField.getValue();
+            String taskTitle = titleField.getValue();
             LocalDate deadline = dueDate.getValue();
 
             if (selectedPerson != null && taskDescription != null && !taskDescription.trim().isEmpty() && deadline != null) {
@@ -159,7 +172,7 @@ public class ManagerTasksView extends HorizontalLayout implements BeforeEnterObs
 
         button.setWidthFull();
 
-        content.add(selectEmployee, selectText, dueDate, button);
+        content.add(selectEmployee,titleField,descriptionField, dueDate, button);
 
         splitLayout.addToSecondary(content);
     }

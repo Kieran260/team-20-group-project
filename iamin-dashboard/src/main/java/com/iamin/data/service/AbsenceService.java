@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AbsenceService {
@@ -31,5 +32,12 @@ public class AbsenceService {
 
     public void deleteAbsenceRequest(Absence absenceRequest) {
         absenceRepository.delete(absenceRequest);
+    }
+    public List<Absence> findAllUnapproved() {
+        return absenceRepository.findAllUnapproved();
+    }
+
+    public Optional<Absence> findById(Long requestId) {
+        return absenceRepository.findById(requestId);
     }
 }

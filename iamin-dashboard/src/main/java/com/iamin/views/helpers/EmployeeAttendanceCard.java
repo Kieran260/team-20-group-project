@@ -1,4 +1,5 @@
 package com.iamin.views.helpers;
+import com.google.firebase.cloud.StorageClient;
 import com.iamin.data.entity.Absence;
 import com.iamin.data.entity.CheckInOut;
 import com.iamin.data.entity.Holidays;
@@ -18,29 +19,41 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.upload.Receiver;
 import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
+import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.textfield.Autocomplete;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.notification.Notification.Position;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import javax.persistence.EntityNotFoundException;
 
 @Component
 public class EmployeeAttendanceCard {
-	
+
 	@Autowired
 	private LoginService loginService;
 	@Autowired
@@ -289,7 +302,7 @@ public class EmployeeAttendanceCard {
             if (holidaysSelected <= holidaysRemaining && !holidayReason.isEmpty() && !fromDate.isEmpty() && !toDate.isEmpty() && toDate.getValue().isAfter(fromDate.getValue())) {
                 Holidays holiday = new Holidays();
                 holiday.setPerson(person);
-                holiday.setReason(holidayReason.getValue());
+                holiday.setHolidayReason(holidayReason.getValue());
                 holiday.setStartDate(fromDate.getValue());
                 holiday.setEndDate(toDate.getValue());
                 holiday.setTotalDays(holidaysSelected);
@@ -338,8 +351,31 @@ public class EmployeeAttendanceCard {
         absenceName.setRequired(true);
         absenceFromDate.setRequired(true);
         absenceToDate.setRequired(true);
+        final String[] fileUrl = {""};
+        MemoryBuffer buffer = new MemoryBuffer();
+        Upload fileUpload = new Upload(buffer);
+        fileUpload.addSucceededListener(event -> {
+            try {
+                InputStream inputStream = buffer.getInputStream();
+                String uuid = UUID.randomUUID().toString();
+                String fileExtension = event.getFileName().substring(event.getFileName().lastIndexOf('.'));
+                String firebaseStorageFileName = "absence_requests/" + uuid + fileExtension;
+        
+                // Upload the file to Firebase Storage
+                StorageClient.getInstance().bucket().create(firebaseStorageFileName, inputStream, event.getMIMEType());
+        
+                // Store the file URL in the Absence object
+                String filerl = StorageClient.getInstance().bucket().get(firebaseStorageFileName).signUrl(30, TimeUnit.MINUTES).toString();
+                fileUrl[0] = filerl;
+                Notification.show("File uploaded successfully", 3000, Notification.Position.TOP_CENTER).addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            } catch (Exception e) {
+                Notification.show("Error uploading file to Firebase Storage", 3000, Notification.Position.TOP_CENTER).addThemeVariants(NotificationVariant.LUMO_ERROR);
+                e.printStackTrace();
+                
+            }
+        });
 
-        Upload fileUpload = new Upload();
+
         fileUpload.setAcceptedFileTypes("application/pdf");
         fileUpload.setMaxFiles(1);
         fileUpload.setMaxFileSize(10485760); // 10MB
@@ -351,7 +387,7 @@ public class EmployeeAttendanceCard {
         fileUploadlLabel.getStyle().set("color", "grey");
         absenceDialogLayout.add(absenceName,absenceFromDate,absenceToDate, fileUpload , fileUploadlLabel);
         absenceDialog.add(absenceDialogLayout);
-
+      
         // TODO: 
         // Validation: check that all fields are not empty
         // AFTER VALIDATION submit absence request to DB
@@ -365,6 +401,7 @@ public class EmployeeAttendanceCard {
                 absence.setAbsenceReason(absenceName.getValue());
                 absence.setStartDate(absenceFromDate.getValue());
                 absence.setEndDate(absenceToDate.getValue());
+                absence.setDocumentsURL(fileUrl[0]);
                 absenceService.createAbsenceRequest(absence);
                 absenceDialog.close();
                 Notification.show("Success! Absence request submitted", 3000, Position.TOP_CENTER);

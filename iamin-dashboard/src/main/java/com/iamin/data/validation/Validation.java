@@ -30,7 +30,7 @@ public class Validation {
         String regex = "^[a-zA-Z]+$";
         return (myStr != null) && myStr.matches(regex);
     }
-
+  
     public boolean usernameExists(String username) {
         return loginService.checkIfUsernameExists(username);
     }

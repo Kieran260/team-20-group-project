@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 import javax.annotation.security.RolesAllowed;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,11 +36,16 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.Key;
+
+
 import com.vaadin.flow.component.UI;
+
+
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -58,6 +65,9 @@ public class CreateEmployeeView extends VerticalLayout implements BeforeEnterObs
 
     @Autowired
     LoginRepository loginRepository;
+
+    @Autowired
+    LoginService loginService;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -134,7 +144,6 @@ public class CreateEmployeeView extends VerticalLayout implements BeforeEnterObs
         jobInfoForm.addFormItem(occupation, "Occupation");
         jobInfoForm.addFormItem(jobTitle, "Job Title");
         jobInfoForm.addFormItem(role, "Role");
-        jobInfoForm.addFormItem(departmentComboBox, "Department");
         
         //add save button
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
@@ -146,14 +155,15 @@ public class CreateEmployeeView extends VerticalLayout implements BeforeEnterObs
             // Use one column by default
             new ResponsiveStep("0", 1),
             // Use two columns, if the layout's width exceeds 320px
-            new ResponsiveStep("400px", 2));
+            new ResponsiveStep("400px", 2)
+        );
 
         //add the save button
-        VerticalLayout mainLayout = new VerticalLayout(titleLabel, miniFormsCombined, save);
+        VerticalLayout mainLayout = new VerticalLayout(titleLabel, miniFormsCombined);
         mainLayout.getStyle().set("width","100%");
         mainLayout.getStyle().set("max-width","1000px");
         titleLabel.getStyle().set("font-weight","bold");
-
+    
         
         add(mainLayout);
         //do stuff when form is submitted
@@ -193,6 +203,7 @@ public class CreateEmployeeView extends VerticalLayout implements BeforeEnterObs
                 
                 //set password as default pass
                 credentials.setHashedPassword(passwordEncoder.encode(defaultPassword));
+                credentials.setPasswordSetFlag(false);
 
                 //set person association 
                 credentials.setPerson(savedPerson);
@@ -202,7 +213,105 @@ public class CreateEmployeeView extends VerticalLayout implements BeforeEnterObs
 
                 //notify on success and show generated username
                 Notification.show(successMessage+generatedUsername).setPosition(Notification.Position.TOP_CENTER);  
+            
+                // Clear the form
+                firstName.clear();
+                lastName.clear();
+                phone.clear();
+                email.clear();
+                email.setInvalid(false);
+                address.clear();
+                dateOfBirth.clear();
+                occupation.clear();
+                jobTitle.clear();
+                role.clear();
             }
+        });
+        // Add a reset password button
+        Button resetPasswordButton = new Button("Reset Password");
+        resetPasswordButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+
+        // Add a pending accounts button
+        Button pendingAccountsButton = new Button("Pending Accounts");
+        pendingAccountsButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
+
+        // Add the reset password button to the mainLayout
+        HorizontalLayout buttonLayout = new HorizontalLayout(save, resetPasswordButton, pendingAccountsButton);
+        mainLayout.add(buttonLayout);
+
+        // Add a click listener to the reset password button
+        resetPasswordButton.addClickListener(event -> {
+            // Create a dialog
+            Dialog resetPasswordDialog = new Dialog();
+
+            // Add a label and a TextField for entering the username
+            Label resetPasswordLabel = new Label("Enter the existing username to reset the password:");
+            TextField usernameField = new TextField();
+            usernameField.setPlaceholder("Username");
+
+            // Add a "Submit" button to confirm the reset action
+            Button confirmResetButton = new Button("Submit", e -> {
+                String username = usernameField.getValue();
+                Login login = loginRepository.findByUsername(username);
+
+                if (login != null) {
+                    // Reset the password to "123456789"
+                    login.setHashedPassword(passwordEncoder.encode("123456789"));
+                    loginRepository.save(login);
+                    Notification.show("The password has been reset to '123456789'.").setPosition(Notification.Position.TOP_CENTER);
+                } else {
+                    Notification.show("Username not found.").setPosition(Notification.Position.TOP_CENTER);
+                }
+                resetPasswordDialog.close();
+            });
+            confirmResetButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+            // Add a "Cancel" button to close the dialog
+            Button cancelResetButton = new Button("Cancel", e -> resetPasswordDialog.close());
+
+            // Create a layout for the buttons and add the buttons to it
+            HorizontalLayout resetPasswordButtonLayout = new HorizontalLayout();
+            resetPasswordButtonLayout.setJustifyContentMode(JustifyContentMode.CENTER);
+            resetPasswordButtonLayout.add(confirmResetButton, cancelResetButton);
+
+            // Create a VerticalLayout to organize the components
+            VerticalLayout resetPasswordLayout = new VerticalLayout();
+            resetPasswordLayout.add(resetPasswordLabel, usernameField, resetPasswordButtonLayout);
+            resetPasswordLayout.setAlignItems(Alignment.CENTER);
+            resetPasswordLayout.setSpacing(true);
+            resetPasswordLayout.setPadding(true);
+
+            // Add the VerticalLayout to the dialog
+            resetPasswordDialog.add(resetPasswordLayout);
+
+            // Open the dialog
+            resetPasswordDialog.open();
+        });
+
+        // Pending Accounts Button
+        pendingAccountsButton.addClickListener(event -> {
+            Dialog pendingAccountsDialog = new Dialog();
+            pendingAccountsDialog.setMaxWidth("60%");
+            pendingAccountsDialog.setMinWidth("400px");
+            pendingAccountsDialog.setWidth("600px");
+
+        
+            Grid<Accounts> pendingAccountsGrid = new Grid<>();
+        
+            List<Accounts> pendingAccounts = getPendingAccounts();
+            pendingAccountsGrid.setItems(pendingAccounts);
+        
+            pendingAccountsGrid.addColumn(Accounts::getPersonName).setHeader("Name");
+            pendingAccountsGrid.addColumn(Accounts::getUsername).setHeader("Username");
+            pendingAccountsGrid.addColumn(Accounts::getPassword).setHeader("Password"); 
+        
+            pendingAccountsDialog.add(pendingAccountsGrid);
+        
+            Button closeButton = new Button("Close", e -> pendingAccountsDialog.close());
+            closeButton.getElement().getStyle().set("margin-top", "20px");
+            pendingAccountsDialog.add(closeButton);
+        
+            pendingAccountsDialog.open();
         });
         
     }
@@ -300,6 +409,59 @@ public class CreateEmployeeView extends VerticalLayout implements BeforeEnterObs
             
         }
         return valid;
+    }
+
+    public List<Accounts> getPendingAccounts() {
+        List<Login> pendingLogins = loginService.findAllPendingLogins();
+        if (!pendingLogins.isEmpty()) {
+            return pendingLogins.stream().map(login -> {
+                SamplePerson person = login.getPerson();
+                String name = person.getFirstName() + " " + person.getLastName();
+                String username = login.getUsername();
+                return new Accounts(name, username);
+            }).collect(Collectors.toList());
+        } else {
+            return new ArrayList<>();
+        }
+    }
+    
+    
+    public class Accounts {
+        private String personName;
+        private String username;
+        private String password;
+    
+        public Accounts(String personName, String username) {
+            this.personName = personName;
+            this.username = username;
+            // This is a constant value for the password as all passwords are the same for default accounts
+            this.password = "123456789";
+        }
+    
+        public String getPassword() {
+            return password;
+        }
+    
+        public void setPassword(String password) {
+            this.password = password;
+        }
+    
+        public String getPersonName() {
+            return personName;
+        }
+    
+        public void setPersonName(String personName) {
+            this.personName = personName;
+        }
+    
+        public String getUsername() {
+            return username;
+        }
+    
+        public void setUsername(String username) {
+            this.username = username;
+        }
+
     }
     
 }

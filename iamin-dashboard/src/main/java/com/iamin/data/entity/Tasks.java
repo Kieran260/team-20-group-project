@@ -11,25 +11,33 @@ import javax.persistence.Table;
 
 
 @Table(name = "Tasks")
- @Entity
+@Entity
 public class Tasks extends AbstractEntity
 {
     
-	
+
     @ManyToOne
 	@JoinColumn(name = "person_id")
 	private SamplePerson person;  
     private LocalDate submittedDate;  
+    private String title;
     private String description;
     private LocalDate deadLine;
     private LocalDateTime dateModified;
     private LocalDate assignDate;
     private boolean completed;
+    
     public SamplePerson getPerson() {
         return person;
     }
     public void setPerson(SamplePerson person) {
         this.person = person;
+    }
+    public String getTitle() {
+        return title;
+    }
+    public void setTitle(String title) {
+        this.title = title;
     }
     
     public String getDescription() {

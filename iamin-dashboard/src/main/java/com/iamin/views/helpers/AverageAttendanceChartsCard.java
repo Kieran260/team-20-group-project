@@ -28,7 +28,7 @@ public class AverageAttendanceChartsCard {
 
     
         // Create Label
-        Label cardHeader = new Label("Last 6 Months");
+        Label cardHeader = new Label("Employee Attendance");
         cardHeader.getStyle().set("font-weight", "bold");
         cardHeader.getStyle().set("font-size", "18px");
     
@@ -51,7 +51,7 @@ public class AverageAttendanceChartsCard {
         Div barChart = createBarChart();
         barChart.getStyle().set("margin-right","10px");
 
-        Label barChartLabel = new Label("Last 3 Months");
+        Label barChartLabel = new Label("Last 6 Months");
         barChartLabel.getStyle().set("font-size", "14px");
         barChartLabel.getStyle().set("color", "grey");
         barChartLabel.getStyle().set("margin-left", "10px");

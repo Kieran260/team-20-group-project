@@ -175,6 +175,7 @@ public class LoginView extends VerticalLayout {
                 user.setRoles(roles);
                 user.setUsername(username);
                 user.setHashedPassword(passwordEncoder.encode(password));
+                user.setPasswordSetFlag(true);
                 loginRepository.save(user);
 
                 Notification.show("Account created successfully!", 3000, Position.TOP_CENTER);

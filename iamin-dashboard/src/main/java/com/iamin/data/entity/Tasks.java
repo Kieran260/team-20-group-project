@@ -25,6 +25,7 @@ public class Tasks extends AbstractEntity
     private LocalDate deadLine;
     private LocalDateTime dateModified;
     private LocalDate assignDate;
+    private LocalDate ackDate;
     private boolean completed;
     
     public SamplePerson getPerson() {
@@ -82,5 +83,12 @@ public class Tasks extends AbstractEntity
     }
     public void setSubmittedDate(LocalDate submittedDate) {
         this.submittedDate = submittedDate;
+    }
+
+    public LocalDate getAckDate() {
+        return submittedDate;
+    }
+    public void setAckDate() {
+        this.ackDate = LocalDate.now();
     }
 }

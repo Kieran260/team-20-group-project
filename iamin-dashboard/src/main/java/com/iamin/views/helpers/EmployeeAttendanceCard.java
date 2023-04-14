@@ -306,6 +306,7 @@ public class EmployeeAttendanceCard {
                 holiday.setStartDate(fromDate.getValue());
                 holiday.setEndDate(toDate.getValue());
                 holiday.setTotalDays(holidaysSelected);
+                holiday.setDateModified();
                 holidaysService.createHolidayRequest(holiday);
                 holidayDialog.close();
 
@@ -402,6 +403,7 @@ public class EmployeeAttendanceCard {
                 absence.setStartDate(absenceFromDate.getValue());
                 absence.setEndDate(absenceToDate.getValue());
                 absence.setDocumentsURL(fileUrl[0]);
+                absence.setDateModified();
                 absenceService.createAbsenceRequest(absence);
                 absenceDialog.close();
                 Notification.show("Success! Absence request submitted", 3000, Position.TOP_CENTER);

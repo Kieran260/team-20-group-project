@@ -125,8 +125,6 @@ public class CalendarCard {
                 }
             }          
         }
-  
-           
 
         calendarGrid.setItems(calendarItems); 
     }

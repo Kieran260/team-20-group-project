@@ -86,7 +86,7 @@ public class Tasks extends AbstractEntity
     }
 
     public LocalDate getAckDate() {
-        return submittedDate;
+        return ackDate;
     }
     public void setAckDate() {
         this.ackDate = LocalDate.now();

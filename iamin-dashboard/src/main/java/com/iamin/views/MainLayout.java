@@ -137,7 +137,7 @@ public class MainLayout extends AppLayout {
         }
 
         if (accessChecker.hasAccess(CreateEmployeeView.class)){
-            nav.addItem(new AppNavItem("Add Employee", CreateEmployeeView.class, "la la-user-plus"));
+            nav.addItem(new AppNavItem("Create Account", CreateEmployeeView.class, "la la-user-plus"));
         }
         if (accessChecker.hasAccess(ViewRequestsView.class)) {
             nav.addItem(new AppNavItem("View Requests", ViewRequestsView.class, "la la-question-circle"));

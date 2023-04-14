@@ -48,8 +48,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.HasValue;
 
-@PageTitle("Add Employee")
-@Route(value = "add-employee", layout= MainLayout.class)
+@PageTitle("Create Account")
+@Route(value = "create-account", layout= MainLayout.class)
 @RolesAllowed("ADMIN")
 public class CreateEmployeeView extends VerticalLayout {
 
@@ -69,7 +69,7 @@ public class CreateEmployeeView extends VerticalLayout {
     DepartmentRepository departmentRepository;
     
     //form fields
-    private Label      titleLabel  = new Label("Create Employee");
+    private Label      titleLabel  = new Label("Create Account");
     private TextField  firstName   = new TextField();
     private TextField  lastName    = new TextField();
     private TextField  phone       = new TextField();
@@ -85,7 +85,7 @@ public class CreateEmployeeView extends VerticalLayout {
     //default values
     private String defaultPassword = "123456789"; 
     private Integer defaultMaxHoliday = 20;
-    private String successMessage = "New employee has been added successfuly. They can access their "+ 
+    private String successMessage = "New account has been added successfuly. They can access their "+ 
                                     "account under the following username:\n";
     
     //constructor

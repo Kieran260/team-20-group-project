@@ -97,12 +97,14 @@ public class DashboardView extends VerticalLayout {
 
     private final EmployeesTableCard employeesTableCard;
 
+    private final CalendarCard calendarCard;
+
     private final PersonFormDialog personFormDialog;
     private final LoginRepository loginRepository;
     private final PasswordDialog passwordDialog;
 
 
-    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository,EmployeeAttendanceCard employeeAttendanceCard,DepartmentMembersCard departmentMembersCard,NotificationsCard notificationsCard, EmployeesTableCard employeesTableCard, EmployeeTasksCard employeeTasksCard, PasswordEncoder passwordEncoder, PasswordDialog passwordDialog,AverageAttendanceCard averageAttendanceCard,EmployeeAverageAttendanceCard employeeAverageAttendanceCard) {
+    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository,EmployeeAttendanceCard employeeAttendanceCard,DepartmentMembersCard departmentMembersCard,NotificationsCard notificationsCard, EmployeesTableCard employeesTableCard, EmployeeTasksCard employeeTasksCard, PasswordEncoder passwordEncoder, PasswordDialog passwordDialog,AverageAttendanceCard averageAttendanceCard,EmployeeAverageAttendanceCard employeeAverageAttendanceCard,CalendarCard calendarCard) {
         this.personFormDialog = personFormDialog;
         this.loginRepository = loginRepository;
         this.employeeAttendanceCard = employeeAttendanceCard;
@@ -114,6 +116,7 @@ public class DashboardView extends VerticalLayout {
         this.passwordDialog = passwordDialog;
         this.averageAttendanceCard = averageAttendanceCard;
         this.employeeAverageAttendanceCard = employeeAverageAttendanceCard;
+        this.calendarCard = calendarCard;
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         
@@ -157,8 +160,7 @@ public class DashboardView extends VerticalLayout {
         // Calendar - All Roles
         // Display all events, holidays and absences with respect to user role
         Div card3 = new Div();
-        CalendarCard calendarCard = new CalendarCard();
-        calendarCard.createCard(card3);
+        calendarCard.createCard(card3, userLogin);
         
            
         // Department Members - All Roles

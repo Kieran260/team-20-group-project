@@ -1,10 +1,21 @@
 package com.iamin.views.helpers;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+
+
+import com.iamin.data.entity.Events;
+import com.iamin.data.entity.Login;
+import com.iamin.data.service.EventService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.grid.Grid;
@@ -13,12 +24,20 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 
-
+@Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class CalendarCard {
 
-    Grid<Event> calendarGrid = new Grid();
+    private EventService eventService;
 
-    public Div createCard(Div card) {
+    Grid<CalendarItem> calendarGrid = new Grid();
+
+    @Autowired
+    public CalendarCard(EventService eventService) {
+        this.eventService = eventService;
+    }
+
+    public Div createCard(Div card, Login login) {
         Styling.styleSquareBox(card);
     
         // Header Items
@@ -71,9 +90,9 @@ public class CalendarCard {
         // Calendar grid configuration
         calendarGrid.getStyle().set("height","180px");
         calendarGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-        calendarGrid.addColumn(Event::getEventName).setHeader("Name");
-        calendarGrid.addColumn(Event::getEventType).setHeader("Type");
-        calendarGrid.addColumn(Event::getEventTime).setHeader("Time");
+        calendarGrid.addColumn(CalendarItem::getItemName).setHeader("Name");
+        calendarGrid.addColumn(CalendarItem::getItemType).setHeader("Type");
+        calendarGrid.addColumn(CalendarItem::getItemTime).setHeader("Time");
         getEvents(1, LocalDate.now());
 
         calendar.add(calendarGrid);
@@ -81,50 +100,63 @@ public class CalendarCard {
 
         // Functionality for updating grid
         datePicker.addValueChangeListener(event -> {
-            LocalDate selectedDate = event.getValue();
-            getEvents(1, selectedDate); // Replace '1' with the personId you want to pass.
+            LocalDate selectedDate = datePicker.getValue();
+            getEvents(login.getPerson().getId(), selectedDate); 
         });
 
         return card;
     }
 
-    // To be updated to fetch events when event repository is implemented
-    // TODO: Update to fetch events from database
-    private void getEvents(int personId, LocalDate date) {
-        System.out.println("Fetching events for personId: " + personId + " and date: " + date);
+    // To be updated to fetch events from repository
+    private void getEvents(long personId, LocalDate date) {
+        List<CalendarItem> calendarItems = new ArrayList<>();
 
-        List<Event> events = List.of(
-            new Event("Meeting", "Business", LocalTime.now()),
-            new Event("Presentation", "Product", LocalTime.now().plusHours(1)),
-            new Event("Conference", "Industry", LocalTime.now().plusHours(2))
-        );
 
-        calendarGrid.setItems(events);
-    }
-
-    private static class Event {
-        private final String eventName;
-        private final String eventType;
-        private final LocalTime eventTime;
-
-        public Event(String firstName, String lastName, LocalTime eventTime) {
-            this.eventName = firstName;
-            this.eventType = lastName;
-            this.eventTime = eventTime;
-        }
-    
-        public String getEventName() {
-            return eventName;
-        }
-    
-        public String getEventType() {
-            return eventType;
-        }
-
-        public String getEventTime() {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-            return eventTime.format(formatter);
-        }
         
+        // Get events
+        /* 
+        List<Events> events = eventService.getEventsByDate(personId, dateTime);
+        for (Events event : events) {
+            if (event.getEventTime() != null) {
+                CalendarItem item = new CalendarItem(
+                    event.getEventTitle(), 
+                    event.getEventType(), 
+                    event.getEventTime());
+                calendarItems.add(item);
+            }
+        }    
+        */    
+
+        calendarGrid.setItems(calendarItems); 
     }
+
+    private static class CalendarItem {
+        private final String itemName;
+        private final String itemType;
+        private final LocalTime itemTime;
+    
+        public CalendarItem(String itemName, String itemType, LocalTime itemTime) {
+            this.itemName = itemName;
+            this.itemType = itemType;
+            this.itemTime = itemTime;
+        }
+    
+        public String getItemName() {
+            return itemName;
+        }
+    
+        public String getItemType() {
+            return itemType;
+        }
+
+        public LocalTime getItemTime() {
+            return itemTime;
+        }
+    
+        public String getItemTimeString() {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+            return itemTime.format(formatter);
+        }
+    }
+    
 }

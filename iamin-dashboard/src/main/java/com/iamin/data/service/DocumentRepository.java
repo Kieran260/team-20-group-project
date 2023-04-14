@@ -7,9 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.iamin.data.entity.Document;
+import com.iamin.data.entity.SamplePerson;
 
 @Repository
 public interface DocumentRepository extends JpaRepository<Document, Long> {
     @Query("SELECT d FROM Document d WHERE d.signed = true")
     List<Document> findBySignedTrue();
+    List<Document> findByPerson(SamplePerson person);
+
 }

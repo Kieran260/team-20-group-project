@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.iamin.data.entity.Document;
+import com.iamin.data.entity.SamplePerson;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,4 +46,8 @@ public class DocumentService {
     public List<Document> getSignedDocuments() {
         return documentRepository.findBySignedTrue();
     }
+    public List<Document> findDocumentsForPerson(SamplePerson person) {
+        return documentRepository.findByPerson(person);
+    }
+    
 }

@@ -1,4 +1,5 @@
 package com.iamin.views.documentUploadView;
+import com.google.cloud.storage.BlobId;
 import com.google.firebase.cloud.StorageClient;
 import com.iamin.data.entity.Document;
 import com.iamin.data.entity.SamplePerson;
@@ -29,7 +30,9 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.vaadin.flow.component.UI;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -40,7 +43,19 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import javax.annotation.security.RolesAllowed;
-
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.HttpMethod;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
+import com.google.firebase.cloud.StorageClient;
+import com.vaadin.flow.component.UI;
+import java.net.URL;
+import java.util.concurrent.TimeUnit;
+import com.iamin.FirebaseInitializer;
+import com.google.auth.ServiceAccountSigner;
+import com.google.auth.oauth2.GoogleCredentials;
 @Route(value = "upload", layout = MainLayout.class)
 @PageTitle("Document Upload")
 @RolesAllowed("ADMIN")
@@ -48,19 +63,19 @@ public class DocumentUploadView extends Div {
 
     private DocumentService documentService;
     private SamplePersonService personService;
+    private FirebaseInitializer firebaseInitializer;
     private SplitLayout splitLayout = new SplitLayout();
 
-    public DocumentUploadView(DocumentService documentService, SamplePersonService personService) {
+    public DocumentUploadView(DocumentService documentService, SamplePersonService personService, FirebaseInitializer firebaseInitializer) {
         this.documentService = documentService;
         this.personService = personService;
+        this.firebaseInitializer = firebaseInitializer;
 
         addClassName("document-upload-view");
         splitLayout.getStyle().set("width", "100%");
 
-        // Create upload container
         configureUploadContainer();
 
-        // Create document grid
         configureDocumentGrid();
 
         add(splitLayout);
@@ -86,14 +101,24 @@ public class DocumentUploadView extends Div {
         documentGrid.addColumn(Document::getSigned).setHeader("Signed").setAutoWidth(true);
         documentGrid.addColumn(Document::getUploadDate).setHeader("Upload Date").setAutoWidth(true);
         documentGrid.addColumn(Document::getSubmitDate).setHeader("Submition Date").setAutoWidth(true);    
-        
-        documentGrid.addColumn(new ComponentRenderer<Component, Document>(document -> {
+        documentGrid.addColumn(new ComponentRenderer<>(document -> {
             if (document.getDocumentUrl() != null && !document.getDocumentUrl().isEmpty()) {
-                Anchor anchor = new Anchor(document.getDocumentUrl(), "View Document");
-                anchor.setTarget("_blank");
-                return anchor;
+                Button viewButton = new Button("View Document", clickEvent -> {
+                    try {
+                        String documentPath = document.getDocumentUrl(); 
+                        BlobId blobId = BlobId.of(StorageClient.getInstance().bucket().getName(), documentPath);
+                        Storage storage = StorageOptions.newBuilder().setCredentials(GoogleCredentials.fromStream(FirebaseInitializer.class.getClassLoader().getResourceAsStream("iamin-381803-138505f81084.json"))).build().getService();
+                        Blob blob = storage.get(blobId);
+        
+                        URL url = blob.signUrl(30, TimeUnit.MINUTES, Storage.SignUrlOption.httpMethod(HttpMethod.GET), Storage.SignUrlOption.withV4Signature(), Storage.SignUrlOption.signWith(firebaseInitializer.getServiceAccountSigner()));
+                        UI.getCurrent().getPage().open(url.toString(), "_blank");
+                    } catch (Exception e) {
+                        Notification.show("Error retrieving file", 3000, Notification.Position.TOP_CENTER).addThemeVariants(NotificationVariant.LUMO_ERROR);
+                    }
+                });
+                return viewButton;
             } else {
-                return new Div(); // Return an empty Div when there is no documentsURL
+                return new Div(); 
             }
         })).setHeader("URL").setAutoWidth(true);
         
@@ -106,7 +131,6 @@ public class DocumentUploadView extends Div {
         VerticalLayout uploadContainer = new VerticalLayout();
         uploadContainer.setWidth("20%");
 
-        // Add components and listeners for the upload container
         MemoryBuffer buffer = new MemoryBuffer();
         TextField titleField = new TextField("Document Title");
         TextField descriptionField = new TextField("Document Description");
@@ -117,10 +141,10 @@ public class DocumentUploadView extends Div {
         datePicker.setWidthFull();
 
         Upload upload = new Upload(buffer);
-        upload.setAcceptedFileTypes("application/pdf"); // Only accept PDF files
+        upload.setAcceptedFileTypes("application/pdf"); 
         Button submitButton = new Button("Submit");
 
-        List<SamplePerson> employees = personService.getAllSamplePersons(); // Fetch all employees
+        List<SamplePerson> employees = personService.getAllSamplePersons(); 
         MultiSelectComboBox<SamplePerson> employeeList = new MultiSelectComboBox<>("Select Employees");
         employeeList.setDataProvider(new ListDataProvider<>(employees));
         upload.setWidthFull();
@@ -155,13 +179,10 @@ public class DocumentUploadView extends Div {
                 String fileExtension = event.getFileName().substring(event.getFileName().lastIndexOf('.'));
                 String firebaseStorageFileName = "documents/" + uuid + fileExtension;
 
-                // Upload the file to Firebase Storage
                 StorageClient.getInstance().bucket().create(firebaseStorageFileName, inputStream, event.getMIMEType());
 
-                // Store the file URL in the Document object
                 String filelink = StorageClient.getInstance().bucket().get(firebaseStorageFileName).signUrl(30, TimeUnit.MINUTES).toString();
-                fileUrl[0] = filelink;
-                // TODO: Save the fileUrl to the Document object
+                fileUrl[0] = firebaseStorageFileName;
                 Notification.show("File uploaded successfully", 3000, Notification.Position.TOP_CENTER).addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             } catch (Exception e) {
                 Notification.show("Error uploading file", 3000, Notification.Position.TOP_CENTER).addThemeVariants(NotificationVariant.LUMO_ERROR);
@@ -180,9 +201,8 @@ public class DocumentUploadView extends Div {
                 document.setDocumentUrl(fileUrl[0]);
                 document.setUploadDate(LocalDate.now());
                 document.setSubmitDate(datePicker.getValue());
-                document.setSigned(false);
+                document.setSigned(true);
         
-                // Set the selected employees
                 Set<SamplePerson> selectedEmployees = employeeList.getSelectedItems();
                 for (SamplePerson employee : selectedEmployees) {
                     document.setPerson(employee);
@@ -204,6 +224,8 @@ public class DocumentUploadView extends Div {
         uploadContainer.add( titleField, descriptionField, datePicker,  employeeList, upload, submitButton);
         splitLayout.addToSecondary(uploadContainer);
     }
+    
+    
 
 }
 

@@ -22,6 +22,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -93,7 +94,9 @@ public class NotificationsCard {
     
         // Create a grid to display the list of notifications
         Grid<Notification> grid = new Grid<>();
-        grid.setHeight("80%");
+        grid.setHeight("90%");
+ 
+
         grid.setItems(notifications);
 
         // Remove the default header row
@@ -117,23 +120,27 @@ public class NotificationsCard {
 
 
         List<Notification> notifications = new ArrayList<>();
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM");
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("EEEE d MMMM", Locale.ENGLISH);
 
 
         
         // Get events of all types except tasks that are happening within 24 hours
         // TODO: Not working
-        /* 
-        List<Events> events = eventService.findEventsWithinHoursForPerson(person, 24);
-        for (Events event : events) {      
-            LocalDateTime eventDateTime = event.getEventDate().atTime(event.getEventTime());
-            Notification notification = new Notification(
-                "You have an event: " + event.getEventTitle(),
-                eventDateTime
-            );
-            notifications.add(notification);
+
+        try {
+            List<Events> events = eventService.findEventsWithinHoursForPerson(person, 24);
+            for (Events event : events) {      
+                Notification notification = new Notification(
+                    "Event happening soon: " + event.getEventTitle(),
+                    event.getEventDate().format(dateFormatter) + " at " + event.getEventTime().format(DateTimeFormatter.ofPattern("HH:mm"))
+                );
+                notifications.add(notification);
+            }
+        } catch (Exception e) {
+            System.out.println("Error: No events found or login does not have a person set.");
         }
-        */
+        
+        
         
         
         // Get uncompleted tasks that are due within 48 hours
@@ -148,7 +155,7 @@ public class NotificationsCard {
             }
         }
         
-        // Get non-acknowledged tasks that have been set
+        // Get non-acknowledged tasks that have been set for person
         List<Tasks> allTasks = tasksService.findTasksForPerson(person);
         for (Tasks task : allTasks) {
             if (task.getAckDate() == null) {
@@ -355,16 +362,20 @@ public class NotificationsCard {
 
     private static Renderer<Notification> createNotificationRenderer() {
         return LitRenderer.<Notification> of(
-                "<vaadin-horizontal-layout style=\"align-items: center; margin-left: 0;\" theme=\"spacing\">"
-                        + "  <vaadin-vertical-layout style=\"line-height: var(--lumo-line-height-m); margin-left: 0;\">"
-                        + "    <span style=\"word-wrap: break-word; max-width: 100%;\"> ${item.description} </span>"
-                        + "    <span style=\"font-size: var(--lumo-font-size-s); color: var(--lumo-secondary-text-color);\">"
-                        + "      ${item.status}" + "    </span>"
-                        + "  </vaadin-vertical-layout>"
-                        + "</vaadin-horizontal-layout>")
-                .withProperty("description", Notification::getDescription)
-                .withProperty("status", notification -> "No notifications to show".equals(notification.getDescription()) ?
-                "" : notification.getStatus());
+            "<vaadin-horizontal-layout style=\"align-items: center; margin: 0; padding: 0; box-sizing: border-box;\">"
+            + "  <vaadin-vertical-layout style=\"line-height: var(--lumo-line-height-m); margin: 0; padding: 0; box-sizing: border-box;\">"
+            + "    <span style=\"word-wrap: break-word; max-width: 100%; margin: 0; padding: 0; box-sizing: border-box;\">${item.description}</span>"
+            + "    <span style=\"font-size: var(--lumo-font-size-s); color: var(--lumo-secondary-text-color); margin: 0; padding: 0; box-sizing: border-box;\">${item.status}</span>"
+            + "  </vaadin-vertical-layout>"
+            + "</vaadin-horizontal-layout>")
+            .withProperty("description", Notification::getDescription)
+            .withProperty("status", notification -> "No notifications to show".equals(notification.getDescription()) ?
+            "" : notification.getStatus());
     }
+    
+    
+    
+
+    
     
 }

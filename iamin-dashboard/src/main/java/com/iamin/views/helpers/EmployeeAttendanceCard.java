@@ -407,6 +407,7 @@ public class EmployeeAttendanceCard {
                 absenceService.createAbsenceRequest(absence);
                 absenceDialog.close();
                 Notification.show("Success! Absence request submitted", 3000, Position.TOP_CENTER);
+                new Page(UI.getCurrent()).reload();
             } 
             else if (!absenceToDate.getValue().isAfter(absenceFromDate.getValue())) {
                 Notification.show("Error! Please select a valid date range", 3000, Position.TOP_CENTER);

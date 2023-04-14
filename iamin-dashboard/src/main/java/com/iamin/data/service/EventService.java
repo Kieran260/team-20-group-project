@@ -7,6 +7,7 @@ import com.iamin.data.entity.SamplePerson;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -55,4 +56,20 @@ public class EventService {
     public Page<Events> list(Pageable pageable) {
         return eventRepository.findAll(pageable);
     }
+
+    public List<Events> findEventsWithinHoursForPerson(SamplePerson person, int hours) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime upperBound = now.plusHours(hours);
+    
+        List<Events> eventsForPerson = findByAttendees_Id(person.getId());
+        List<Events> eventsWithinHours = new ArrayList<>();
+        for (Events event : eventsForPerson) {
+            LocalDateTime eventDateTime = event.getEventDate().atTime(event.getEventTime());
+            if (eventDateTime.isAfter(now) && eventDateTime.isBefore(upperBound)) {
+                eventsWithinHours.add(event);
+            }
+        }
+    
+        return eventsWithinHours;
+    }    
 }

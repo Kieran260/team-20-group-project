@@ -28,10 +28,14 @@ import com.vaadin.flow.component.html.Footer;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Header;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.map.configuration.View;
 import com.vaadin.flow.component.menubar.MenuBar;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.Scroller;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
@@ -52,6 +56,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class MainLayout extends AppLayout {
 
     private H2 viewTitle;
+    // manager only
+    private int todayAttendance;
+
+    // manager show all tasks, employee show only tasks currently in progress
+    private int todayTasks;
+    private int tasksInProgress;
+
+    // manager and employee show events today
+    private int todayEvents;
 
     private AuthenticatedUser authenticatedUser;
     private AccessAnnotationChecker accessChecker;
@@ -74,12 +87,49 @@ public class MainLayout extends AppLayout {
     private void addHeaderContent() {
         DrawerToggle toggle = new DrawerToggle();
         toggle.getElement().setAttribute("aria-label", "Menu toggle");
-
+    
         viewTitle = new H2();
         viewTitle.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
+    
 
-        addToNavbar(true, toggle, viewTitle);
+        H2 label0 = new H2("Today ");
+        label0.addClassNames(LumoUtility.FontSize.SMALL, LumoUtility.Margin.NONE);
+
+
+        // Create the labels and divs
+        Span icon1 = new Span();
+        icon1.addClassNames("la", "la-user-check");
+        H2 label1 = new H2("Attendance: 25%");
+        label1.addClassNames(LumoUtility.FontSize.SMALL, LumoUtility.Margin.NONE);
+        HorizontalLayout div1 = new HorizontalLayout(icon1, label1);
+    
+        Span icon2 = new Span();
+        icon2.addClassNames("la", "la-clock-o");
+        H2 label2 = new H2("Tasks Due: 2");
+        label2.addClassNames(LumoUtility.FontSize.SMALL, LumoUtility.Margin.NONE);
+        HorizontalLayout div2 = new HorizontalLayout(icon2, label2);
+    
+        Span icon3 = new Span();
+        icon3.addClassNames("la", "la-calendar");
+        H2 label3 = new H2("Events: 4");
+        label3.addClassNames(LumoUtility.FontSize.SMALL, LumoUtility.Margin.NONE);
+        HorizontalLayout div3 = new HorizontalLayout(icon3, label3);
+    
+        // Create a FlexLayout containing the labels
+        FlexLayout labelsLayout = new FlexLayout(label0, div1, div2, div3);
+        labelsLayout.getStyle().set("margin-right", "20px");
+        labelsLayout.getStyle().set("gap", "40px");
+    
+        labelsLayout.setJustifyContentMode(JustifyContentMode.END); 
+    
+        // Create a Div container for the FlexLayout
+        Div container = new Div(labelsLayout);
+        container.setWidth("100%"); 
+    
+        // Add the components to the navbar
+        addToNavbar(true, toggle, viewTitle, container);
     }
+    
 
     private void addDrawerContent() {
         H1 appName = new H1("IAMIN");

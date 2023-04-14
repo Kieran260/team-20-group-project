@@ -51,6 +51,11 @@ public class Holidays extends AbstractEntity{
         public void updateDateModified() {
             this.dateModified = LocalDateTime.now();
         }
+        
+        public void setDateModified() {
+            this.dateModified = LocalDateTime.now();
+        }
+        
         public SamplePerson getPerson() {
             return person;
         }

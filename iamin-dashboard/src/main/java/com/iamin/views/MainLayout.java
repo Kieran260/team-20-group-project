@@ -2,8 +2,16 @@ package com.iamin.views;
 
 import com.iamin.components.appnav.AppNav;
 import com.iamin.components.appnav.AppNavItem;
+import com.iamin.data.entity.CheckInOut;
 import com.iamin.data.entity.Login;
+import com.iamin.data.entity.SamplePerson;
+import com.iamin.data.entity.Tasks;
 import com.iamin.data.service.LoginService;
+import com.iamin.data.service.SamplePersonService;
+import com.iamin.data.service.TasksService;
+import com.iamin.data.service.CheckInOutService;
+import com.iamin.data.service.EventService;
+import com.iamin.data.Role;
 import com.iamin.security.AuthenticatedUser;
 import com.iamin.views.dashboard.DashboardView;
 import com.iamin.views.login.LoginView;
@@ -41,7 +49,13 @@ import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import java.io.ByteArrayInputStream;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityNotFoundException;
 
@@ -56,10 +70,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class MainLayout extends AppLayout {
 
     private H2 viewTitle;
-    // manager only
-    private int todayAttendance;
+    private H2 label0;
+    private H2 label1;
+    private H2 label2;
+    private H2 label3;
 
-    // manager show all tasks, employee show only tasks currently in progress
+    // manager only
+    private double todayAttendance;
+
+    // manager show all tasks due today, employee show only tasks currently in progress
     private int todayTasks;
     private int tasksInProgress;
 
@@ -72,12 +91,30 @@ public class MainLayout extends AppLayout {
     @Autowired
     private LoginService loginService;
 
+    @Autowired
+    private CheckInOutService checkInOutService;
+
+    @Autowired
+    private TasksService taskService;
+
+    @Autowired
+    private EventService eventsService;
+
+    @Autowired
+    private SamplePersonService samplePersonService;
+
+    private Authentication authentication;
+    private String userRole;
+
     public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker,
             LoginService loginService) {
         this.authenticatedUser = authenticatedUser;
         this.accessChecker = accessChecker;
         this.loginService = loginService;
         this.addClassName("main-layout");
+
+        this.authentication = SecurityContextHolder.getContext().getAuthentication();
+        userRole = getUserRole(authentication);
 
         setPrimarySection(Section.DRAWER);
         addDrawerContent();
@@ -90,42 +127,53 @@ public class MainLayout extends AppLayout {
     
         viewTitle = new H2();
         viewTitle.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
-    
+        viewTitle.getStyle().set("min-width","180px");
 
-        H2 label0 = new H2("Today ");
+
+        label0 = new H2();
         label0.addClassNames(LumoUtility.FontSize.SMALL, LumoUtility.Margin.NONE);
 
 
         // Create the labels and divs
         Span icon1 = new Span();
         icon1.addClassNames("la", "la-user-check");
-        H2 label1 = new H2("Attendance: 25%");
+        label1 = new H2();
         label1.addClassNames(LumoUtility.FontSize.SMALL, LumoUtility.Margin.NONE);
         HorizontalLayout div1 = new HorizontalLayout(icon1, label1);
     
         Span icon2 = new Span();
         icon2.addClassNames("la", "la-clock-o");
-        H2 label2 = new H2("Tasks Due: 2");
+        label2 = new H2();
         label2.addClassNames(LumoUtility.FontSize.SMALL, LumoUtility.Margin.NONE);
         HorizontalLayout div2 = new HorizontalLayout(icon2, label2);
     
         Span icon3 = new Span();
         icon3.addClassNames("la", "la-calendar");
-        H2 label3 = new H2("Events: 4");
+        label3 = new H2();
         label3.addClassNames(LumoUtility.FontSize.SMALL, LumoUtility.Margin.NONE);
         HorizontalLayout div3 = new HorizontalLayout(icon3, label3);
     
         // Create a FlexLayout containing the labels
-        FlexLayout labelsLayout = new FlexLayout(label0, div1, div2, div3);
+        FlexLayout labelsLayout = new FlexLayout();
         labelsLayout.getStyle().set("margin-right", "20px");
-        labelsLayout.getStyle().set("gap", "40px");
+        labelsLayout.getStyle().set("gap", "30px");
     
         labelsLayout.setJustifyContentMode(JustifyContentMode.END); 
-    
+
+        try {
+            if ("ROLE_ADMIN".equals(userRole)) {
+                labelsLayout.add(label0, div1, div2, div3);
+            } else if ("ROLE_USER".equals(userRole)) {
+                labelsLayout.add(label0, div2, div3);
+            } 
+        } catch (NullPointerException e) {
+            UI.getCurrent().navigate(LoginView.class);
+        }
+
         // Create a Div container for the FlexLayout
         Div container = new Div(labelsLayout);
         container.setWidth("100%"); 
-    
+
         // Add the components to the navbar
         addToNavbar(true, toggle, viewTitle, container);
     }
@@ -133,10 +181,7 @@ public class MainLayout extends AppLayout {
 
     private void addDrawerContent() {
         H1 appName = new H1("IAMIN");
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        // Get user's role and set the app name accordingly
-        String userRole = getUserRole(authentication);
         
         // Try to get the user's name from the database and catch the exception if the user is not found
         try {
@@ -250,6 +295,19 @@ public class MainLayout extends AppLayout {
     protected void afterNavigation() {
         super.afterNavigation();
         viewTitle.setText(getCurrentPageTitle());
+
+        // Update header stats
+        updateAttendance();
+        updateTodayTasks();
+        updateTodayEvents();
+        updateTasksInProgress();
+
+        label0.setText("Today");
+        label1.setText("Attendance: " + todayAttendance + "%");
+        label2.setText("Tasks Due: " + todayTasks);
+        label3.setText("Events: " + todayEvents);
+
+
     }
 
     private String getCurrentPageTitle() {
@@ -268,4 +326,72 @@ public class MainLayout extends AppLayout {
         }
         return null;
     }
+
+
+    public void updateAttendance() {
+        LocalDate today = LocalDate.now();
+    
+        // Get the list of CheckInOut for today
+        List<CheckInOut> checkInOutList = Collections.emptyList();
+        try {
+            checkInOutList = checkInOutService.findByDateBetween(today, today);
+            System.out.println("CheckInOut List: " + checkInOutList);
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    
+        // Count the number of checked-in employees
+        int checkedInEmployees = 0;
+        for (CheckInOut checkInOut : checkInOutList) {
+            if (checkInOut.getcheckInTime() != null) {
+                // Count the number of employees who checked in
+                checkedInEmployees++;
+            }
+        }
+
+        System.out.println("Checked-in Employees: " + checkedInEmployees);
+    
+        // Get the total number of employees
+        List<Login> allLogins = loginService.findAll();
+        List<Login> filteredLogins = new ArrayList<>();
+    
+        for (Login login : allLogins) {
+            Set<Role> roles = login.getRoles();
+            if (roles.contains(Role.USER) && !roles.contains(Role.ADMIN)) {
+                filteredLogins.add(login);
+            }
+            System.out.println("Login: " + login.getUsername() + ", Roles: " + roles);
+        }
+    
+        int totalEmployees = filteredLogins.size();
+        System.out.println("Total Employees: " + totalEmployees);
+    
+        // Calculate the attendance percentage
+        double attendancePercentage = (double) checkedInEmployees / totalEmployees * 100;
+        attendancePercentage = (double) Math.round(attendancePercentage * 10) / 10;
+    
+        todayAttendance = attendancePercentage;
+        System.out.println("Attendance: " + todayAttendance + "%");
+    }
+
+    private void updateTodayTasks() {
+        List<Tasks> taskList = Collections.emptyList();
+        try {
+            taskList = taskService.findTasksDueToday();
+            System.out.println("Task List: " + taskList);
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+        todayTasks = taskList.size();
+    }
+
+    private void updateTodayEvents() {
+
+    }
+
+    private void updateTasksInProgress() {
+
+    }
+
 }
+

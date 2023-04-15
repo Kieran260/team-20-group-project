@@ -63,4 +63,9 @@ public class TasksService {
         return tasksRepository.findByPersonAndCompletedFalse(person);
     }
 
+    public List<Tasks> findTasksDueToday() {
+        LocalDate today = LocalDate.now();
+        return tasksRepository.findByDeadLine(today);
+    }
+
 }

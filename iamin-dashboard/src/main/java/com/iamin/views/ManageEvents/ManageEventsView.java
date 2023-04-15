@@ -11,6 +11,7 @@ import com.iamin.data.service.TasksService;
 import com.iamin.views.MainLayout;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.component.select.Select;
@@ -19,12 +20,16 @@ import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.timepicker.TimePicker;
+import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
@@ -36,6 +41,7 @@ import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.security.RolesAllowed;
@@ -105,12 +111,29 @@ public class ManageEventsView extends Div {
         VerticalLayout content = new VerticalLayout();
         content.setWidth("20%");
     
-        Select<SamplePerson> selectAttendee = new Select<>();
-        selectAttendee.setLabel("Select Attendee");
-        selectAttendee.setItemLabelGenerator(samplePerson -> samplePerson.getFirstName() + " " + samplePerson.getLastName());
+        List<SamplePerson> employees = samplePersonService.getAllSamplePersons();
     
-        List<SamplePerson> persons = samplePersonService.getAllSamplePersons();
-        selectAttendee.setItems(persons);
+        // start
+        MultiSelectComboBox<SamplePerson> employeeList = new MultiSelectComboBox<>("Select Attendees");
+        employeeList.setDataProvider(new ListDataProvider<>(employees));
+        employeeList.setWidthFull();
+        employeeList.setRenderer(new ComponentRenderer<>(person -> {
+            HorizontalLayout row = new HorizontalLayout();
+            row.setAlignItems(FlexComponent.Alignment.CENTER);
+    
+            Span name = new Span(person.getFirstName() + " " + person.getLastName());
+            Span profession = new Span(person.getJobTitle());
+            profession.getStyle().set("color", "var(--lumo-secondary-text-color)").set("font-size", "var(--lumo-font-size-s)");
+    
+            VerticalLayout column = new VerticalLayout(name, profession);
+            column.setPadding(false);
+            column.setSpacing(false);
+    
+            row.add(column);
+            row.getStyle().set("line-height", "var(--lumo-line-height-m)");
+            return row;
+        }));
+        // end
     
         TextField eventTitle = new TextField();
         eventTitle.setLabel("Event Title");
@@ -126,7 +149,7 @@ public class ManageEventsView extends Div {
             LocalTime selectedTime = event.getValue();
             LocalTime startTime = LocalTime.of(9, 0);
             LocalTime endTime = LocalTime.of(17, 0);
-
+    
             if (selectedTime != null && (selectedTime.isBefore(startTime) || selectedTime.isAfter(endTime))) {
                 eventTime.setErrorMessage("Please select a time between 9:00 and 17:00.");
                 eventTime.setInvalid(true);
@@ -141,7 +164,7 @@ public class ManageEventsView extends Div {
         TextField eventLocation = new TextField();
         eventLocation.setLabel("Event Location");
     
-        selectAttendee.setWidthFull();
+        employeeList.setWidthFull();
         eventTitle.setWidthFull();
         eventDescription.setWidthFull();
         eventDate.setWidthFull();
@@ -150,21 +173,22 @@ public class ManageEventsView extends Div {
         eventLocation.setWidthFull();
     
         Button saveButton = new Button("Create Event", event -> {
-            SamplePerson selectedAttendee = selectAttendee.getValue();
+            Set<SamplePerson> selectedAttendees = employeeList.getValue();
             String title = eventTitle.getValue();
             String description = eventDescription.getValue();
             LocalDate date = eventDate.getValue();
             LocalTime time = eventTime.getValue();
-            
+        
             String type = eventType.getValue();
             String location = eventLocation.getValue();
-    
-            if (selectedAttendee != null && title != null && !title.trim().isEmpty()
+        
+            if (selectedAttendees != null && !selectedAttendees.isEmpty()
+                    && title != null && !title.trim().isEmpty()
                     && description != null && !description.trim().isEmpty()
                     && date != null && time != null
                     && type != null && !type.trim().isEmpty()
                     && location != null && !location.trim().isEmpty()) {
-    
+        
                 Events newEvent = new Events();
                 newEvent.setEventTitle(title);
                 newEvent.setEventDescription(description);
@@ -172,10 +196,13 @@ public class ManageEventsView extends Div {
                 newEvent.setEventTime(time);
                 newEvent.setEventType(type);
                 newEvent.setEventLocation(location);
-                newEvent.addAttendee(selectedAttendee);
-    
+        
+                for (SamplePerson attendee : selectedAttendees) {
+                    newEvent.addAttendee(attendee);
+                }
+        
                 eventService.createEvent(newEvent);
-    
+        
                 Notification.show("Event created successfully.", 3000, Notification.Position.TOP_CENTER);
                 eventTitle.clear();
                 eventDescription.clear();
@@ -183,14 +210,16 @@ public class ManageEventsView extends Div {
                 eventTime.clear();
                 eventType.clear();
                 eventLocation.clear();
+                employeeList.clear();
                 grid.getDataProvider().refreshAll();
             } else {
                 Notification.show("Please fill all required fields.", 3000, Notification.Position.TOP_CENTER);
             }
         });
         saveButton.setWidthFull();
+        
 
-        content.add(selectAttendee, eventTitle, eventDescription, eventDate, eventTime, eventType, eventLocation, saveButton);
+        content.add(employeeList, eventTitle, eventDescription, eventDate, eventTime, eventType, eventLocation, saveButton);
     
         splitLayout.addToSecondary(content);
     }

@@ -15,6 +15,8 @@ import com.iamin.data.service.EventService;
 import com.iamin.data.Role;
 import com.iamin.security.AuthenticatedUser;
 import com.iamin.views.dashboard.DashboardView;
+import com.iamin.views.documentEmployeeView.DocumentsEmployeeView;
+import com.iamin.views.documentUploadView.DocumentUploadView;
 import com.iamin.views.login.LoginView;
 import com.iamin.views.manageemployees.ManageEmployeesView;
 import com.iamin.views.viewRequests.ViewRequestsView;
@@ -250,6 +252,12 @@ public class MainLayout extends AppLayout {
 
         if (accessChecker.hasAccess(TimetableView.class)){
             nav.addItem(new AppNavItem("Timetable", TimetableView.class, "la la-calendar"));
+        }
+        if (accessChecker.hasAccess(DocumentUploadView.class)){
+            nav.addItem(new AppNavItem("Upload Documents", DocumentUploadView.class, "la la-copy"));
+        }
+        if (accessChecker.hasAccess(DocumentsEmployeeView.class)){
+            nav.addItem(new AppNavItem("View Documents", DocumentsEmployeeView.class, "la la-copy"));
         }
 
         

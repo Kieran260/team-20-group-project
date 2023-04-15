@@ -23,7 +23,7 @@ public class HolidaysService {
     public List<Holidays> getAllHolidays() {
         return holidaysRepository.findAll();
     }
-
+    
     public List<Holidays> getHolidaysForPerson(SamplePerson person) {
         return holidaysRepository.findByPerson(person);
     }

@@ -2,8 +2,13 @@ package com.iamin.views.helpers;
 
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.Component;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+import com.iamin.data.entity.Absence;
+import com.iamin.data.entity.Holidays;
+import com.vaadin.flow.component.Component;
 public class Request {
     public Component getApprovedComponent() {
         Icon icon;
@@ -22,33 +27,68 @@ public class Request {
 
     private final String firstName;
     private final String lastName;
-    private final String startDate;
-    private final String endDate;
+    private final LocalDate startDate;
+    private final LocalDate endDate;
     private final String denialReason;
-    private final String responsibleManager;
-    private final String dateAuthorised;
+    private final LocalDateTime dateAuthorised;
     private final String type;
     private final String reason;
     private final String isApproved;
     private final String isPaid;
 
-    public Request(String firstName, String lastName, String startDate,
-            String endDate, String denialReason, String responsibleManager,
-            String dateAuthorised, String type, String reason,
-            String isApproved, String isPaid) {
+    public Request(String firstName, String lastName, LocalDate startDate,
+                   LocalDate endDate, String denialReason,
+                   LocalDateTime dateAuthorised, String type, String reason,
+                   String isApproved, String isPaid) {
 
         this.firstName = firstName;
         this.lastName = lastName;
         this.startDate = startDate;
         this.endDate = endDate;
         this.denialReason = denialReason;
-        this.responsibleManager = responsibleManager;
         this.dateAuthorised = dateAuthorised;
         this.type = type;
         this.reason = reason;
         this.isApproved = isApproved;
         this.isPaid = isPaid;
     }
+
+
+    public Request(Holidays holiday) {
+        this.firstName = holiday.getPerson().getFirstName();
+        this.lastName = holiday.getPerson().getLastName();
+        this.startDate = holiday.getStartDate();
+        this.endDate = holiday.getEndDate();
+        this.denialReason = holiday.getDenyReason();
+        this.dateAuthorised = holiday.getDateModified();
+        this.type = "Holiday";
+        this.reason = holiday.getHolidayReason();
+        if (holiday.getHolidaysApproval() == null) {
+            this.isApproved = "Pending";
+        } else {
+            this.isApproved = holiday.getHolidaysApproval() ? "Yes" : "No";
+        }          
+        this.isPaid = "Yes";
+    }
+
+
+    public Request(Absence absence) {
+        this.firstName = absence.getPerson().getFirstName();
+        this.lastName = absence.getPerson().getLastName();
+        this.startDate = absence.getStartDate();
+        this.endDate = absence.getEndDate();
+        this.denialReason = absence.getDenyReason();
+        this.dateAuthorised = absence.getDateModified();
+        this.type = "Absence";
+        this.reason = absence.getAbsenceReason();
+        if (absence.getAbsenceApproval() == null) {
+            this.isApproved = "Pending";
+        } else {
+            this.isApproved = absence.getAbsenceApproval() ? "Yes" : "No";
+        }        
+        this.isPaid = (absence.getAbsenceApproval() == null || !absence.getAbsenceApproval()) ? "No" : "Yes";
+    }
+
 
     public String getFirstName() {
         return firstName;
@@ -58,11 +98,11 @@ public class Request {
         return lastName;
     }
 
-    public String getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public String getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
@@ -70,12 +110,8 @@ public class Request {
         return denialReason;
     }
 
-    public String getResponsibleManager() {
-        return responsibleManager;
-    }
-
-    public String getDateAuthorised() {
-        return dateAuthorised;
+    public LocalDate getDateAuthorised() {
+        return dateAuthorised.toLocalDate();
     }
 
     public String getType() {

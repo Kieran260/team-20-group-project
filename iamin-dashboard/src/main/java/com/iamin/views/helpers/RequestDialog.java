@@ -43,7 +43,8 @@ public class RequestDialog {
 
         VerticalLayout verticalLayout = new VerticalLayout();
 
-        Label authorisedByLabel = new Label("Responsible manager: " + req.getResponsibleManager());
+        // No manager responsible yet
+        //Label authorisedByLabel = new Label("Responsible manager: " + req.getResponsibleManager());
 
         // Check if request is holiday or absence before populating dialog
 
@@ -51,17 +52,17 @@ public class RequestDialog {
             // add holiday info
             if (req.getIsApproved().equals("Yes")) {
                 Label dateAuthorisedLabel = new Label("Date authorised: " + req.getDateAuthorised());
-                verticalLayout.add(authorisedByLabel, dateAuthorisedLabel);
+                verticalLayout.add(dateAuthorisedLabel);
             } else {
                 Label deniedReasonLabel = new Label("Denial reason: " + req.getDenialReason());
-                verticalLayout.add(authorisedByLabel, deniedReasonLabel);
+                verticalLayout.add(deniedReasonLabel);
             }
 
         } else {
             // add absence info
             // authorisedBy, payAuthorisation
             Label payAuthorisationLabel = new Label("Pay authorised: " + req.getIsPaid());
-            verticalLayout.add(authorisedByLabel, payAuthorisationLabel);
+            verticalLayout.add(payAuthorisationLabel);
         }
         dialog.add(verticalLayout);
         // Open the dialog

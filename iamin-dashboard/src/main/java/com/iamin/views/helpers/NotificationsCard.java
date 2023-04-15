@@ -184,56 +184,67 @@ public class NotificationsCard {
 
 
         // Fetch absences with approved or denied status for the current person
-        List<Absence> absences = absenceService.getAbsencesForPerson(person);
-        for (Absence absence : absences) {
-            Boolean approvalStatus = absence.getAbsenceApproval();
-            if (approvalStatus != null && absence.getEndDate().isAfter(LocalDate.now())) {
-                String status = approvalStatus ? "approved" : "denied";
-                Duration duration = Duration.between(absence.getDateModified(), LocalDate.now());
-                long hours = duration.toHours();
-                long minutes = duration.toMinutes();
 
-                if (hours >= 1) {
-                    Notification notification = new Notification(
-                        "Absence request " + absence.getAbsenceReason() + " has been " + status,
-                        hours + " hours ago"
-                    );
-                    notifications.add(notification);
-                } else {
-                    Notification notification = new Notification(
-                        "Absence request for " + absence.getAbsenceReason() + " has been " + status,
-                        minutes + " minutes ago"
-                    );
-                    notifications.add(notification);
+        try {
+            List<Absence> absences = absenceService.getAbsencesForPerson(person);
+            for (Absence absence : absences) {
+                Boolean approvalStatus = absence.getAbsenceApproval();
+                if (approvalStatus != null && absence.getEndDate().isAfter(LocalDate.now())) {
+                    String status = approvalStatus ? "approved" : "denied";
+                    Duration duration = Duration.between(absence.getDateModified(), LocalDate.now());
+                    long hours = duration.toHours();
+                    long minutes = duration.toMinutes();
+    
+                    if (hours >= 1) {
+                        Notification notification = new Notification(
+                            "Absence request " + absence.getAbsenceReason() + " has been " + status,
+                            hours + " hours ago"
+                        );
+                        notifications.add(notification);
+                    } else {
+                        Notification notification = new Notification(
+                            "Absence request for " + absence.getAbsenceReason() + " has been " + status,
+                            minutes + " minutes ago"
+                        );
+                        notifications.add(notification);
+                    }
                 }
             }
+        } catch (Exception e) {
+            System.out.println("Error: No absences found or login does not have a person set.");
         }
+
 
         // Fetch holidays with approved or denied status for the current person
-        List<Holidays> holidays = holidaysService.getHolidaysForPerson(person);
-        for (Holidays holiday : holidays) {
-            Boolean approvalStatus = holiday.getHolidaysApproval();
-            if (approvalStatus != null && holiday.getEndDate().isAfter(LocalDate.now())) {
-                String status = approvalStatus ? "approved" : "denied";
-                Duration duration = Duration.between(holiday.getDateModified(), LocalDate.now());
-                long hours = duration.toHours();
-                long minutes = duration.toMinutes();
-
-                if (hours >= 1) {
-                    Notification notification = new Notification(
-                        "Holiday request " + holiday.getHolidayReason() + " has been " + status,
-                        hours + " hours ago"
-                    );
-                    notifications.add(notification);
-                } else {
-                    Notification notification = new Notification(
-                        "Holiday request for " + holiday.getHolidayReason() + " has been " + status,
-                        minutes + " minutes ago"
-                    );
-                    notifications.add(notification);
+        try {
+            List<Holidays> holidays = holidaysService.getHolidaysForPerson(person);
+            for (Holidays holiday : holidays) {
+                Boolean approvalStatus = holiday.getHolidaysApproval();
+                if (approvalStatus != null && holiday.getEndDate().isAfter(LocalDate.now())) {
+                    String status = approvalStatus ? "approved" : "denied";
+                    Duration duration = Duration.between(holiday.getDateModified(), LocalDate.now());
+                    long hours = duration.toHours();
+                    long minutes = duration.toMinutes();
+    
+                    if (hours >= 1) {
+                        Notification notification = new Notification(
+                            "Holiday request " + holiday.getHolidayReason() + " has been " + status,
+                            hours + " hours ago"
+                        );
+                        notifications.add(notification);
+                    } else {
+                        Notification notification = new Notification(
+                            "Holiday request for " + holiday.getHolidayReason() + " has been " + status,
+                            minutes + " minutes ago"
+                        );
+                        notifications.add(notification);
+                    }
                 }
             }
+        } catch (Exception e) {
+            System.out.println("Error: No holidays found or login does not have a person set.");
         }
+    
 
 
 

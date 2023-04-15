@@ -8,20 +8,35 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.button.Button;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.iamin.views.helpers.RequestDialog;
+import com.iamin.data.entity.Absence;
+import com.iamin.data.entity.Holidays;
+import com.iamin.data.service.AbsenceService;
+import com.iamin.data.service.HolidaysService;
 import com.iamin.views.helpers.Request;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.component.Component;
 
 // Handle absence and holiday in separate tables?
 // Pull records from DB and create Request object with important details?
-
 public class ViewRequestsTableCard {
+
+    private HolidaysService holidaysService;
+    
+    private AbsenceService absenceService;
+
+
+
+    
 
     public Div createCard() {
         // Dummy data
@@ -29,18 +44,7 @@ public class ViewRequestsTableCard {
         List<Request> pastRequestsList = new ArrayList<>();
         RequestDialog reqDialog = new RequestDialog();
 
-        for (int i = 0; i < 10; i++) {
-            String approved = (i % 2 == 0) ? "Yes" : "No";
-            activeRequestsList.add(new Request("John", "Doe", "12-03-23", "18-03-23", "Pending", "Pending", "Pending",
-                    "Holiday", "Fishing", "Pending", "Pending"));
-            pastRequestsList.add(new Request("John", "Doe", "12-03-23", "18-03-23", "poor excuse", "Mr Smith", "N/A",
-                    "Holiday", "Fishing", "No", "No"));
-            activeRequestsList.add(new Request("John", "Doe", "12-03-23", "18-03-23", "Pending", "Pending", "Pending",
-                    "Absence", "Fishing", "Pending", "Pending"));
-            pastRequestsList.add(new Request("John", "Doe", "12-03-23", "18-03-23", "N/A", "Mr Smith", "12-02-23",
-                    "Absence", "Fishing", "Yes", "Yes"));
-
-        }
+        populateRequestLists(activeRequestsList, pastRequestsList);
 
         ListDataProvider<Request> activeDataProvider = new ListDataProvider<>(activeRequestsList);
         ListDataProvider<Request> pastDataProvider = new ListDataProvider<>(pastRequestsList);
@@ -119,5 +123,25 @@ public class ViewRequestsTableCard {
         container.add(activeHeader, activeRequests, pastHeader, pastRequests);
         return container;
     }
+
+    private void populateRequestLists(List<Request> activeRequestsList, List<Request> pastRequestsList) {
+        List<Holidays> allHolidays = holidaysService.getAllHolidays();
+        List<Absence> allAbsences = absenceService.getAllAbsences();
+    
+        List<Request> allRequests = new ArrayList<>();
+    
+        allRequests.addAll(allHolidays.stream().map(holiday -> new Request(holiday)).collect(Collectors.toList()));
+        allRequests.addAll(allAbsences.stream().map(absence -> new Request(absence)).collect(Collectors.toList()));
+    
+        for (Request request : allRequests) {
+            if (request.getIsApproved().equals("Pending")) {
+                activeRequestsList.add(request);
+            } else {
+                pastRequestsList.add(request);
+            }
+        }
+    }
+    
+    
 
 }

@@ -14,6 +14,7 @@ import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.component.textfield.TextArea;
@@ -137,12 +138,14 @@ public class ManageRequestsView extends Div {
                     Optional<Absence> absence = absenceService.findById(request.getRequestId());
                     if (absence.isPresent()) {
                         absence.get().setAbsenceApproval(true);
+                        absence.get().setDateModified();
                     absenceService.createAbsenceRequest(absence.get());
                     }
                 } else if ("holiday".equals(request.getRequestType())) {
                     Optional<Holidays> holiday = holidayService.findById(request.getRequestId());
                     if (holiday.isPresent()) {
                         holiday.get().setHolidaysApproval(true);
+                        holiday.get().setDateModified();
                         holidayService.createHolidayRequest(holiday.get());
                     }
                 }
@@ -168,6 +171,7 @@ public class ManageRequestsView extends Div {
                         }
                         absence.get().setAbsenceApproval(false);
                         absence.get().setDenyReason(denyReasonTextArea.getValue()); 
+                        absence.get().setDateModified();
                         absenceService.createAbsenceRequest(absence.get());
                         requestsTable.getDataProvider().refreshAll();
                         new Page(UI.getCurrent()).reload();
@@ -180,6 +184,9 @@ public class ManageRequestsView extends Div {
                     if (holiday.isPresent()) {
                         Dialog denyReasonDialog = new Dialog();
                         TextArea denyReasonTextArea = new TextArea();
+                        FlexLayout denyReasonLayout = new FlexLayout();
+                        denyReasonLayout.getStyle().set("flex-direction", "column");
+                        denyReasonLayout.getStyle().set("gap", "20px");
                         denyReasonTextArea.setPlaceholder("Enter deny reason...");
                         Button confirmButton = new Button("Confirm", event2 -> {
                             if (denyReasonTextArea.getValue().isEmpty()) {
@@ -188,12 +195,14 @@ public class ManageRequestsView extends Div {
                             }
                             holiday.get().setHolidaysApproval(false);
                             holiday.get().setDenyReason(denyReasonTextArea.getValue()); 
+                            holiday.get().setDateModified();
                             holidayService.createHolidayRequest(holiday.get());
                             requestsTable.getDataProvider().refreshAll();
                             new Page(UI.getCurrent()).reload();
                             denyReasonDialog.close();
                         });
-                        denyReasonDialog.add(denyReasonTextArea, confirmButton);
+                        denyReasonLayout.add(denyReasonTextArea, confirmButton);
+                        denyReasonDialog.add(denyReasonLayout);
                         denyReasonDialog.open();
                     }
                 }

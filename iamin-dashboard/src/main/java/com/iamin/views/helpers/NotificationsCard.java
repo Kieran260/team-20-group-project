@@ -191,7 +191,7 @@ public class NotificationsCard {
                 Boolean approvalStatus = absence.getAbsenceApproval();
                 if (approvalStatus != null && absence.getEndDate().isAfter(LocalDate.now())) {
                     String status = approvalStatus ? "approved" : "denied";
-                    Duration duration = Duration.between(absence.getDateModified(), LocalDate.now());
+                    Duration duration = Duration.between(absence.getDateModified(), LocalDateTime.now());
                     long hours = duration.toHours();
                     long minutes = duration.toMinutes();
     
@@ -222,7 +222,7 @@ public class NotificationsCard {
                 Boolean approvalStatus = holiday.getHolidaysApproval();
                 if (approvalStatus != null && holiday.getEndDate().isAfter(LocalDate.now())) {
                     String status = approvalStatus ? "approved" : "denied";
-                    Duration duration = Duration.between(holiday.getDateModified(), LocalDate.now());
+                    Duration duration = Duration.between(holiday.getDateModified(), LocalDateTime.now());
                     long hours = duration.toHours();
                     long minutes = duration.toMinutes();
     

@@ -12,7 +12,7 @@ public interface HolidaysRepository extends JpaRepository<Holidays, Long> {
 
     List<Holidays> findByPerson(SamplePerson person);
 
-    @Query("SELECT SUM(h.totalDays) FROM Holidays h WHERE h.person = :person")
+    @Query("SELECT SUM(h.totalDays) FROM Holidays h WHERE h.person = :person AND h.holidaysApproval = true OR h.holidaysApproval = NULL") 
     Integer calculateTotalDaysOff(@Param("person") SamplePerson person);
     @Query("SELECT h FROM Holidays h WHERE h.holidaysApproval IS NULL")
     List<Holidays> findAllUnapproved();

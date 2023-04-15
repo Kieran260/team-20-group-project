@@ -68,4 +68,9 @@ public class TasksService {
         return tasksRepository.findByDeadLine(today);
     }
 
+    public List<Tasks> findTasksInProgress(SamplePerson person) {
+        return tasksRepository.findByPersonAndAckDateIsNotNullAndCompletedFalse(person);
+    }
+    
+
 }

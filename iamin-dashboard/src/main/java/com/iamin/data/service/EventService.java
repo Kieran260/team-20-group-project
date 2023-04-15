@@ -85,4 +85,26 @@ public class EventService {
     
         return eventsForDate;
     }
+
+    public List<Events> findEventsByDate(LocalDate date) {
+        return eventRepository.findByEventDate(date);
+    }
+
+    public List<Events> findEventsToday() {
+        LocalDate today = LocalDate.now();
+        return eventRepository.findByEventDate(today);
+    }
+
+    public List<Events> findEventsTodayForPerson(SamplePerson person) {
+        LocalDate today = LocalDate.now();
+        List<Events> eventsForPerson = findByAttendees_Id(person.getId());
+        List<Events> eventsToday = new ArrayList<>();
+        for (Events event : eventsForPerson) {
+            if (event.getEventDate().equals(today)) {
+                eventsToday.add(event);
+            }
+        }
+        return eventsToday;
+    }
+    
 }

@@ -49,8 +49,7 @@ import org.springframework.stereotype.Component;
 @Uses(Icon.class)
 @PageTitle("View Tasks")
 @Route(value = "view-tasks", layout = MainLayout.class)
-//@RolesAllowed("USER")
-@PermitAll
+@RolesAllowed("USER")
 public class EmployeeViewTasks extends VerticalLayout{
 
    private LoginService loginService;

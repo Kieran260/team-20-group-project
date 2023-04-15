@@ -3,6 +3,7 @@ package com.iamin.views;
 import com.iamin.components.appnav.AppNav;
 import com.iamin.components.appnav.AppNavItem;
 import com.iamin.data.entity.CheckInOut;
+import com.iamin.data.entity.Events;
 import com.iamin.data.entity.Login;
 import com.iamin.data.entity.SamplePerson;
 import com.iamin.data.entity.Tasks;
@@ -30,6 +31,7 @@ import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.contextmenu.MenuItem;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Footer;
@@ -44,6 +46,7 @@ import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
+import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
@@ -113,6 +116,7 @@ public class MainLayout extends AppLayout {
         this.loginService = loginService;
         this.addClassName("main-layout");
 
+        
         this.authentication = SecurityContextHolder.getContext().getAuthentication();
         userRole = getUserRole(authentication);
 
@@ -173,9 +177,14 @@ public class MainLayout extends AppLayout {
         // Create a Div container for the FlexLayout
         Div container = new Div(labelsLayout);
         container.setWidth("100%"); 
+        container.setClassName("hide-on-small-screen");
 
         // Add the components to the navbar
         addToNavbar(true, toggle, viewTitle, container);
+
+        Element styleElement = new Element("style");
+        styleElement.setText("@media (max-width: 650px) { .hide-on-small-screen { display: none; } }");
+        getElement().appendChild(styleElement);
     }
     
 
@@ -302,12 +311,20 @@ public class MainLayout extends AppLayout {
         updateTodayEvents();
         updateTasksInProgress();
 
-        label0.setText("Today");
-        label1.setText("Attendance: " + todayAttendance + "%");
-        label2.setText("Tasks Due: " + todayTasks);
-        label3.setText("Events: " + todayEvents);
 
-
+        try {
+            if ("ROLE_ADMIN".equals(userRole)) {
+                label0.setText("Today");
+                label1.setText("Attendance: " + todayAttendance + "%");
+                label2.setText("Tasks Due: " + todayTasks);
+                label3.setText("Events: " + todayEvents);    
+            } else if ("ROLE_USER".equals(userRole)) {
+                label0.setText("Today");
+                label2.setText("Tasks In Progress: " + tasksInProgress);
+                label3.setText("Events: " + todayEvents);            } 
+        } catch (NullPointerException e) {
+            UI.getCurrent().navigate(LoginView.class);
+        }
     }
 
     private String getCurrentPageTitle() {
@@ -386,11 +403,28 @@ public class MainLayout extends AppLayout {
     }
 
     private void updateTodayEvents() {
-
+        List<Events> eventList = Collections.emptyList();
+        try {
+            SamplePerson currentPerson = authenticatedUser.get().get().getPerson();
+            eventList = eventsService.findEventsTodayForPerson(currentPerson);
+            System.out.println("Event List: " + eventList);
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+        todayEvents = eventList.size();
     }
+    
 
     private void updateTasksInProgress() {
-
+        List<Tasks> taskList = Collections.emptyList();
+        try {
+            SamplePerson currentPerson = authenticatedUser.get().get().getPerson();
+            taskList = taskService.findTasksInProgress(currentPerson);
+            System.out.println("Task List: " + taskList);
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+        tasksInProgress = taskList.size();
     }
 
 }

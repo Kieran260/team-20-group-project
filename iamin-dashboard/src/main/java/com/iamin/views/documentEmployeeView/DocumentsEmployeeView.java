@@ -13,6 +13,7 @@ import com.google.cloud.storage.StorageOptions;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -68,7 +69,7 @@ import com.iamin.FirebaseInitializer;
 @Uses(Icon.class)
 @PageTitle("View Documents")
 @Route(value = "view-documents", layout = MainLayout.class)
-@RolesAllowed("ADMIN")
+@RolesAllowed("USER")
 public class DocumentsEmployeeView extends VerticalLayout {
 
     private LoginService loginService;
@@ -150,7 +151,7 @@ public class DocumentsEmployeeView extends VerticalLayout {
             Upload upload = new Upload(buffer);
             upload.setAcceptedFileTypes("application/pdf");
             upload.setWidthFull();
-
+            Label uploadLabel = new Label("Upload the document after fill & sign");
             Button submitButton = new Button("Submit");
             submitButton.setWidthFull();
 
@@ -174,8 +175,7 @@ public class DocumentsEmployeeView extends VerticalLayout {
             });
 
             submitButton.addClickListener(event -> {
-                if (fileUrl[0] != null) {
-                    System.out.println(fileUrl[0]);
+                if (fileUrl[0] != "") {
                     document.setDocumentUrl(fileUrl[0]);
                     document.setSigned(true);
                     documentService.updateDocument(document);
@@ -188,7 +188,7 @@ public class DocumentsEmployeeView extends VerticalLayout {
                 }
             });
 
-            dialogLayout.add(upload, submitButton);
+            dialogLayout.add(uploadLabel, upload, submitButton);
             uploadDialog.add(dialogLayout);
             uploadDialog.open();
         });

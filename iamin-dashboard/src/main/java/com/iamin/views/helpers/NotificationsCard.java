@@ -260,6 +260,7 @@ public class NotificationsCard {
                     Duration duration = Duration.between(holiday.getDateModified(), LocalDateTime.now());
                     long hours = duration.toHours();
                     long minutes = duration.toMinutes();
+                    long days = duration.toDays();
                     System.out.println("loop entered");
                     if (hours >= 1) {
                         Notification notification = new Notification(
@@ -271,6 +272,18 @@ public class NotificationsCard {
                         Notification notification = new Notification(
                             "Request from " + holiday.getPerson().getFirstName() + " " + holiday.getPerson().getLastName() + " awaiting approval",
                             hours + " hour ago"
+                        );
+                        notifications.add(notification);
+                    } else if (hours >= 24 && days < 1) {
+                        Notification notification = new Notification(
+                            "Request from " + holiday.getPerson().getFirstName() + " " + holiday.getPerson().getLastName() + " awaiting approval",
+                            1 + " day ago"
+                        );
+                        notifications.add(notification);
+                    } else if (days > 1) {
+                        Notification notification = new Notification(
+                            "Request from " + holiday.getPerson().getFirstName() + " " + holiday.getPerson().getLastName() + " awaiting approval",
+                            Math.floor(days) + " day ago"
                         );
                         notifications.add(notification);
                     } else if (minutes < 1) {

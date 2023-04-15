@@ -17,6 +17,9 @@ import javax.annotation.security.RolesAllowed;
 import com.vaadin.flow.component.html.Div;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.component.html.Label;
@@ -37,8 +40,10 @@ import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.iamin.views.helpers.RequestDialog;
 import com.iamin.data.entity.Absence;
 import com.iamin.data.entity.Holidays;
+import com.iamin.data.entity.SamplePerson;
 import com.iamin.data.service.AbsenceService;
 import com.iamin.data.service.HolidaysService;
+import com.iamin.data.service.LoginService;
 import com.iamin.views.helpers.Request;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.component.Component;
@@ -56,11 +61,13 @@ public class ViewRequestsView extends Div {
 
     private HolidaysService holidaysService;
     private AbsenceService absenceService;
+    private LoginService loginService;
 
 
-    public ViewRequestsView(AbsenceService absenceService, HolidaysService holidaysService) {
+    public ViewRequestsView(AbsenceService absenceService, HolidaysService holidaysService, LoginService loginService) {
         this.absenceService = absenceService;
         this.holidaysService = holidaysService;
+        this.loginService = loginService;
 
         // Master Container
         VerticalLayout layout = new VerticalLayout();
@@ -153,8 +160,10 @@ public class ViewRequestsView extends Div {
     }
 
     private void populateRequestLists(List<Request> activeRequestsList, List<Request> pastRequestsList) {
-        List<Holidays> allHolidays = holidaysService.getAllHolidays();
-        List<Absence> allAbsences = absenceService.getAllAbsences();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        SamplePerson person = loginService.getSamplePersonByUsername(authentication.getName());
+        List<Holidays> allHolidays = holidaysService.getHolidaysForPerson(person);
+        List<Absence> allAbsences = absenceService.getAbsencesForPerson(person);
     
         List<Request> allRequests = new ArrayList<>();
     

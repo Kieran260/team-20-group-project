@@ -367,7 +367,7 @@ public class EmployeeAttendanceCard {
         
                 // Store the file URL in the Absence object
                 String filerl = StorageClient.getInstance().bucket().get(firebaseStorageFileName).signUrl(30, TimeUnit.MINUTES).toString();
-                fileUrl[0] = filerl;
+                fileUrl[0] = firebaseStorageFileName;
                 Notification.show("File uploaded successfully", 3000, Notification.Position.TOP_CENTER).addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             } catch (Exception e) {
                 Notification.show("Error uploading file to Firebase Storage", 3000, Notification.Position.TOP_CENTER).addThemeVariants(NotificationVariant.LUMO_ERROR);

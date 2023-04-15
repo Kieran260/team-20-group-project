@@ -146,13 +146,13 @@ public class ViewRequestsView extends Div {
 
         // Add columns to the tables
 
-        activeRequests.addColumn(Request::getFirstName).setHeader("First Name");
-        activeRequests.addColumn(Request::getLastName).setHeader("Last Name");
-        activeRequests.addColumn(Request::getStartDate).setHeader("Start date");
-        activeRequests.addColumn(Request::getEndDate).setHeader("End date");
-        activeRequests.addColumn(Request::getType).setHeader("Type");
-        activeRequests.addColumn(Request::getReason).setHeader("Reason");
-        activeRequests.addColumn(new ComponentRenderer<>(Request::getApprovedComponent)).setHeader("Approved");
+        activeRequests.addColumn(Request::getFirstName).setHeader("First Name").setAutoWidth(true);
+        activeRequests.addColumn(Request::getLastName).setHeader("Last Name").setAutoWidth(true);
+        activeRequests.addColumn(Request::getStartDate).setHeader("Start date").setAutoWidth(true);
+        activeRequests.addColumn(Request::getEndDate).setHeader("End date").setAutoWidth(true);
+        activeRequests.addColumn(Request::getType).setHeader("Type").setAutoWidth(true);
+        activeRequests.addColumn(Request::getReason).setHeader("Reason").setAutoWidth(true);
+        activeRequests.addColumn(new ComponentRenderer<>(Request::getApprovedComponent)).setHeader("Approved").setAutoWidth(true);
         activeRequests.addColumn(new ComponentRenderer<>(document -> {
             if (document.getDocumentsURL() != null && !document.getDocumentsURL().isEmpty()) {
                 Button viewButton = new Button("View Document", clickEvent -> {
@@ -174,13 +174,13 @@ public class ViewRequestsView extends Div {
             }
         })).setHeader(" ").setAutoWidth(true);
 
-        pastRequests.addColumn(Request::getFirstName).setHeader("First Name");
-        pastRequests.addColumn(Request::getLastName).setHeader("Last Name");
-        pastRequests.addColumn(Request::getStartDate).setHeader("Start date");
-        pastRequests.addColumn(Request::getEndDate).setHeader("End date");
-        pastRequests.addColumn(Request::getType).setHeader("Type");
-        pastRequests.addColumn(Request::getReason).setHeader("Reason");
-        pastRequests.addColumn(new ComponentRenderer<>(Request::getApprovedComponent)).setHeader("Approved");
+        pastRequests.addColumn(Request::getFirstName).setHeader("First Name").setAutoWidth(true);
+        pastRequests.addColumn(Request::getLastName).setHeader("Last Name").setAutoWidth(true);
+        pastRequests.addColumn(Request::getStartDate).setHeader("Start date").setAutoWidth(true);
+        pastRequests.addColumn(Request::getEndDate).setHeader("End date").setAutoWidth(true);
+        pastRequests.addColumn(Request::getType).setHeader("Type").setAutoWidth(true);
+        pastRequests.addColumn(Request::getReason).setHeader("Reason").setAutoWidth(true);
+        pastRequests.addColumn(new ComponentRenderer<>(Request::getApprovedComponent)).setHeader("Approved").setAutoWidth(true);
         pastRequests.addColumn(new ComponentRenderer<>(document -> {
             if (document.getDocumentsURL() != null && !document.getDocumentsURL().isEmpty()) {
                 Button viewButton = new Button("View Document", clickEvent -> {

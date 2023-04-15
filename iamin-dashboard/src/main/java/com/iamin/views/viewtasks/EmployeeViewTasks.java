@@ -59,7 +59,7 @@ public class EmployeeViewTasks extends VerticalLayout{
    public EmployeeViewTasks(LoginService loginService, TasksService tasksService) {
        this.loginService = loginService;
        this.tasksService = tasksService;
-      }
+    }
 
       @PostConstruct
       private void onPostConstruct() {

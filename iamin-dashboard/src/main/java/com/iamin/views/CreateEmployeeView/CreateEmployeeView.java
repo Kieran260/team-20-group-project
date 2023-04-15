@@ -128,7 +128,7 @@ public class CreateEmployeeView extends VerticalLayout {
         miniFormsCombined.setResponsiveSteps(
             // Use one column by default
             new ResponsiveStep("0", 1),
-            // Use two columns, if the layout's width exceeds 320px
+            // Use two columns, if the layout's width exceeds 400px
             new ResponsiveStep("400px", 2)
         );
 

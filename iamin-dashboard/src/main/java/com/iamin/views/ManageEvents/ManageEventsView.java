@@ -64,14 +64,9 @@ public class ManageEventsView extends Div {
     @Autowired
     private SamplePersonService samplePersonService;
 
-    @Autowired
-    private MainLayout mainLayout;
-
-
-    public ManageEventsView(EventService eventService, SamplePersonService samplePersonService,MainLayout mainLayout) {
+    public ManageEventsView(EventService eventService, SamplePersonService samplePersonService ) {
         this.samplePersonService = samplePersonService;
         this.eventService = eventService;
-        this.mainLayout = mainLayout;
         addClassName("list-view");
 
         splitLayout.getStyle().set("width", "100%");

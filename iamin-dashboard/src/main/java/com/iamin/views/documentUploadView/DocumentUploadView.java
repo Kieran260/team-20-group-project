@@ -15,6 +15,7 @@ import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.listbox.MultiSelectListBox;
 import com.vaadin.flow.component.notification.Notification;
@@ -122,9 +123,9 @@ public class DocumentUploadView extends Div {
             }
         })).setHeader("URL").setAutoWidth(true);
         
-
-        documentGridContainer.add(documentGrid);
-        splitLayout.addToPrimary(documentGridContainer);
+        H4 title = new H4("Signed Documents");
+        documentGridContainer.add(title , documentGrid);
+        splitLayout.addToPrimary( documentGridContainer);
     }
 
     private void configureUploadContainer() {

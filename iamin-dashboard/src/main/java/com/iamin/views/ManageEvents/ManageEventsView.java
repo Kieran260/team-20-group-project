@@ -9,7 +9,7 @@ import com.iamin.data.entity.Tasks;
 import com.iamin.data.service.SamplePersonService;
 import com.iamin.data.service.TasksService;
 import com.iamin.views.MainLayout;
-
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -64,9 +64,14 @@ public class ManageEventsView extends Div {
     @Autowired
     private SamplePersonService samplePersonService;
 
-    public ManageEventsView(EventService eventService, SamplePersonService samplePersonService) {
+    @Autowired
+    private MainLayout mainLayout;
+
+
+    public ManageEventsView(EventService eventService, SamplePersonService samplePersonService,MainLayout mainLayout) {
         this.samplePersonService = samplePersonService;
         this.eventService = eventService;
+        this.mainLayout = mainLayout;
         addClassName("list-view");
 
         splitLayout.getStyle().set("width", "100%");
@@ -200,7 +205,6 @@ public class ManageEventsView extends Div {
                 for (SamplePerson attendee : selectedAttendees) {
                     newEvent.addAttendee(attendee);
                 }
-        
                 eventService.createEvent(newEvent);
         
                 Notification.show("Event created successfully.", 3000, Notification.Position.TOP_CENTER);

@@ -274,7 +274,7 @@ public class CreateEmployeeView extends VerticalLayout {
         
             List<Accounts> pendingAccounts = getPendingAccounts();
             pendingAccountsGrid.setItems(pendingAccounts);
-        
+            Label pendingAccountsLabel = new Label("Note: each time you click on Pending Accounts button, the passwords will be updated.");
             pendingAccountsGrid.addColumn(Accounts::getPersonName).setHeader("Name");
             pendingAccountsGrid.addColumn(Accounts::getUsername).setHeader("Username");
             pendingAccountsGrid.addColumn(Accounts::getPassword).setHeader("Password"); 
@@ -283,7 +283,10 @@ public class CreateEmployeeView extends VerticalLayout {
         
             Button closeButton = new Button("Close", e -> pendingAccountsDialog.close());
             closeButton.getElement().getStyle().set("margin-top", "20px");
-            pendingAccountsDialog.add(closeButton);
+            VerticalLayout pendingAccountsLayout = new VerticalLayout();
+            pendingAccountsLayout.setAlignItems(Alignment.CENTER);
+            pendingAccountsLayout.add(pendingAccountsLabel, closeButton);
+            pendingAccountsDialog.add(pendingAccountsLayout);
         
             pendingAccountsDialog.open();
         });

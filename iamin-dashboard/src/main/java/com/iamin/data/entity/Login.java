@@ -63,7 +63,7 @@ public class Login extends AbstractEntity  {
     public void setPerson(SamplePerson person) {
         this.person = person;
     }
-    public Boolean isPasswordSet(SamplePerson person) {
+    public Boolean getPasswordSet() {
     	return passwordSet;
     }
     public void setPasswordSetFlag(Boolean passwordSet) {

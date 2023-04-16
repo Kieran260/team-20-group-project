@@ -101,7 +101,7 @@ public class DocumentUploadView extends Div {
         }).setHeader("Employee").setAutoWidth(true);
         documentGrid.addColumn(Document::getSigned).setHeader("Signed").setAutoWidth(true);
         documentGrid.addColumn(Document::getUploadDate).setHeader("Upload Date").setAutoWidth(true);
-        documentGrid.addColumn(Document::getSubmitDate).setHeader("Submition Date").setAutoWidth(true);    
+        documentGrid.addColumn(Document::getSubmitDate).setHeader("Submit Date").setAutoWidth(true);    
         documentGrid.addColumn(new ComponentRenderer<>(document -> {
             if (document.getDocumentUrl() != null && !document.getDocumentUrl().isEmpty()) {
                 Button viewButton = new Button("View Document", clickEvent -> {
@@ -135,7 +135,7 @@ public class DocumentUploadView extends Div {
         MemoryBuffer buffer = new MemoryBuffer();
         TextField titleField = new TextField("Document Title");
         TextField descriptionField = new TextField("Document Description");
-        DatePicker datePicker = new DatePicker("Submition Date");
+        DatePicker datePicker = new DatePicker("Submit Date");
         descriptionField.getStyle().set("margin-top", "16px");
         titleField.setWidthFull();
         descriptionField.setWidthFull();

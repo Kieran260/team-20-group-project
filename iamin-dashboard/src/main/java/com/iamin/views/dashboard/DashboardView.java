@@ -131,7 +131,7 @@ public class DashboardView extends VerticalLayout {
             if (userLogin != null && userLogin.getPerson() == null) {
                 personFormDialog.showPersonFormDialog();
             }
-            if (userLogin != null && passwordEncoder.matches("123456789", userLogin.getHashedPassword())) {
+            if (userLogin != null && userLogin.getPasswordSet() == false) {
                 passwordDialog.showPasswordChangeDialog();
             }
         } catch (NullPointerException e) {

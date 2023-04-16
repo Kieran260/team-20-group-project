@@ -11,20 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.H1;
 import com.iamin.data.service.SamplePersonRepository;
 import com.iamin.data.Role;
-import com.iamin.data.entity.Department;
 import com.iamin.data.entity.Login;
 import com.iamin.data.entity.SamplePerson;
 import com.iamin.views.MainLayout;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
-import com.vaadin.flow.component.orderedlayout.FlexLayout;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
@@ -37,16 +30,11 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.Notification.Position;
-import com.vaadin.flow.component.notification.NotificationVariant;
-import com.iamin.data.service.DepartmentRepository;
 import com.iamin.data.service.LoginRepository;
 import com.iamin.data.service.LoginService;
-
-import com.iamin.data.service.LoginRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
-import com.vaadin.flow.component.HasValue;
+
 
 @PageTitle("Create Account")
 @Route(value = "create-account", layout= MainLayout.class)
@@ -65,8 +53,7 @@ public class CreateEmployeeView extends VerticalLayout {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    @Autowired
-    DepartmentRepository departmentRepository;
+  
     
     //form fields
     private Label      titleLabel  = new Label("Create Account");
@@ -89,16 +76,6 @@ public class CreateEmployeeView extends VerticalLayout {
     
     //constructor
     public CreateEmployeeView() {
-        //get department options
-        if(departmentRepository != null){
-            List<Department> departments = departmentRepository.findAll();
-            List<String> deptNames = new ArrayList<String>();
-            for (Department dept : departments) {
-                deptNames.add(dept.getDepartmentName());
-            }
-            departmentComboBox.setItems(deptNames);
-        }
-        
          
         //set role options
         role.setItems("Employee", "Manager");

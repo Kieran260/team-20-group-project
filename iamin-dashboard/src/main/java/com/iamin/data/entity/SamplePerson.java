@@ -2,10 +2,7 @@ package com.iamin.data.entity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.PreUpdate;
 import javax.validation.constraints.Email;
 
@@ -23,18 +20,7 @@ public class SamplePerson extends AbstractEntity {
     private String jobTitle;
     private LocalDateTime dateModified;
     private Integer maxHolidays;
-    @ManyToOne
-    @JoinColumn(name = "department_id")
-    private Department department;
 
-   
-
-    public Department getDepartment() {
-        return department;
-    }
-    public void setDepartment(Department department) {
-        this.department = department;
-    }
     public String getFirstName() {
         return firstName;
     }

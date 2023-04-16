@@ -6,18 +6,13 @@ import com.iamin.data.entity.SamplePerson;
 import com.iamin.data.service.DocumentService;
 import com.iamin.data.service.SamplePersonService;
 import com.iamin.views.MainLayout;
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.listbox.MultiSelectListBox;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -30,14 +25,9 @@ import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import org.springframework.beans.factory.annotation.Autowired;
 import com.vaadin.flow.component.UI;
-
-import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -45,17 +35,11 @@ import java.util.concurrent.TimeUnit;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import javax.annotation.security.RolesAllowed;
 import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.BlobId;
-import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.HttpMethod;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
-import com.google.firebase.cloud.StorageClient;
-import com.vaadin.flow.component.UI;
 import java.net.URL;
-import java.util.concurrent.TimeUnit;
 import com.iamin.FirebaseInitializer;
-import com.google.auth.ServiceAccountSigner;
 import com.google.auth.oauth2.GoogleCredentials;
 @Route(value = "upload", layout = MainLayout.class)
 @PageTitle("Assign Documents")
@@ -182,7 +166,6 @@ public class DocumentUploadView extends Div {
 
                 StorageClient.getInstance().bucket().create(firebaseStorageFileName, inputStream, event.getMIMEType());
 
-                String filelink = StorageClient.getInstance().bucket().get(firebaseStorageFileName).signUrl(30, TimeUnit.MINUTES).toString();
                 fileUrl[0] = firebaseStorageFileName;
                 Notification.show("File uploaded successfully", 3000, Notification.Position.TOP_CENTER).addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             } catch (Exception e) {

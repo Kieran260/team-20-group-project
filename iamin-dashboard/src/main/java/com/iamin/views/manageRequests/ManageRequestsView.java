@@ -122,12 +122,12 @@ public class ManageRequestsView extends Div {
         requestsTable.addThemeVariants(GridVariant.LUMO_NO_BORDER);
     
         // Add columns to the table
-        requestsTable.addColumn(Request::getFirstName).setHeader("First Name");
-        requestsTable.addColumn(Request::getLastName).setHeader("Last Name");
-        requestsTable.addColumn(Request::getStartDate).setHeader("Start date");
-        requestsTable.addColumn(Request::getEndDate).setHeader("End date");
-        requestsTable.addColumn(Request::getReason).setHeader("Reason");
-        requestsTable.addColumn(Request::getRequestType).setHeader("Request Type");
+        requestsTable.addColumn(Request::getFirstName).setHeader("First Name").setAutoWidth(true);
+        requestsTable.addColumn(Request::getLastName).setHeader("Last Name").setAutoWidth(true);
+        requestsTable.addColumn(Request::getStartDate).setHeader("Start date").setAutoWidth(true);
+        requestsTable.addColumn(Request::getEndDate).setHeader("End date").setAutoWidth(true);
+        requestsTable.addColumn(Request::getReason).setHeader("Reason").setAutoWidth(true);
+        requestsTable.addColumn(Request::getRequestType).setHeader("Request Type").setAutoWidth(true);
         requestsTable.addColumn(new ComponentRenderer<>(document -> {
             if (document.getDocumentsURL() != null && !document.getDocumentsURL().isEmpty()) {
                 Button viewButton = new Button("View Document", clickEvent -> {
@@ -171,7 +171,7 @@ public class ManageRequestsView extends Div {
                 new Page(UI.getCurrent()).reload();
             });
             return approveButton;
-        }).setHeader("Approve");
+        }).setHeader("Approve").setAutoWidth(true);
 
         requestsTable.addComponentColumn(request -> {
             Button denyButton = new Button("Deny");
@@ -220,7 +220,7 @@ public class ManageRequestsView extends Div {
                 }
             });
             return denyButton;
-        }).setHeader("Deny");
+        }).setHeader("Deny").setAutoWidth(true);
     
         return requestsTable;
     }

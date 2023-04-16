@@ -254,7 +254,7 @@ public class MainLayout extends AppLayout {
             nav.addItem(new AppNavItem("Timetable", TimetableView.class, "la la-calendar"));
         }
         if (accessChecker.hasAccess(DocumentUploadView.class)){
-            nav.addItem(new AppNavItem("Upload Documents", DocumentUploadView.class, "la la-copy"));
+            nav.addItem(new AppNavItem("Assign Documents", DocumentUploadView.class, "la la-copy"));
         }
         if (accessChecker.hasAccess(DocumentsEmployeeView.class)){
             nav.addItem(new AppNavItem("View Documents", DocumentsEmployeeView.class, "la la-copy"));

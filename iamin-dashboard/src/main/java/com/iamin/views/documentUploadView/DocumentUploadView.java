@@ -58,7 +58,7 @@ import com.iamin.FirebaseInitializer;
 import com.google.auth.ServiceAccountSigner;
 import com.google.auth.oauth2.GoogleCredentials;
 @Route(value = "upload", layout = MainLayout.class)
-@PageTitle("Document Upload")
+@PageTitle("Assign Documents")
 @RolesAllowed("ADMIN")
 public class DocumentUploadView extends Div {
 

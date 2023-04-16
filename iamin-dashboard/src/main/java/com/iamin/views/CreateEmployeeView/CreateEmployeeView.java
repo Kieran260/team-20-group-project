@@ -11,20 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.H1;
 import com.iamin.data.service.SamplePersonRepository;
 import com.iamin.data.Role;
-import com.iamin.data.entity.Department;
 import com.iamin.data.entity.Login;
 import com.iamin.data.entity.SamplePerson;
 import com.iamin.views.MainLayout;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
-import com.vaadin.flow.component.orderedlayout.FlexLayout;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
@@ -37,16 +30,11 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.Notification.Position;
-import com.vaadin.flow.component.notification.NotificationVariant;
-import com.iamin.data.service.DepartmentRepository;
 import com.iamin.data.service.LoginRepository;
 import com.iamin.data.service.LoginService;
-
-import com.iamin.data.service.LoginRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
-import com.vaadin.flow.component.HasValue;
+
 
 @PageTitle("Create Account")
 @Route(value = "create-account", layout= MainLayout.class)
@@ -65,8 +53,7 @@ public class CreateEmployeeView extends VerticalLayout {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    @Autowired
-    DepartmentRepository departmentRepository;
+  
     
     //form fields
     private Label      titleLabel  = new Label("Create Account");
@@ -83,23 +70,12 @@ public class CreateEmployeeView extends VerticalLayout {
     Button save = new Button("Save");
 
     //default values
-    private String defaultPassword = "123456789"; 
     private Integer defaultMaxHoliday = 20;
     private String successMessage = "New account has been added successfuly. They can access their "+ 
                                     "account under the following username:\n";
     
     //constructor
     public CreateEmployeeView() {
-        //get department options
-        if(departmentRepository != null){
-            List<Department> departments = departmentRepository.findAll();
-            List<String> deptNames = new ArrayList<String>();
-            for (Department dept : departments) {
-                deptNames.add(dept.getDepartmentName());
-            }
-            departmentComboBox.setItems(deptNames);
-        }
-        
          
         //set role options
         role.setItems("Employee", "Manager");
@@ -164,6 +140,7 @@ public class CreateEmployeeView extends VerticalLayout {
                 
                 //create login credentials 
                 String generatedUsername = genUserName(firstName.getValue(), lastName.getValue());
+                String generatedPassword = genPassword();
                 Login credentials = new Login();
                 
                 //set role
@@ -176,7 +153,7 @@ public class CreateEmployeeView extends VerticalLayout {
                 credentials.setUsername(generatedUsername);
                 
                 //set password as default pass
-                credentials.setHashedPassword(passwordEncoder.encode(defaultPassword));
+                credentials.setHashedPassword(passwordEncoder.encode(generatedPassword));
                 credentials.setPasswordSetFlag(false);
 
                 //set person association 
@@ -186,7 +163,7 @@ public class CreateEmployeeView extends VerticalLayout {
                 loginRepository.save(credentials);
 
                 //notify on success and show generated username
-                Notification.show(successMessage+generatedUsername).setPosition(Notification.Position.TOP_CENTER);  
+                Notification.show(successMessage+generatedUsername+"\npassword: "+generatedPassword).setPosition(Notification.Position.TOP_CENTER);  
             
                 // Clear the form
                 firstName.clear();
@@ -229,10 +206,10 @@ public class CreateEmployeeView extends VerticalLayout {
                 Login login = loginRepository.findByUsername(username);
 
                 if (login != null) {
-                    // Reset the password to "123456789"
-                    login.setHashedPassword(passwordEncoder.encode("123456789"));
+                    String generatedPassword = genPassword();
+                    login.setHashedPassword(passwordEncoder.encode(generatedPassword));
                     loginRepository.save(login);
-                    Notification.show("The password has been reset to '123456789'.").setPosition(Notification.Position.TOP_CENTER);
+                    Notification.show("The new password: "+generatedPassword).setPosition(Notification.Position.TOP_CENTER);
                 } else {
                     Notification.show("Username not found.").setPosition(Notification.Position.TOP_CENTER);
                 }
@@ -274,7 +251,7 @@ public class CreateEmployeeView extends VerticalLayout {
         
             List<Accounts> pendingAccounts = getPendingAccounts();
             pendingAccountsGrid.setItems(pendingAccounts);
-        
+            Label pendingAccountsLabel = new Label("Note: each time you click on Pending Accounts button, the passwords will be updated.");
             pendingAccountsGrid.addColumn(Accounts::getPersonName).setHeader("Name");
             pendingAccountsGrid.addColumn(Accounts::getUsername).setHeader("Username");
             pendingAccountsGrid.addColumn(Accounts::getPassword).setHeader("Password"); 
@@ -283,7 +260,10 @@ public class CreateEmployeeView extends VerticalLayout {
         
             Button closeButton = new Button("Close", e -> pendingAccountsDialog.close());
             closeButton.getElement().getStyle().set("margin-top", "20px");
-            pendingAccountsDialog.add(closeButton);
+            VerticalLayout pendingAccountsLayout = new VerticalLayout();
+            pendingAccountsLayout.setAlignItems(Alignment.CENTER);
+            pendingAccountsLayout.add(pendingAccountsLabel, closeButton);
+            pendingAccountsDialog.add(pendingAccountsLayout);
         
             pendingAccountsDialog.open();
         });
@@ -316,6 +296,29 @@ public class CreateEmployeeView extends VerticalLayout {
         
         username += "" + firstChar + secondChar;
         return username;
+    }
+    private String genPassword(){
+        /*
+         * Assumption: password is at least 8 characters long
+         * Password format: 
+         *      3 random lower case letters
+         *      3 random numbers
+         *      2 random special upper case characters
+         */
+        String password = "";
+        //first three chars
+        for(int i = 0; i < 3; i++){
+            password += (char) ('a' + (int) (Math.random() * 26));
+        }
+        //second three chars
+        for(int i = 0; i < 3; i++){
+            password += (int) (Math.random() * 10);
+        }
+        //last two characters 
+        for(int i = 0; i < 2; i++){
+            password += (char) ('A' + (int) (Math.random() * 26));
+        }
+        return password;
     }
 
     private boolean requiredFields() {
@@ -370,7 +373,11 @@ public class CreateEmployeeView extends VerticalLayout {
                 SamplePerson person = login.getPerson();
                 String name = person.getFirstName() + " " + person.getLastName();
                 String username = login.getUsername();
-                return new Accounts(name, username);
+                String password = genPassword();
+                //Reset the password to the generated one
+                login.setHashedPassword(passwordEncoder.encode(password));
+                loginRepository.save(login);
+                return new Accounts(name, username, password);
             }).collect(Collectors.toList());
         } else {
             return new ArrayList<>();
@@ -383,11 +390,10 @@ public class CreateEmployeeView extends VerticalLayout {
         private String username;
         private String password;
     
-        public Accounts(String personName, String username) {
+        public Accounts(String personName, String username, String password) {
             this.personName = personName;
             this.username = username;
-            // This is a constant value for the password as all passwords are the same for default accounts
-            this.password = "123456789";
+            this.password = password;
         }
     
         public String getPassword() {

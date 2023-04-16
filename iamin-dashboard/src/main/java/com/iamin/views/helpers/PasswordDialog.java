@@ -58,6 +58,7 @@ public class PasswordDialog {
             String currentUsername = authentication.getName();
             Login userLogin = loginRepository.findByUsername(currentUsername);
             userLogin.setHashedPassword(passwordEncoder.encode(newPassword));
+            userLogin.setPasswordSetFlag(true);
             loginRepository.save(userLogin);
             // Save the new password and close the dialog
             passwordDialog.close();

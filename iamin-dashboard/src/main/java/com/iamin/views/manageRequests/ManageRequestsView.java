@@ -1,7 +1,12 @@
 package com.iamin.views.manageRequests;
-
+import com.google.cloud.storage.Blob;
 import com.iamin.views.MainLayout;
 import com.iamin.views.helpers.Styling;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.HttpMethod;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
+import com.google.firebase.cloud.StorageClient;
 import com.iamin.data.entity.Absence;
 import com.iamin.data.entity.Holidays;
 import com.iamin.data.service.AbsenceRepository;
@@ -26,8 +31,10 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-
-
+import com.google.auth.oauth2.GoogleCredentials;
+import com.iamin.FirebaseInitializer;
+import java.util.concurrent.TimeUnit;
+import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -39,6 +46,7 @@ import javax.annotation.security.RolesAllowed;
 
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -52,11 +60,13 @@ public class ManageRequestsView extends Div {
     String currentUserRole;
     private final AbsenceService absenceService;
     private final HolidaysService holidayService;
+    private final FirebaseInitializer firebaseInitializer;
 
     @Autowired
-    public ManageRequestsView(AbsenceService absenceService, HolidaysService holidayService) {
+    public ManageRequestsView(AbsenceService absenceService, HolidaysService holidayService, FirebaseInitializer firebaseInitializer) {
         this.absenceService = absenceService;
         this.holidayService = holidayService;
+        this.firebaseInitializer = firebaseInitializer;
 
 
         getStyle().set("background-color", "rgba(250, 250, 250)");
@@ -113,21 +123,32 @@ public class ManageRequestsView extends Div {
         requestsTable.addThemeVariants(GridVariant.LUMO_NO_BORDER);
     
         // Add columns to the table
-        requestsTable.addColumn(Request::getFirstName).setHeader("First Name");
-        requestsTable.addColumn(Request::getLastName).setHeader("Last Name");
-        requestsTable.addColumn(Request::getStartDate).setHeader("Start date");
-        requestsTable.addColumn(Request::getEndDate).setHeader("End date");
-        requestsTable.addColumn(Request::getReason).setHeader("Reason");
-        requestsTable.addColumn(Request::getRequestType).setHeader("Request Type");
-        requestsTable.addColumn(new ComponentRenderer<>(request -> {
-            if (request.getDocumentsURL() != null && !request.getDocumentsURL().isEmpty()) {
-                Anchor anchor = new Anchor(request.getDocumentsURL(), "View Document");
-                anchor.setTarget("_blank");
-                return anchor;
+        requestsTable.addColumn(Request::getFirstName).setHeader("First Name").setAutoWidth(true);
+        requestsTable.addColumn(Request::getLastName).setHeader("Last Name").setAutoWidth(true);
+        requestsTable.addColumn(Request::getStartDate).setHeader("Start date").setAutoWidth(true);
+        requestsTable.addColumn(Request::getEndDate).setHeader("End date").setAutoWidth(true);
+        requestsTable.addColumn(Request::getReason).setHeader("Reason").setAutoWidth(true);
+        requestsTable.addColumn(Request::getRequestType).setHeader("Request Type").setAutoWidth(true);
+        requestsTable.addColumn(new ComponentRenderer<>(document -> {
+            if (document.getDocumentsURL() != null && !document.getDocumentsURL().isEmpty()) {
+                Button viewButton = new Button("View Document", clickEvent -> {
+                    try {
+                        String documentPath = document.getDocumentsURL(); 
+                        BlobId blobId = BlobId.of(StorageClient.getInstance().bucket().getName(), documentPath);
+                        Storage storage = StorageOptions.newBuilder().setCredentials(GoogleCredentials.fromStream(FirebaseInitializer.class.getClassLoader().getResourceAsStream("iamin-381803-138505f81084.json"))).build().getService();
+                        Blob blob = storage.get(blobId);
+        
+                        URL url = blob.signUrl(30, TimeUnit.MINUTES, Storage.SignUrlOption.httpMethod(HttpMethod.GET), Storage.SignUrlOption.withV4Signature(), Storage.SignUrlOption.signWith(firebaseInitializer.getServiceAccountSigner()));
+                        UI.getCurrent().getPage().open(url.toString(), "_blank");
+                    } catch (Exception e) {
+                        Notification.show("Error retrieving file", 3000, Notification.Position.TOP_CENTER).addThemeVariants(NotificationVariant.LUMO_ERROR);
+                    }
+                });
+                return viewButton;
             } else {
-                return new Div(); // Return an empty Div when there is no documentsURL
+                return new Div(); 
             }
-        })).setHeader(" ");
+        })).setHeader(" ").setAutoWidth(true);
 
 
     
@@ -153,7 +174,7 @@ public class ManageRequestsView extends Div {
                 new Page(UI.getCurrent()).reload();
             });
             return approveButton;
-        }).setHeader("Approve");
+        }).setHeader("Approve").setAutoWidth(true);
 
         requestsTable.addComponentColumn(request -> {
             Button denyButton = new Button("Deny");
@@ -208,7 +229,7 @@ public class ManageRequestsView extends Div {
                 }
             });
             return denyButton;
-        }).setHeader("Deny");
+        }).setHeader("Deny").setAutoWidth(true);
     
         return requestsTable;
     }

@@ -139,6 +139,11 @@ public class DocumentsEmployeeView extends VerticalLayout {
 
     documentGrid.addColumn(new ComponentRenderer<>(document -> {
         Button uploadButton = new Button("Upload Document");
+        if (document.getSigned() == true) {
+            uploadButton.setEnabled(false);
+        } else {
+            uploadButton.setEnabled(true);
+        }
         uploadButton.addClickListener(e -> {
             Dialog uploadDialog = new Dialog();
             uploadDialog.setWidth("400px");
@@ -193,6 +198,7 @@ public class DocumentsEmployeeView extends VerticalLayout {
             uploadDialog.open();
         });
         return uploadButton;
+        
     })).setHeader("Upload").setAutoWidth(true);
     
     

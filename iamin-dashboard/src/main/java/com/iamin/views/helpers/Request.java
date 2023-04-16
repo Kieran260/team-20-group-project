@@ -35,11 +35,12 @@ public class Request {
     private final String reason;
     private final String isApproved;
     private final String isPaid;
+    private final String documentURL;
 
     public Request(String firstName, String lastName, LocalDate startDate,
                    LocalDate endDate, String denialReason,
                    LocalDateTime dateAuthorised, String type, String reason,
-                   String isApproved, String isPaid) {
+                   String isApproved, String isPaid, String documentURL) {
 
         this.firstName = firstName;
         this.lastName = lastName;
@@ -51,6 +52,7 @@ public class Request {
         this.reason = reason;
         this.isApproved = isApproved;
         this.isPaid = isPaid;
+        this.documentURL = documentURL;
     }
 
 
@@ -69,6 +71,7 @@ public class Request {
             this.isApproved = holiday.getHolidaysApproval() ? "Yes" : "No";
         }          
         this.isPaid = "Yes";
+        this.documentURL = null;
     }
 
 
@@ -87,6 +90,7 @@ public class Request {
             this.isApproved = absence.getAbsenceApproval() ? "Yes" : "No";
         }        
         this.isPaid = (absence.getAbsenceApproval() == null || !absence.getAbsenceApproval()) ? "No" : "Yes";
+        this.documentURL = absence.documentsURL();
     }
 
 
@@ -128,5 +132,10 @@ public class Request {
 
     public String getIsPaid() {
         return isPaid;
+    }
+
+
+    public String getDocumentsURL() {
+        return documentURL;
     }
 }

@@ -3,8 +3,10 @@ package com.iamin.views.CreateEmployeeView;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 
 import javax.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,8 +73,7 @@ public class CreateEmployeeView extends VerticalLayout {
 
     //default values
     private Integer defaultMaxHoliday = 20;
-    private String successMessage = "New account has been added successfuly. They can access their "+ 
-                                    "account under the following username:\n";
+    private String successMessage = "New account has been added successfully. Please click pending accounts to view the login credentials.";
     
     //constructor
     public CreateEmployeeView() {
@@ -163,7 +164,7 @@ public class CreateEmployeeView extends VerticalLayout {
                 loginRepository.save(credentials);
 
                 //notify on success and show generated username
-                Notification.show(successMessage+generatedUsername+"\npassword: "+generatedPassword).setPosition(Notification.Position.TOP_CENTER);  
+                Notification.show(successMessage).setPosition(Notification.Position.TOP_CENTER);  
             
                 // Clear the form
                 firstName.clear();
@@ -209,7 +210,7 @@ public class CreateEmployeeView extends VerticalLayout {
                     String generatedPassword = genPassword();
                     login.setHashedPassword(passwordEncoder.encode(generatedPassword));
                     loginRepository.save(login);
-                    Notification.show("The new password: "+generatedPassword).setPosition(Notification.Position.TOP_CENTER);
+                    Notification.show("Password changed successfully. Please click pending accounts to view the login credentials.").setPosition(Notification.Position.TOP_CENTER);
                 } else {
                     Notification.show("Username not found.").setPosition(Notification.Position.TOP_CENTER);
                 }
@@ -246,27 +247,56 @@ public class CreateEmployeeView extends VerticalLayout {
             pendingAccountsDialog.setMinWidth("400px");
             pendingAccountsDialog.setWidth("600px");
 
-        
             Grid<Accounts> pendingAccountsGrid = new Grid<>();
-        
             List<Accounts> pendingAccounts = getPendingAccounts();
+
             pendingAccountsGrid.setItems(pendingAccounts);
-            Label pendingAccountsLabel = new Label("Note: each time you click on Pending Accounts button, the passwords will be updated.");
+            Label pendingAccountsLabel = new Label("Note: each time you click 'View Password' a new password will be generated for the user.");
             pendingAccountsGrid.addColumn(Accounts::getPersonName).setHeader("Name");
             pendingAccountsGrid.addColumn(Accounts::getUsername).setHeader("Username");
-            pendingAccountsGrid.addColumn(Accounts::getPassword).setHeader("Password"); 
-        
+
+            pendingAccountsGrid.addComponentColumn(account -> {
+                Button viewPasswordButton = new Button("View Password");
+                viewPasswordButton.addClickListener(e -> {
+            
+                    // Generate the password for the person in the row that has been clicked
+                    String password = genPassword();
+                    List<Login> currentPendingLogins = loginService.findAllPendingLogins();
+                    Optional<Login> loginOpt = currentPendingLogins.stream()
+                            .filter(login -> login.getUsername().equals(account.getUsername()))
+                            .findFirst();
+                    if (loginOpt.isPresent()) {
+                        Login login = loginOpt.get();
+                        login.setHashedPassword(passwordEncoder.encode(password));
+                        loginRepository.save(login);
+            
+                        Dialog passwordDialog = new Dialog();
+                        Label passwordLabel = new Label("Password: " + password);
+                        Label nameLabel = new Label("Username: " + account.getUsername());
+                        Button closeButton = new Button("Close", e2 -> passwordDialog.close());
+            
+                        VerticalLayout layout = new VerticalLayout(nameLabel, passwordLabel, closeButton);
+                        layout.setAlignItems(Alignment.CENTER);
+                        passwordDialog.add(layout);
+                        passwordDialog.open();
+                    }
+                });
+                return viewPasswordButton;
+            }).setHeader("Password");
+
             pendingAccountsDialog.add(pendingAccountsGrid);
-        
+
             Button closeButton = new Button("Close", e -> pendingAccountsDialog.close());
             closeButton.getElement().getStyle().set("margin-top", "20px");
             VerticalLayout pendingAccountsLayout = new VerticalLayout();
             pendingAccountsLayout.setAlignItems(Alignment.CENTER);
             pendingAccountsLayout.add(pendingAccountsLabel, closeButton);
             pendingAccountsDialog.add(pendingAccountsLayout);
-        
+
             pendingAccountsDialog.open();
         });
+
+
         
     }
 
@@ -373,11 +403,14 @@ public class CreateEmployeeView extends VerticalLayout {
                 SamplePerson person = login.getPerson();
                 String name = person.getFirstName() + " " + person.getLastName();
                 String username = login.getUsername();
-                String password = genPassword();
+                //String password = genPassword();
                 //Reset the password to the generated one
+                /* 
                 login.setHashedPassword(passwordEncoder.encode(password));
                 loginRepository.save(login);
-                return new Accounts(name, username, password);
+                */
+                return new Accounts(name, username);
+                
             }).collect(Collectors.toList());
         } else {
             return new ArrayList<>();
@@ -388,20 +421,10 @@ public class CreateEmployeeView extends VerticalLayout {
     public class Accounts {
         private String personName;
         private String username;
-        private String password;
     
-        public Accounts(String personName, String username, String password) {
+        public Accounts(String personName, String username) {
             this.personName = personName;
             this.username = username;
-            this.password = password;
-        }
-    
-        public String getPassword() {
-            return password;
-        }
-    
-        public void setPassword(String password) {
-            this.password = password;
         }
     
         public String getPersonName() {

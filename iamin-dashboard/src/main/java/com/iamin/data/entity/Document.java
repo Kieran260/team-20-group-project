@@ -14,6 +14,7 @@ public class Document extends AbstractEntity {
     private String documentUrl;
     private LocalDate uploadDate;
     private LocalDate submitDate;
+    private LocalDate signDate;
     private Boolean signed;
 
     @ManyToOne
@@ -58,6 +59,14 @@ public class Document extends AbstractEntity {
 
     public void setSubmitDate(LocalDate submitDate) {
         this.submitDate = submitDate;
+    }
+
+    public LocalDate getSignDate() {
+        return signDate;
+    }
+
+    public void setSignDate(LocalDate signDate) {
+        this.signDate = signDate;
     }
 
     public Boolean getSigned() {

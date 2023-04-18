@@ -32,6 +32,7 @@ import com.vaadin.flow.theme.lumo.Lumo;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import javax.annotation.security.RolesAllowed;
@@ -110,15 +111,15 @@ public class DocumentsEmployeeView extends VerticalLayout {
 
        documentGrid.addClassName("view-documents");
        documentGrid.setDataProvider(dataProvider);
-       documentGrid.addColumn(Document::getDocumentTitle).setHeader("Title").setAutoWidth(true);
+       documentGrid.addColumn(Document::getDocumentTitle).setHeader("Document Name").setAutoWidth(true);
        documentGrid.addColumn(Document::getDocumentDescription).setHeader("Description").setAutoWidth(true);
-       documentGrid.addColumn(Document::getUploadDate).setHeader("Upload Date").setAutoWidth(true);
-       documentGrid.addColumn(Document::getSubmitDate).setHeader("Submit Date").setAutoWidth(true);
+       documentGrid.addColumn(Document::getUploadDate).setHeader("Date Received").setAutoWidth(true);
+       documentGrid.addColumn(Document::getSubmitDate).setHeader("Submission Deadline").setAutoWidth(true);
        documentGrid.addColumn(Document::getSigned).setHeader("Signed").setAutoWidth(true);
        documentGrid.addColumn(new ComponentRenderer<>(document -> {
         if (document.getDocumentUrl() != null && !document.getDocumentUrl().isEmpty()) {
             Button viewButton = new Button("View Document", clickEvent -> {
-                Notification.show("Please download the file fill & sign it and upload it again", 3000, Notification.Position.TOP_CENTER);
+                Notification.show("Please download the file and re-upload the signed document.", 3000, Notification.Position.TOP_CENTER);
                 try {
                     String documentPath = document.getDocumentUrl(); 
                     BlobId blobId = BlobId.of(StorageClient.getInstance().bucket().getName(), documentPath);
@@ -135,7 +136,7 @@ public class DocumentsEmployeeView extends VerticalLayout {
         } else {
             return new Div(); 
         }
-    })).setHeader("URL").setAutoWidth(true);
+    })).setHeader("View Document").setAutoWidth(true);
 
     documentGrid.addColumn(new ComponentRenderer<>(document -> {
         Button uploadButton = new Button("Upload Document");
@@ -156,7 +157,7 @@ public class DocumentsEmployeeView extends VerticalLayout {
             Upload upload = new Upload(buffer);
             upload.setAcceptedFileTypes("application/pdf");
             upload.setWidthFull();
-            Label uploadLabel = new Label("Upload the document after fill & sign");
+            Label uploadLabel = new Label("Please upload the signed document.");
             Button submitButton = new Button("Submit");
             submitButton.setWidthFull();
 
@@ -183,11 +184,13 @@ public class DocumentsEmployeeView extends VerticalLayout {
                 if (fileUrl[0] != "") {
                     document.setDocumentUrl(fileUrl[0]);
                     document.setSigned(true);
+                    document.setSignDate(LocalDate.now());
                     documentService.updateDocument(document);
-                    Notification.show("Document updated successfully", 3000, Notification.Position.TOP_CENTER);
+                    Notification.show("Document uploaded successfully.", 3000, Notification.Position.TOP_CENTER);
                     fileUrl[0] = "";
                     upload.getElement().setProperty("value", null);
                     uploadDialog.close();
+                    configureDocuments();
                 } else {
                     Notification.show("Please upload a file", 3000, Notification.Position.TOP_CENTER);
                 }
@@ -199,7 +202,7 @@ public class DocumentsEmployeeView extends VerticalLayout {
         });
         return uploadButton;
         
-    })).setHeader("Upload").setAutoWidth(true);
+    })).setHeader("Upload Signed").setAutoWidth(true);
     
     
       documentGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);

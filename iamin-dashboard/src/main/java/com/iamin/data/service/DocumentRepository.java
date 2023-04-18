@@ -13,6 +13,6 @@ import com.iamin.data.entity.SamplePerson;
 public interface DocumentRepository extends JpaRepository<Document, Long> {
     @Query("SELECT d FROM Document d WHERE d.signed = true")
     List<Document> findBySignedTrue();
+    List<Document> findBySignedFalse();
     List<Document> findByPerson(SamplePerson person);
-
 }

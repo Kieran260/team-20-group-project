@@ -45,5 +45,9 @@ public class DocumentService {
     public List<Document> findDocumentsForPerson(SamplePerson person) {
         return documentRepository.findByPerson(person);
     }
+
+    public List<Document> getUnsignedDocuments () {
+        return documentRepository.findBySignedFalse();
+    }
     
 }

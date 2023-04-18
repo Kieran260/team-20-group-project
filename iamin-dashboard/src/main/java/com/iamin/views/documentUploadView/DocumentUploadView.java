@@ -41,7 +41,7 @@ import com.google.cloud.storage.StorageOptions;
 import java.net.URL;
 import com.iamin.FirebaseInitializer;
 import com.google.auth.oauth2.GoogleCredentials;
-@Route(value = "upload", layout = MainLayout.class)
+@Route(value = "assign-documents", layout = MainLayout.class)
 @PageTitle("Assign Documents")
 @RolesAllowed("ADMIN")
 public class DocumentUploadView extends Div {
@@ -60,7 +60,6 @@ public class DocumentUploadView extends Div {
         splitLayout.getStyle().set("width", "100%");
 
         configureUploadContainer();
-
         configureDocumentGrid();
 
         add(splitLayout);
@@ -68,9 +67,10 @@ public class DocumentUploadView extends Div {
 
     private void configureDocumentGrid() {
         VerticalLayout documentGridContainer = new VerticalLayout();
-        documentGridContainer.setWidth("80%");
+        documentGridContainer.setWidth("100%");
 
         Grid<Document> documentGrid = new Grid<>();
+        documentGrid.setWidth("100%");
         documentGrid.addClassName("tasks-grid");
         
         List<Document> signedDocuments = documentService.getSignedDocuments();
@@ -83,9 +83,7 @@ public class DocumentUploadView extends Div {
             SamplePerson person = task.getPerson();
             return person != null ? person.getFirstName() + " " + person.getLastName() : "";
         }).setHeader("Employee").setAutoWidth(true);
-        documentGrid.addColumn(Document::getSigned).setHeader("Signed").setAutoWidth(true);
-        documentGrid.addColumn(Document::getUploadDate).setHeader("Upload Date").setAutoWidth(true);
-        documentGrid.addColumn(Document::getSubmitDate).setHeader("Submit Date").setAutoWidth(true);    
+        documentGrid.addColumn(Document::getSubmitDate).setHeader("Sign Date").setAutoWidth(true);
         documentGrid.addColumn(new ComponentRenderer<>(document -> {
             if (document.getDocumentUrl() != null && !document.getDocumentUrl().isEmpty()) {
                 Button viewButton = new Button("View Document", clickEvent -> {
@@ -105,12 +103,67 @@ public class DocumentUploadView extends Div {
             } else {
                 return new Div(); 
             }
-        })).setHeader("URL").setAutoWidth(true);
+        })).setHeader("View").setAutoWidth(true);
         
         H4 title = new H4("Signed Documents");
         documentGridContainer.add(title , documentGrid);
-        splitLayout.addToPrimary( documentGridContainer);
+
+        // New grid
+        VerticalLayout pendingDocumentGridContainer = new VerticalLayout();
+        pendingDocumentGridContainer.setWidth("100%");
+
+        Grid<Document> pendingDocumentGrid = new Grid<>();       
+        pendingDocumentGrid.setWidth("100%");
+        List<Document> unsignedDocuments = documentService.getUnsignedDocuments();
+
+        ListDataProvider<Document> unsignedDataProvider = new ListDataProvider<>(unsignedDocuments);
+        pendingDocumentGrid.setDataProvider(unsignedDataProvider);
+        pendingDocumentGrid.addColumn(Document::getDocumentTitle).setHeader("Title").setAutoWidth(true);
+        pendingDocumentGrid.addColumn(Document::getDocumentDescription).setHeader("Description").setAutoWidth(true);
+        pendingDocumentGrid.addColumn(task -> {
+            SamplePerson person = task.getPerson();
+            return person != null ? person.getFirstName() + " " + person.getLastName() : "";
+        }).setHeader("Employee").setAutoWidth(true);
+        pendingDocumentGrid.addColumn(Document::getSubmitDate).setHeader("Signature Deadline").setAutoWidth(true);    
+        pendingDocumentGrid.addColumn(new ComponentRenderer<>(document -> {
+            if (document.getDocumentUrl() != null && !document.getDocumentUrl().isEmpty()) {
+                Button viewButton = new Button("View Document", clickEvent -> {
+                    try {
+                        String documentPath = document.getDocumentUrl(); 
+                        BlobId blobId = BlobId.of(StorageClient.getInstance().bucket().getName(), documentPath);
+                        Storage storage = StorageOptions.newBuilder().setCredentials(GoogleCredentials.fromStream(FirebaseInitializer.class.getClassLoader().getResourceAsStream("iamin-381803-138505f81084.json"))).build().getService();
+                        Blob blob = storage.get(blobId);
+        
+                        URL url = blob.signUrl(30, TimeUnit.MINUTES, Storage.SignUrlOption.httpMethod(HttpMethod.GET), Storage.SignUrlOption.withV4Signature(), Storage.SignUrlOption.signWith(firebaseInitializer.getServiceAccountSigner()));
+                        UI.getCurrent().getPage().open(url.toString(), "_blank");
+                    } catch (Exception e) {
+                        Notification.show("Error retrieving file", 3000, Notification.Position.TOP_CENTER).addThemeVariants(NotificationVariant.LUMO_ERROR);
+                    }
+                });
+                return viewButton;
+            } else {
+                return new Div(); 
+            }
+        })).setHeader("View").setAutoWidth(true);
+        
+        H4 title2 = new H4("Pending Documents");
+        pendingDocumentGridContainer.add(title2,pendingDocumentGrid);
+
+        VerticalLayout masterContainer = new VerticalLayout();
+        masterContainer.add(documentGridContainer,pendingDocumentGridContainer);
+        documentGridContainer.getStyle().set("padding","0");
+        documentGridContainer.getStyle().set("margin","0");
+        pendingDocumentGridContainer.getStyle().set("padding","0");
+        pendingDocumentGridContainer.getStyle().set("margin","0");
+        title.getStyle().set("padding-left","5px");
+        title2.getStyle().set("padding-left","5px");
+
+
+        masterContainer.setWidth("80%");
+
+        splitLayout.addToPrimary(masterContainer);
     }
+
 
     private void configureUploadContainer() {
         VerticalLayout uploadContainer = new VerticalLayout();
@@ -119,8 +172,7 @@ public class DocumentUploadView extends Div {
         MemoryBuffer buffer = new MemoryBuffer();
         TextField titleField = new TextField("Document Title");
         TextField descriptionField = new TextField("Document Description");
-        DatePicker datePicker = new DatePicker("Submit Date");
-        descriptionField.getStyle().set("margin-top", "16px");
+        DatePicker datePicker = new DatePicker("Signature Deadline");
         titleField.setWidthFull();
         descriptionField.setWidthFull();
         datePicker.setWidthFull();
@@ -199,13 +251,14 @@ public class DocumentUploadView extends Div {
                 employeeList.clear();
                 fileUrl[0] = "";
                 upload.getElement().setProperty("value", null);
+                configureDocumentGrid();
             } else {
                 Notification.show("Please fill all fields", 3000, Notification.Position.TOP_CENTER);
             }
         });
 
 
-        uploadContainer.add( titleField, descriptionField, datePicker,  employeeList, upload, submitButton);
+        uploadContainer.add(titleField, descriptionField, datePicker,  employeeList, upload, submitButton);
         splitLayout.addToSecondary(uploadContainer);
     }
     

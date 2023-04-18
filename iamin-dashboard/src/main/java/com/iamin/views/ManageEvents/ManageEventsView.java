@@ -40,6 +40,8 @@ import java.time.LocalDateTime;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -79,32 +81,50 @@ public class ManageEventsView extends Div {
     public void configureEvents() {
         VerticalLayout events = new VerticalLayout();
         events.setWidth("80%");
-
+    
         // give grid a class name - as a reference point
         grid.addClassName("manager-assigns-events");
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.setWidth("80%");
-
+    
         grid.addColumn("eventTitle").setAutoWidth(true);
         grid.addColumn("eventDescription").setAutoWidth(true);
-        grid.addColumn("eventDate").setAutoWidth(true);
-        grid.addColumn("eventTime").setAutoWidth(true);
-        grid.addColumn("eventType").setAutoWidth(true);
+    
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yy");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+    
+        grid.addColumn(event -> event.getEventDate().format(dateFormatter))
+            .setHeader("Event Date")
+            .setAutoWidth(true);
+    
+        grid.addColumn(event -> event.getEventTime().format(timeFormatter))
+            .setHeader("Event Time")
+            .setAutoWidth(true);
+    
+        grid.addColumn(event -> event.getEventType())
+            .setHeader("Event Type")
+            .setAutoWidth(true);
+    
         grid.addColumn("eventLocation").setAutoWidth(true);
+    
         grid.addColumn(event -> {
             List<SamplePerson> attendees = event.getAttendees();
             return attendees.stream()
                     .map(person -> person.getFirstName() + " " + person.getLastName())
                     .collect(Collectors.joining(", "));
         }).setHeader("Attendees").setAutoWidth(true);
-
+    
         grid.setItems(query -> eventService.list(
                 PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
-                .stream());
+                .stream()
+                .sorted(Comparator.comparing(Events::getEventDate)
+                    .thenComparing(Events::getEventTime).reversed())
+        );
         events.add(grid);
-
+    
         splitLayout.addToPrimary(grid);
     }
+    
     
  
     public void configureAssignBar() {

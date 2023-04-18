@@ -25,6 +25,8 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
@@ -64,18 +66,33 @@ public class ManagerTasksView extends Div {
     public void configureTasks() {
         VerticalLayout tasks = new VerticalLayout();
         tasks.setWidth("80%");
-
-        // give grid a class name - as a referece point
+    
+        // give grid a class name - as a reference point
         grid.addClassName("manager-assigns-tasks");
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.setWidth("80%");
-        
+    
         grid.addColumn("title").setAutoWidth(true);
         grid.addColumn("description").setAutoWidth(true);
-        grid.addColumn("assignDate").setAutoWidth(true);
-        grid.addColumn("deadLine").setAutoWidth(true);
-        grid.addColumn("submittedDate").setAutoWidth(true);
-        grid.addColumn("completed").setAutoWidth(true);
+    
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yy");
+    
+        grid.addColumn(task -> task.getAssignDate().format(dateFormatter))
+            .setHeader("Assign Date")
+            .setAutoWidth(true);
+    
+        grid.addColumn(task -> task.getDeadLine().format(dateFormatter))
+            .setHeader("Deadline")
+            .setAutoWidth(true);
+    
+        grid.addColumn(task -> task.getSubmittedDate() != null ? task.getSubmittedDate().format(dateFormatter) : "")
+            .setHeader("Submitted Date")
+            .setAutoWidth(true);
+    
+        grid.addColumn(task -> task.isCompleted() ? "Yes" : "No")
+            .setHeader("Completed")
+            .setAutoWidth(true);
+    
         grid.addColumn(task -> {
             SamplePerson person = task.getPerson();
             return person != null ? person.getFirstName() + " " + person.getLastName() : "";
@@ -83,11 +100,17 @@ public class ManagerTasksView extends Div {
     
         grid.setItems(query -> tasksService.list(
             PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
-            .stream());
+            .stream()
+            .sorted(Comparator.comparing(Tasks::isCompleted)
+                .thenComparing(Tasks::getDeadLine))
+        );
         tasks.add(grid);
     
         splitLayout.addToPrimary(grid);
     }
+    
+    
+    
     
 
     public void configureAssignBar() {

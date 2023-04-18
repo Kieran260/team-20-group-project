@@ -20,6 +20,7 @@ import com.iamin.data.entity.SamplePerson;
 import com.iamin.views.MainLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
@@ -58,7 +59,7 @@ public class CreateEmployeeView extends VerticalLayout {
   
     
     //form fields
-    private Label      titleLabel  = new Label("Create Account");
+    private H4         titleLabel  = new H4("Create Account");
     private TextField  firstName   = new TextField();
     private TextField  lastName    = new TextField();
     private TextField  phone       = new TextField();
@@ -113,7 +114,9 @@ public class CreateEmployeeView extends VerticalLayout {
         VerticalLayout mainLayout = new VerticalLayout(titleLabel, miniFormsCombined);
         mainLayout.getStyle().set("width","100%");
         mainLayout.getStyle().set("max-width","1000px");
-        titleLabel.getStyle().set("font-weight","bold");
+        titleLabel.getStyle().set("margin-top","0");
+        titleLabel.getStyle().set("padding-top","0");
+
     
         
         add(mainLayout);

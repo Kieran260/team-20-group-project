@@ -28,6 +28,8 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.component.UI;
 import java.io.InputStream;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -68,13 +70,16 @@ public class DocumentUploadView extends Div {
     private void configureDocumentGrid() {
         VerticalLayout documentGridContainer = new VerticalLayout();
         documentGridContainer.setWidth("100%");
-
+    
         Grid<Document> documentGrid = new Grid<>();
         documentGrid.setWidth("100%");
         documentGrid.addClassName("tasks-grid");
-        
+    
         List<Document> signedDocuments = documentService.getSignedDocuments();
-
+    
+        // Sort signedDocuments by sign date, newest at the top
+        signedDocuments.sort(Comparator.comparing(Document::getSubmitDate).reversed());
+    
         ListDataProvider<Document> dataProvider = new ListDataProvider<>(signedDocuments);
         documentGrid.setDataProvider(dataProvider);
         documentGrid.addColumn(Document::getDocumentTitle).setHeader("Title").setAutoWidth(true);
@@ -83,7 +88,11 @@ public class DocumentUploadView extends Div {
             SamplePerson person = task.getPerson();
             return person != null ? person.getFirstName() + " " + person.getLastName() : "";
         }).setHeader("Employee").setAutoWidth(true);
-        documentGrid.addColumn(Document::getSubmitDate).setHeader("Sign Date").setAutoWidth(true);
+    
+        // Update date format
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yy");
+    
+        documentGrid.addColumn(doc -> dateFormatter.format(doc.getSubmitDate())).setHeader("Sign Date").setAutoWidth(true);
         documentGrid.addColumn(new ComponentRenderer<>(document -> {
             if (document.getDocumentUrl() != null && !document.getDocumentUrl().isEmpty()) {
                 Button viewButton = new Button("View Document", clickEvent -> {
@@ -92,7 +101,7 @@ public class DocumentUploadView extends Div {
                         BlobId blobId = BlobId.of(StorageClient.getInstance().bucket().getName(), documentPath);
                         Storage storage = StorageOptions.newBuilder().setCredentials(GoogleCredentials.fromStream(FirebaseInitializer.class.getClassLoader().getResourceAsStream("iamin-381803-138505f81084.json"))).build().getService();
                         Blob blob = storage.get(blobId);
-        
+    
                         URL url = blob.signUrl(30, TimeUnit.MINUTES, Storage.SignUrlOption.httpMethod(HttpMethod.GET), Storage.SignUrlOption.withV4Signature(), Storage.SignUrlOption.signWith(firebaseInitializer.getServiceAccountSigner()));
                         UI.getCurrent().getPage().open(url.toString(), "_blank");
                     } catch (Exception e) {
@@ -104,7 +113,7 @@ public class DocumentUploadView extends Div {
                 return new Div(); 
             }
         })).setHeader("View").setAutoWidth(true);
-        
+    
         H4 title = new H4("Signed Documents");
         documentGridContainer.add(title , documentGrid);
 
@@ -116,6 +125,9 @@ public class DocumentUploadView extends Div {
         pendingDocumentGrid.setWidth("100%");
         List<Document> unsignedDocuments = documentService.getUnsignedDocuments();
 
+        // Sort unsignedDocuments by signature deadline, newest at the top
+        unsignedDocuments.sort(Comparator.comparing(Document::getSubmitDate).reversed());
+
         ListDataProvider<Document> unsignedDataProvider = new ListDataProvider<>(unsignedDocuments);
         pendingDocumentGrid.setDataProvider(unsignedDataProvider);
         pendingDocumentGrid.addColumn(Document::getDocumentTitle).setHeader("Title").setAutoWidth(true);
@@ -124,7 +136,7 @@ public class DocumentUploadView extends Div {
             SamplePerson person = task.getPerson();
             return person != null ? person.getFirstName() + " " + person.getLastName() : "";
         }).setHeader("Employee").setAutoWidth(true);
-        pendingDocumentGrid.addColumn(Document::getSubmitDate).setHeader("Signature Deadline").setAutoWidth(true);    
+        pendingDocumentGrid.addColumn(doc -> dateFormatter.format(doc.getSubmitDate())).setHeader("Signature Deadline").setAutoWidth(true);
         pendingDocumentGrid.addColumn(new ComponentRenderer<>(document -> {
             if (document.getDocumentUrl() != null && !document.getDocumentUrl().isEmpty()) {
                 Button viewButton = new Button("View Document", clickEvent -> {
@@ -133,7 +145,7 @@ public class DocumentUploadView extends Div {
                         BlobId blobId = BlobId.of(StorageClient.getInstance().bucket().getName(), documentPath);
                         Storage storage = StorageOptions.newBuilder().setCredentials(GoogleCredentials.fromStream(FirebaseInitializer.class.getClassLoader().getResourceAsStream("iamin-381803-138505f81084.json"))).build().getService();
                         Blob blob = storage.get(blobId);
-        
+
                         URL url = blob.signUrl(30, TimeUnit.MINUTES, Storage.SignUrlOption.httpMethod(HttpMethod.GET), Storage.SignUrlOption.withV4Signature(), Storage.SignUrlOption.signWith(firebaseInitializer.getServiceAccountSigner()));
                         UI.getCurrent().getPage().open(url.toString(), "_blank");
                     } catch (Exception e) {
@@ -144,25 +156,25 @@ public class DocumentUploadView extends Div {
             } else {
                 return new Div(); 
             }
-        })).setHeader("View").setAutoWidth(true);
-        
+            })).setHeader("View").setAutoWidth(true);
+
         H4 title2 = new H4("Pending Documents");
-        pendingDocumentGridContainer.add(title2,pendingDocumentGrid);
+        pendingDocumentGridContainer.add(title2, pendingDocumentGrid);
 
         VerticalLayout masterContainer = new VerticalLayout();
-        masterContainer.add(documentGridContainer,pendingDocumentGridContainer);
-        documentGridContainer.getStyle().set("padding","0");
-        documentGridContainer.getStyle().set("margin","0");
-        pendingDocumentGridContainer.getStyle().set("padding","0");
-        pendingDocumentGridContainer.getStyle().set("margin","0");
-        title.getStyle().set("padding-left","5px");
-        title2.getStyle().set("padding-left","5px");
-
+        masterContainer.add(documentGridContainer, pendingDocumentGridContainer);
+        documentGridContainer.getStyle().set("padding", "0");
+        documentGridContainer.getStyle().set("margin", "0");
+        pendingDocumentGridContainer.getStyle().set("padding", "0");
+        pendingDocumentGridContainer.getStyle().set("margin", "0");
+        title.getStyle().set("padding-left", "5px");
+        title2.getStyle().set("padding-left", "5px");
 
         masterContainer.setWidth("80%");
 
         splitLayout.addToPrimary(masterContainer);
     }
+
 
 
     private void configureUploadContainer() {

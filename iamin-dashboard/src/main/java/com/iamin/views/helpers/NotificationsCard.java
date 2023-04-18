@@ -125,10 +125,9 @@ public class NotificationsCard {
 
         
         // Get events of all types except tasks that are happening within 24 hours
-        // TODO: Not working
 
         try {
-            List<Events> events = eventService.findEventsWithinHoursForPerson(person, 24);
+            List<Events> events = eventService.findEventsWithinHoursForPerson(person, 1);
             for (Events event : events) {      
                 Notification notification = new Notification(
                     "Event happening soon: " + event.getEventTitle(),
@@ -140,6 +139,8 @@ public class NotificationsCard {
             System.out.println("Error: No events found or login does not have a person set.");
         }
         
+        // TODO: Show new event has been set for person
+
         
         
         
@@ -192,22 +193,18 @@ public class NotificationsCard {
                 if (approvalStatus != null && absence.getEndDate().isAfter(LocalDate.now())) {
                     String status = approvalStatus ? "approved" : "denied";
                     Duration duration = Duration.between(absence.getDateModified(), LocalDateTime.now());
-                    long hours = duration.toHours();
-                    long minutes = duration.toMinutes();
-    
-                    if (hours >= 1) {
-                        Notification notification = new Notification(
-                            "Absence request " + absence.getAbsenceReason() + " has been " + status,
-                            hours + " hours ago"
-                        );
-                        notifications.add(notification);
-                    } else {
-                        Notification notification = new Notification(
-                            "Absence request for " + absence.getAbsenceReason() + " has been " + status,
-                            minutes + " minutes ago"
-                        );
+
+
+                    Notification notification = new Notification(
+                        "Absence request " + absence.getAbsenceReason() + " has been " + status,
+                        getTimeAgo(duration)
+                    );
+
+                    if (duration.toHours() < 48) {
                         notifications.add(notification);
                     }
+    
+
                 }
             }
         } catch (Exception e) {
@@ -216,6 +213,7 @@ public class NotificationsCard {
 
 
         // Fetch holidays with approved or denied status for the current person
+        // Employee: your holiday request has been approved/denied
         try {
             List<Holidays> holidays = holidaysService.getHolidaysForPerson(person);
             for (Holidays holiday : holidays) {
@@ -223,22 +221,12 @@ public class NotificationsCard {
                 if (approvalStatus != null && holiday.getEndDate().isAfter(LocalDate.now())) {
                     String status = approvalStatus ? "approved" : "denied";
                     Duration duration = Duration.between(holiday.getDateModified(), LocalDateTime.now());
-                    long hours = duration.toHours();
-                    long minutes = duration.toMinutes();
-    
-                    if (hours >= 1) {
-                        Notification notification = new Notification(
-                            "Holiday request " + holiday.getHolidayReason() + " has been " + status,
-                            hours + " hours ago"
-                        );
-                        notifications.add(notification);
-                    } else {
-                        Notification notification = new Notification(
-                            "Holiday request for " + holiday.getHolidayReason() + " has been " + status,
-                            minutes + " minutes ago"
-                        );
-                        notifications.add(notification);
-                    }
+
+                    Notification notification = new Notification(
+                        "Holiday request " + holiday.getHolidayReason() + " has been " + status,
+                        getTimeAgo(duration)
+                    );
+                    notifications.add(notification);
                 }
             }
         } catch (Exception e) {
@@ -251,6 +239,7 @@ public class NotificationsCard {
 
 
         // Fetch holidays not yet approved if user role admin
+        // Manager: Request from "" is awaiting approval
         // Completed
         try {
             if (login.getRoles().contains(Role.ADMIN)) {
@@ -258,53 +247,15 @@ public class NotificationsCard {
                 System.out.println(holidayRequests.size());
                 for (Holidays holiday : holidayRequests) {
                     Duration duration = Duration.between(holiday.getDateModified(), LocalDateTime.now());
-                    long hours = duration.toHours();
-                    long minutes = duration.toMinutes();
-                    long days = duration.toDays();
+
                     System.out.println("loop entered");
-                    if (hours >= 1) {
-                        Notification notification = new Notification(
-                            "Request from " + holiday.getPerson().getFirstName() + " " + holiday.getPerson().getLastName() + " awaiting approval",
-                            hours + " hours ago"
-                        );
-                        notifications.add(notification);
-                    } else if (hours == 1) {
-                        Notification notification = new Notification(
-                            "Request from " + holiday.getPerson().getFirstName() + " " + holiday.getPerson().getLastName() + " awaiting approval",
-                            hours + " hour ago"
-                        );
-                        notifications.add(notification);
-                    } else if (hours >= 24 && days < 1) {
-                        Notification notification = new Notification(
-                            "Request from " + holiday.getPerson().getFirstName() + " " + holiday.getPerson().getLastName() + " awaiting approval",
-                            1 + " day ago"
-                        );
-                        notifications.add(notification);
-                    } else if (days > 1) {
-                        Notification notification = new Notification(
-                            "Request from " + holiday.getPerson().getFirstName() + " " + holiday.getPerson().getLastName() + " awaiting approval",
-                            Math.floor(days) + " day ago"
-                        );
-                        notifications.add(notification);
-                    } else if (minutes < 1) {
-                        Notification notification = new Notification(
-                            "Request from " + holiday.getPerson().getFirstName() + " " + holiday.getPerson().getLastName() + " awaiting approval",
-                            "Just now"
-                        );
-                        notifications.add(notification);
-                    } else if (minutes == 1) {
-                        Notification notification = new Notification(
-                            "Request from " + holiday.getPerson().getFirstName() + " " + holiday.getPerson().getLastName() + " is awaiting approval",
-                            minutes + " minute ago"
-                        );
-                        notifications.add(notification);
-                    } else {
-                        Notification notification = new Notification(
-                            "Request from " + holiday.getPerson().getFirstName() + " " + holiday.getPerson().getLastName() + " is awaiting approval",
-                            minutes + " minutes ago"
-                        );
-                        notifications.add(notification);
-                    }
+
+                    Notification notification = new Notification(
+                        "Request from " + holiday.getPerson().getFirstName() + " " + holiday.getPerson().getLastName() + " awaiting approval",
+                        getTimeAgo(duration)
+                    );
+                    notifications.add(notification);
+
                 }
             }
             
@@ -313,6 +264,7 @@ public class NotificationsCard {
         }
         
         // Fetch absences not yet approved if user role admin
+        // Manager: Request from : "" + "" is awaiting approval
         // Completed
         try {
             if (login.getRoles().contains(Role.ADMIN)) {
@@ -320,46 +272,26 @@ public class NotificationsCard {
                 System.out.println(absenceRequests.size());
                 for (Absence absence : absenceRequests) {
                     Duration duration = Duration.between(absence.getDateModified(), LocalDateTime.now());
-                    long hours = duration.toHours();
-                    long minutes = duration.toMinutes();
+
                     System.out.println("loop entered");
-                    if (hours >= 1) {
-                        Notification notification = new Notification(
-                            "Request from " + absence.getPerson().getFirstName() + " " + absence.getPerson().getLastName() + " awaiting approval",
-                            hours + " hours ago"
-                        );
-                        notifications.add(notification);
-                    } else if (hours == 1) {
-                        Notification notification = new Notification(
-                            "Request from " + absence.getPerson().getFirstName() + " " + absence.getPerson().getLastName() + " awaiting approval",
-                            hours + " hour ago"
-                        );
-                        notifications.add(notification);
-                    } else if (minutes < 1) {
-                        Notification notification = new Notification(
-                            "Request from " + absence.getPerson().getFirstName() + " " + absence.getPerson().getLastName() + " awaiting approval",
-                            "Just now"
-                        );
-                        notifications.add(notification);
-                    } else if (minutes == 1) {
-                        Notification notification = new Notification(
-                            "Request from " + absence.getPerson().getFirstName() + " " + absence.getPerson().getLastName() + " is awaiting approval",
-                            minutes + " minute ago"
-                        );
-                        notifications.add(notification);
-                    } else {
-                        Notification notification = new Notification(
-                            "Request from " + absence.getPerson().getFirstName() + " " + absence.getPerson().getLastName() + " is awaiting approval",
-                            minutes + " minutes ago"
-                        );
-                        notifications.add(notification);
-                    }
+                    Notification notification = new Notification(
+                        "Request from " + absence.getPerson().getFirstName() + " " + absence.getPerson().getLastName() + " awaiting approval",
+                        getTimeAgo(duration)
+                    );
+                    notifications.add(notification);
                 }
             }
             
         } catch (Exception e) {
             System.out.println("Error: No absence requests found");
         }
+
+        // Notify employee of a new document awaiting signature
+
+
+        // Notify manager of a returned document
+        
+        
 
         // Sort notifications by requests first, then date and time for all events
         return notifications;
@@ -395,6 +327,33 @@ public class NotificationsCard {
             .withProperty("description", Notification::getDescription)
             .withProperty("status", notification -> "No notifications to show".equals(notification.getDescription()) ?
             "" : notification.getStatus());
+    }
+
+    public static String getTimeAgo(Duration duration) {
+        String timeAgo = "";
+
+        long hours = duration.toHours();
+        long minutes = duration.toMinutes();
+        long days = duration.toDays();
+
+        if (hours > 25) {
+            timeAgo = Math.floor(days) + " days ago";
+        } else if (hours == 24) {
+            timeAgo = "1 day ago";
+        } else if (hours < 24 && hours > 1) {
+            timeAgo = hours + " hours ago";
+        } else if (hours == 1) {
+            timeAgo = hours + " hour ago";
+        } else if (minutes < 1) {
+            timeAgo = "Just now";
+        } else if (minutes == 1) {
+            timeAgo = minutes + " minute ago";
+        } else {
+            timeAgo = minutes + " minutes ago";
+        }
+
+
+        return timeAgo;
     }
     
     

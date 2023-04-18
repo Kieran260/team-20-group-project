@@ -143,6 +143,12 @@ public class LoginView extends VerticalLayout {
 
         // AUTHENTICATION START: Sign Up
         signUpButton.addClickListener(event -> {
+            if (loginRepository.count() > 0) {
+                Notification.show("Error: One admin account per organisation already registered. Please log into existing account or contact system admin for more info.", 10000, Position.TOP_CENTER);
+                return;
+            }
+
+
             String username = usernameField.getValue();
             String password = passwordField.getValue();
             String confirmedPassword = confirmPassword.getValue();
@@ -178,6 +184,7 @@ public class LoginView extends VerticalLayout {
                 loginRepository.save(user);
 
                 Notification.show("Account created successfully!", 3000, Position.TOP_CENTER);
+
                 try {
                     Thread.sleep(1000); // Sleep for 1 second (1000 milliseconds)
                 } catch (InterruptedException e) {

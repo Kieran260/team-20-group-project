@@ -67,7 +67,7 @@ public class AverageAttendanceChartsCard {
 
     private Div createBarChart() {
         
-        LocalDate now = LocalDate.now();
+        LocalDate now = LocalDate.now().minusMonths(1);
         LocalDate[] monthStarts = {
             now.minusMonths(5).withDayOfMonth(1),
             now.minusMonths(4).withDayOfMonth(1),
@@ -86,11 +86,12 @@ public class AverageAttendanceChartsCard {
 
         };
             
-        int[] attendanceData = {89,95,92,96,92,91};
+        double[] attendanceData = {0.89,0.95,0.92,0.96,0.92,0.91};
 
         String[] monthLabels = new String[6];
         for (int i = 0; i < 6; i++) {
-            double averageAttendance = calculateAverageAttendance(1, monthStarts[i], monthEnds[i]);
+            //double averageAttendance = calculateAverageAttendance(1, monthStarts[i], monthEnds[i]);
+            double averageAttendance = attendanceData[i];
             attendanceData[i] = (int) Math.round(averageAttendance * 100);
             monthLabels[i] = monthStarts[i].getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH).toUpperCase();
         }

@@ -6,6 +6,8 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.button.Button;
+
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -88,19 +90,20 @@ public class ViewRequestsTableCard {
         container.setHeight("50%");
 
         // Add columns to the tables
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yy");
 
         activeRequests.addColumn(Request::getFirstName).setHeader("First Name");
         activeRequests.addColumn(Request::getLastName).setHeader("Last Name");
-        activeRequests.addColumn(Request::getStartDate).setHeader("Start date");
-        activeRequests.addColumn(Request::getEndDate).setHeader("End date");
+        activeRequests.addColumn(req -> req.getStartDate().format(dateFormatter)).setHeader("Start date");
+        activeRequests.addColumn(req -> req.getEndDate().format(dateFormatter)).setHeader("End date");
         activeRequests.addColumn(Request::getType).setHeader("Type");
         activeRequests.addColumn(Request::getReason).setHeader("Reason");
         activeRequests.addColumn(new ComponentRenderer<>(Request::getApprovedComponent)).setHeader("Approved");
 
         pastRequests.addColumn(Request::getFirstName).setHeader("First Name");
         pastRequests.addColumn(Request::getLastName).setHeader("Last Name");
-        pastRequests.addColumn(Request::getStartDate).setHeader("Start date");
-        pastRequests.addColumn(Request::getEndDate).setHeader("End date");
+        pastRequests.addColumn(req -> req.getStartDate().format(dateFormatter)).setHeader("Start date");
+        pastRequests.addColumn(req -> req.getEndDate().format(dateFormatter)).setHeader("End date");
         pastRequests.addColumn(Request::getType).setHeader("Type");
         pastRequests.addColumn(Request::getReason).setHeader("Reason");
         pastRequests.addColumn(new ComponentRenderer<>(Request::getApprovedComponent)).setHeader("Approved");

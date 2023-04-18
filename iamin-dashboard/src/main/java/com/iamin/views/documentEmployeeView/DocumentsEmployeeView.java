@@ -18,6 +18,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
@@ -33,6 +34,7 @@ import com.vaadin.flow.theme.lumo.Lumo;
 import java.io.InputStream;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import javax.annotation.security.RolesAllowed;
@@ -107,15 +109,17 @@ public class DocumentsEmployeeView extends VerticalLayout {
        documentLayout.setPadding(false); 
        documentLayout.setMargin(false);
        documentGrid.setSizeFull();
-      
+
+       DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yy");
 
        documentGrid.addClassName("view-documents");
        documentGrid.setDataProvider(dataProvider);
        documentGrid.addColumn(Document::getDocumentTitle).setHeader("Document Name").setAutoWidth(true);
        documentGrid.addColumn(Document::getDocumentDescription).setHeader("Description").setAutoWidth(true);
-       documentGrid.addColumn(Document::getUploadDate).setHeader("Date Received").setAutoWidth(true);
-       documentGrid.addColumn(Document::getSubmitDate).setHeader("Submission Deadline").setAutoWidth(true);
-       documentGrid.addColumn(Document::getSigned).setHeader("Signed").setAutoWidth(true);
+       documentGrid.addColumn(doc -> doc.getUploadDate().format(dateFormatter)).setHeader("Date Received").setAutoWidth(true);
+       documentGrid.addColumn(doc -> doc.getSubmitDate().format(dateFormatter)).setHeader("Submission Deadline").setAutoWidth(true);
+       documentGrid.addColumn(doc -> doc.getSigned() ? "Yes" : "No").setHeader("Signed").setAutoWidth(true);
+
        documentGrid.addColumn(new ComponentRenderer<>(document -> {
         if (document.getDocumentUrl() != null && !document.getDocumentUrl().isEmpty()) {
             Button viewButton = new Button("View Document", clickEvent -> {
@@ -189,8 +193,7 @@ public class DocumentsEmployeeView extends VerticalLayout {
                     Notification.show("Document uploaded successfully.", 3000, Notification.Position.TOP_CENTER);
                     fileUrl[0] = "";
                     upload.getElement().setProperty("value", null);
-                    uploadDialog.close();
-                    configureDocuments();
+                    new Page(UI.getCurrent()).reload();
                 } else {
                     Notification.show("Please upload a file", 3000, Notification.Position.TOP_CENTER);
                 }

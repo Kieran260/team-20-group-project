@@ -1,0 +1,10 @@
+:host([overlay]) [part="drawer"] {
+    max-width: 100%;
+  }
+  
+  @media (min-width: 900px) {
+    :host([overlay]) [part="drawer"] {
+      display: none;
+    }
+  }
+  

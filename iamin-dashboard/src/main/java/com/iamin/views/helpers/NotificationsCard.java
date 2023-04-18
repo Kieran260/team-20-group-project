@@ -2,12 +2,14 @@ package com.iamin.views.helpers;
 
 import com.iamin.data.Role;
 import com.iamin.data.entity.Absence;
+import com.iamin.data.entity.Document;
 import com.iamin.data.entity.Events;
 import com.iamin.data.entity.Holidays;
 import com.iamin.data.entity.Login;
 import com.iamin.data.entity.SamplePerson;
 import com.iamin.data.entity.Tasks;
 import com.iamin.data.service.AbsenceService;
+import com.iamin.data.service.DocumentService;
 import com.iamin.data.service.EventService;
 import com.iamin.data.service.HolidaysRepository;
 import com.iamin.data.service.HolidaysService;
@@ -47,6 +49,8 @@ import com.vaadin.flow.data.renderer.Renderer;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class NotificationsCard {
 
+    private DocumentService documentService;
+
     private TasksService tasksService;
 
     private AbsenceService absenceService;
@@ -60,12 +64,13 @@ public class NotificationsCard {
     Login login;
 
     @Autowired
-    public NotificationsCard (TasksService tasksService,AbsenceService absenceService,HolidaysService holidaysService,EventService eventService, HolidaysRepository holidaysRepository) {
+    public NotificationsCard (TasksService tasksService,AbsenceService absenceService,HolidaysService holidaysService,EventService eventService, HolidaysRepository holidaysRepository, DocumentService documentService) {
         this.tasksService = tasksService;
         this.absenceService = absenceService;
         this.holidaysService = holidaysService;
         this.eventService = eventService;
         this.holidaysRepository = holidaysRepository;
+        this.documentService = documentService;
     }
 
     public Div createCard(Div card, Login login) {
@@ -137,12 +142,7 @@ public class NotificationsCard {
             }
         } catch (Exception e) {
             System.out.println("Error: No events found or login does not have a person set.");
-        }
-        
-        // TODO: Show new event has been set for person
-
-        
-        
+        }        
         
         // Get uncompleted tasks that are due within 48 hours
         List<Tasks> tasks = tasksService.findTasksDueWithinHoursForPerson(person, 48);        
@@ -183,6 +183,37 @@ public class NotificationsCard {
             }
         }
 
+        // Get non-signed documents that have been set for person
+        try {
+            List<Document> allDocuments = documentService.findDocumentsForPerson(person);
+            for (Document document : allDocuments) {
+                if (document.getSigned() == false) {
+                    LocalDate assignDate = document.getUploadDate();
+                    LocalDate today = LocalDate.now();
+                    String daySet;
+    
+                    if (assignDate.equals(today)) {
+                        daySet = "Today";
+                    } else {
+                        long daysAgo = ChronoUnit.DAYS.between(assignDate, today);
+                        if (daysAgo > 1) {
+                            daySet = daysAgo + " days ago";
+                        } else {
+                            daySet = daysAgo + " day ago";
+                        }
+                    }
+    
+                    Notification notification = new Notification(
+                        "New document awaiting signature: " + document.getDocumentTitle(),
+                        daySet
+                    );
+                    notifications.add(notification);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error: No documents found or login does not have a person set.");
+        }
+
 
         // Fetch absences with approved or denied status for the current person
 
@@ -194,7 +225,6 @@ public class NotificationsCard {
                     String status = approvalStatus ? "approved" : "denied";
                     Duration duration = Duration.between(absence.getDateModified(), LocalDateTime.now());
 
-
                     Notification notification = new Notification(
                         "Absence request " + absence.getAbsenceReason() + " has been " + status,
                         getTimeAgo(duration)
@@ -203,8 +233,6 @@ public class NotificationsCard {
                     if (duration.toHours() < 48) {
                         notifications.add(notification);
                     }
-    
-
                 }
             }
         } catch (Exception e) {
@@ -286,14 +314,37 @@ public class NotificationsCard {
             System.out.println("Error: No absence requests found");
         }
 
-        // Notify employee of a new document awaiting signature
-
 
         // Notify manager of a returned document
-        
+                // Fetch absences not yet approved if user role admin
+        // Manager: Request from : "" + "" is awaiting approval
+        // Completed
+        try {
+            if (login.getRoles().contains(Role.ADMIN)) {
+                List<Document> documents = documentService.getSignedDocuments();
+                for (Document document : documents) {
+                    Duration duration = Duration.between(document.getSignDate(), LocalDateTime.now());
+
+
+                    System.out.println("loop entered");
+
+                    if (duration.toHours() < 24) {
+                        Notification notification = new Notification(
+                            "Document: " + document.getDocumentTitle() + " signed by " + document.getPerson().getFirstName() + " " + document.getPerson().getLastName(),
+                            getTimeAgo(duration)
+                        );
+                        notifications.add(notification);
+                    }
+                }
+            }
+            
+        } catch (Exception e) {
+            System.out.println("Error: No documents found");
+        }
         
 
         // Sort notifications by requests first, then date and time for all events
+
         return notifications;
     }
 
@@ -352,13 +403,7 @@ public class NotificationsCard {
             timeAgo = minutes + " minutes ago";
         }
 
-
         return timeAgo;
     }
-    
-    
-    
-
-    
     
 }

@@ -299,7 +299,7 @@ public class EmployeeAttendanceCard {
         
         holidaySubmitButton.addClickListener(x -> {
             // check if the user has enough holidays remaining and if all fields are filled in
-            if (holidaysSelected <= holidaysRemaining && !holidayReason.isEmpty() && !fromDate.isEmpty() && !toDate.isEmpty() && toDate.getValue().isAfter(fromDate.getValue())) {
+            if (holidaysSelected <= holidaysRemaining && !holidayReason.isEmpty() && !fromDate.isEmpty() && !toDate.isEmpty() && !toDate.getValue().isBefore(fromDate.getValue())) {
                 Holidays holiday = new Holidays();
                 holiday.setPerson(person);
                 holiday.setHolidayReason(holidayReason.getValue());
@@ -315,14 +315,14 @@ public class EmployeeAttendanceCard {
                 new Page(UI.getCurrent()).reload();
                 // if the user has not filled in all fields
             } else if (holidayReason.isEmpty() || fromDate.isEmpty() || toDate.isEmpty()) {
-                Notification.show("Error! Please fill in all fields", 3000, Position.TOP_CENTER);
+                Notification.show("Error: Please fill in all fields", 3000, Position.TOP_CENTER);
                 // if the user has selected an invalid date range
-            } else if (!toDate.getValue().isAfter(fromDate.getValue())) {
-                Notification.show("Error! Please select a valid date range", 3000, Position.TOP_CENTER);
+            } else if (toDate.getValue().isBefore(fromDate.getValue())) {
+                Notification.show("Error: Please select a valid date range", 3000, Position.TOP_CENTER);
             } 
             // if the user does not has enough holidays remaining
             else {
-                Notification.show("Error! You do not have enough holidays remaining", 3000, Position.TOP_CENTER);
+                Notification.show("Error: You do not have enough holidays remaining", 3000, Position.TOP_CENTER);
             }
         });
 
@@ -409,11 +409,11 @@ public class EmployeeAttendanceCard {
                 Notification.show("Success! Absence request submitted", 3000, Position.TOP_CENTER);
                 new Page(UI.getCurrent()).reload();
             } 
-            else if (!absenceToDate.getValue().isAfter(absenceFromDate.getValue())) {
-                Notification.show("Error! Please select a valid date range", 3000, Position.TOP_CENTER);
+            else if (absenceToDate.getValue().isBefore(absenceFromDate.getValue())) {
+                Notification.show("Error: Please select a valid date range", 3000, Position.TOP_CENTER);
             }
             else {
-                Notification.show("Error! Please fill in all fields", 3000, Position.TOP_CENTER);
+                Notification.show("Error: Please fill in all fields", 3000, Position.TOP_CENTER);
             }
             
         });

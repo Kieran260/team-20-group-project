@@ -35,6 +35,7 @@ import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.button.Button;
 
 import java.net.URL;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -63,7 +64,7 @@ import com.vaadin.flow.component.UI;
 
 @CssImport(value = "dashboard-styles.css")
 @PageTitle("View Requests")
-@Route(value = "viewRequests", layout = MainLayout.class)
+@Route(value = "view-requests", layout = MainLayout.class)
 @RolesAllowed("USER")
 public class ViewRequestsView extends Div {
 
@@ -145,11 +146,13 @@ public class ViewRequestsView extends Div {
         container.setHeight("50%");
 
         // Add columns to the tables
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yy");
+
 
         activeRequests.addColumn(Request::getFirstName).setHeader("First Name").setAutoWidth(true);
         activeRequests.addColumn(Request::getLastName).setHeader("Last Name").setAutoWidth(true);
-        activeRequests.addColumn(Request::getStartDate).setHeader("Start date").setAutoWidth(true);
-        activeRequests.addColumn(Request::getEndDate).setHeader("End date").setAutoWidth(true);
+        activeRequests.addColumn(req -> req.getStartDate().format(dateFormatter)).setHeader("Start date").setAutoWidth(true);
+        activeRequests.addColumn(req -> req.getEndDate().format(dateFormatter)).setHeader("End date").setAutoWidth(true);
         activeRequests.addColumn(Request::getType).setHeader("Type").setAutoWidth(true);
         activeRequests.addColumn(Request::getReason).setHeader("Reason").setAutoWidth(true);
         activeRequests.addColumn(new ComponentRenderer<>(Request::getApprovedComponent)).setHeader("Approved").setAutoWidth(true);
@@ -176,8 +179,8 @@ public class ViewRequestsView extends Div {
 
         pastRequests.addColumn(Request::getFirstName).setHeader("First Name").setAutoWidth(true);
         pastRequests.addColumn(Request::getLastName).setHeader("Last Name").setAutoWidth(true);
-        pastRequests.addColumn(Request::getStartDate).setHeader("Start date").setAutoWidth(true);
-        pastRequests.addColumn(Request::getEndDate).setHeader("End date").setAutoWidth(true);
+        pastRequests.addColumn(req -> req.getStartDate().format(dateFormatter)).setHeader("Start date").setAutoWidth(true);
+        pastRequests.addColumn(req -> req.getEndDate().format(dateFormatter)).setHeader("End date").setAutoWidth(true);
         pastRequests.addColumn(Request::getType).setHeader("Type").setAutoWidth(true);
         pastRequests.addColumn(Request::getReason).setHeader("Reason").setAutoWidth(true);
         pastRequests.addColumn(new ComponentRenderer<>(Request::getApprovedComponent)).setHeader("Approved").setAutoWidth(true);

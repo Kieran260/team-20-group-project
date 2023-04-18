@@ -80,7 +80,6 @@ public class ManageEmployeesView extends Div implements BeforeEnterObserver {
         grid.addColumn("email").setAutoWidth(true);
         grid.addColumn("phone").setAutoWidth(true);
         grid.addColumn("dateOfBirth").setAutoWidth(true);
-        grid.addColumn("occupation").setAutoWidth(true);
         grid.addColumn("jobTitle").setAutoWidth(true);
         grid.addColumn("address").setAutoWidth(true);
         grid.addColumn("maxHolidays").setAutoWidth(true);

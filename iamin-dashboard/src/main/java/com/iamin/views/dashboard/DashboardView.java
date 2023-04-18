@@ -32,6 +32,7 @@ import com.iamin.views.helpers.EmployeeTasksCard;
 import com.iamin.views.helpers.EmployeesTableCard;
 import com.iamin.views.helpers.NotificationsCard;
 import com.iamin.views.helpers.PasswordDialog;
+import com.iamin.views.helpers.AnalyticsCard;
 import com.iamin.views.helpers.AverageAttendanceCard;
 import com.iamin.views.helpers.AverageAttendanceChartsCard;
 import com.iamin.views.helpers.CalendarCard;
@@ -97,6 +98,8 @@ public class DashboardView extends VerticalLayout {
 
     private final EmployeesTableCard employeesTableCard;
 
+    private final AnalyticsCard analyticsCard;
+
     private final CalendarCard calendarCard;
 
     private final PersonFormDialog personFormDialog;
@@ -104,7 +107,7 @@ public class DashboardView extends VerticalLayout {
     private final PasswordDialog passwordDialog;
 
 
-    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository,EmployeeAttendanceCard employeeAttendanceCard,DepartmentMembersCard departmentMembersCard,NotificationsCard notificationsCard, EmployeesTableCard employeesTableCard, EmployeeTasksCard employeeTasksCard, PasswordEncoder passwordEncoder, PasswordDialog passwordDialog,AverageAttendanceCard averageAttendanceCard,EmployeeAverageAttendanceCard employeeAverageAttendanceCard,CalendarCard calendarCard) {
+    public DashboardView(PersonFormDialog personFormDialog, LoginRepository loginRepository,EmployeeAttendanceCard employeeAttendanceCard,DepartmentMembersCard departmentMembersCard,NotificationsCard notificationsCard, EmployeesTableCard employeesTableCard, EmployeeTasksCard employeeTasksCard, PasswordEncoder passwordEncoder, PasswordDialog passwordDialog,AverageAttendanceCard averageAttendanceCard,EmployeeAverageAttendanceCard employeeAverageAttendanceCard,CalendarCard calendarCard,AnalyticsCard analyticsCard) {
         this.personFormDialog = personFormDialog;
         this.loginRepository = loginRepository;
         this.employeeAttendanceCard = employeeAttendanceCard;
@@ -117,6 +120,7 @@ public class DashboardView extends VerticalLayout {
         this.averageAttendanceCard = averageAttendanceCard;
         this.employeeAverageAttendanceCard = employeeAverageAttendanceCard;
         this.calendarCard = calendarCard;
+        this.analyticsCard = analyticsCard;
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         
@@ -184,8 +188,7 @@ public class DashboardView extends VerticalLayout {
         // Charts View - Managers Only
         // Show a bar chart with the average attendance for the last 6 months
         Div card6 = new Div();
-        AverageAttendanceChartsCard averageAttendanceChartsCard = new AverageAttendanceChartsCard();
-        averageAttendanceChartsCard.createCard(card6,userLogin);
+        analyticsCard.createCard(card6);
 
         // Notifications card - All Roles
         // Notifies Managers of requests

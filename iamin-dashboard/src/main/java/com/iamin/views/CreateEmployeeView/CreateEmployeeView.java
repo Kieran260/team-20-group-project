@@ -133,7 +133,6 @@ public class CreateEmployeeView extends VerticalLayout {
                 person.setPhone(phone.getValue());
                 person.setDateOfBirth(dateOfBirth.getValue());
                 person.setAddress(address.getValue());
-                person.setOccupation(occupation.getValue());
                 person.setJobTitle(jobTitle.getValue());
                 person.setMaxHolidays(defaultMaxHoliday);
 

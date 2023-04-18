@@ -59,16 +59,14 @@ public class PersonFormDialog {
         TextField email = new TextField("Email");
         TextField phone = new TextField("Phone Number");
         TextField address = new TextField("Address");
-        TextField occupation = new TextField("Occupation");
         TextField jobTitle = new TextField("Job Title");
-        TextField department = new TextField("Department");
-        TextField maxHolidays = new TextField("maxHolidays");
+        TextField maxHolidays = new TextField("Holiday Allowance");
 
         // Create a date picker for date of birth
         DatePicker dateOfBirth = new DatePicker("Date of Birth");
     
         // Add the input fields to the form layout
-        formLayout.add(firstName, lastName, email, phone, dateOfBirth, address, occupation, jobTitle, department, maxHolidays);
+        formLayout.add(firstName, lastName, email, phone, dateOfBirth, address, jobTitle, maxHolidays);
     
         // Create Save button
         Button saveButton = new Button("Save Details");
@@ -106,7 +104,6 @@ public class PersonFormDialog {
                     person.setPhone(phone.getValue());
                     person.setDateOfBirth(dateOfBirth.getValue());
                     person.setAddress(address.getValue());
-                    person.setOccupation(occupation.getValue());
                     person.setJobTitle(jobTitle.getValue());
                     person.setMaxHolidays(Integer.parseInt(maxHolidays.getValue()));
                 }

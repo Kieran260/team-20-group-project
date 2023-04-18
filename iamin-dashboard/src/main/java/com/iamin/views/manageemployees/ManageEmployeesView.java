@@ -49,7 +49,6 @@ public class ManageEmployeesView extends Div implements BeforeEnterObserver {
     private TextField email;
     private TextField phone;
     private DatePicker dateOfBirth;
-    private TextField occupation;
     private TextField jobTitle;
     private TextField address;
     private TextField maxHolidays;
@@ -170,11 +169,10 @@ public class ManageEmployeesView extends Div implements BeforeEnterObserver {
         email = new TextField("Email");
         phone = new TextField("Phone");
         dateOfBirth = new DatePicker("Date Of Birth");
-        occupation = new TextField("Occupation");
         jobTitle = new TextField("Job Title");
         address = new TextField("Address");
         maxHolidays = new TextField("Maximum Holidays");
-        formLayout.add(firstName, lastName, email, phone, dateOfBirth, occupation, jobTitle, address, maxHolidays);
+        formLayout.add(firstName, lastName, email, phone, dateOfBirth, jobTitle, address, maxHolidays);
 
         editorDiv.add(formLayout);
         createButtonLayout(editorLayoutDiv);

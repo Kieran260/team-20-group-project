@@ -16,7 +16,6 @@ public class SamplePerson extends AbstractEntity {
     private String phone;
     private LocalDate dateOfBirth;
     private String address;
-    private String occupation;
     private String jobTitle;
     private LocalDateTime dateModified;
     private Integer maxHolidays;
@@ -58,12 +57,6 @@ public class SamplePerson extends AbstractEntity {
         this.address = address;
     }
 
-    public String getOccupation() {
-        return occupation;
-    }
-    public void setOccupation(String occupation) {
-        this.occupation = occupation;
-    }
     public String getJobTitle() {
         return jobTitle;
     }

@@ -1,7 +1,9 @@
 package com.iamin.data.service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -71,6 +73,30 @@ public class TasksService {
     public List<Tasks> findTasksInProgress(SamplePerson person) {
         return tasksRepository.findByPersonAndAckDateIsNotNullAndCompletedFalse(person);
     }
-    
 
+    public double calculateOnTimeCompletionPercentageForCurrentWeek() {
+        LocalDate today = LocalDate.now();
+        LocalDate startOfWeek = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        LocalDate endOfWeek = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+        
+        List<Tasks> completedTasksOnOrBeforeDeadline = tasksRepository.findCompletedTasksOnOrBeforeDeadlineBetweenDates(startOfWeek, endOfWeek);
+        List<Tasks> completedTasksAfterDeadline = tasksRepository.findCompletedTasksAfterDeadlineBetweenDates(startOfWeek, endOfWeek);
+    
+        int totalCompletedTasks = completedTasksOnOrBeforeDeadline.size() + completedTasksAfterDeadline.size();
+    
+        if (totalCompletedTasks == 0) {
+            return 0.0;
+        }
+    
+        double onTimeCompletionPercentage = (completedTasksOnOrBeforeDeadline.size() * 100.0) / totalCompletedTasks;
+        return onTimeCompletionPercentage;
+    }
+    
+    public int countTasksBeyondDeadlineForCurrentWeek() {
+        LocalDate currentDate = LocalDate.now();
+        LocalDate startOfWeek = currentDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        List<Tasks> tasksBeyondDeadline = tasksRepository.findTasksBeyondDeadline(currentDate, startOfWeek);
+        return tasksBeyondDeadline.size();
+    }
+    
 }

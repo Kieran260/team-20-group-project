@@ -65,7 +65,7 @@ public class CreateEmployeeView extends VerticalLayout {
     private TextField  phone       = new TextField();
     private EmailField email       = new EmailField();
     private DatePicker dateOfBirth = new DatePicker();
-    private TextField  occupation  = new TextField();
+    private TextField  holidays  = new TextField();
     private TextField  jobTitle    = new TextField();
     private TextField  address     = new TextField(); 
     private RadioButtonGroup<String> role = new RadioButtonGroup<>();
@@ -73,7 +73,7 @@ public class CreateEmployeeView extends VerticalLayout {
     Button save = new Button("Save");
 
     //default values
-    private Integer defaultMaxHoliday = 20;
+    private Integer defaultMaxHoliday = 21;
     private String successMessage = "New account has been added successfully. Please click pending accounts to view the login credentials.";
     
     //constructor
@@ -93,7 +93,7 @@ public class CreateEmployeeView extends VerticalLayout {
         
         //create job info form, add relevant fields
         FormLayout jobInfoForm = new FormLayout();
-        jobInfoForm.addFormItem(occupation, "Occupation");
+        jobInfoForm.addFormItem(holidays, "Holidays");
         jobInfoForm.addFormItem(jobTitle, "Job Title");
         jobInfoForm.addFormItem(role, "Role");
         
@@ -176,7 +176,7 @@ public class CreateEmployeeView extends VerticalLayout {
                 email.setInvalid(false);
                 address.clear();
                 dateOfBirth.clear();
-                occupation.clear();
+                holidays.clear();
                 jobTitle.clear();
                 role.clear();
             }
@@ -381,8 +381,8 @@ public class CreateEmployeeView extends VerticalLayout {
             valid = false;
         }
     
-        if (occupation.getValue().isEmpty()) {
-            errorMessage += "Occupation is required.\n";
+        if (holidays.getValue().isEmpty()) {
+            errorMessage += "Holidays is required.\n";
             valid = false;
         }
     

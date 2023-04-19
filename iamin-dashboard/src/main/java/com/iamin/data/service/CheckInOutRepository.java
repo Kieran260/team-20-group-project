@@ -25,5 +25,6 @@ public interface CheckInOutRepository extends JpaRepository<CheckInOut, Long> , 
 	 List<CheckInOut> findByDateOrderByCheckInTimeDesc(LocalDate date);
 	 List<CheckInOut> findByPersonAndDateBetween(SamplePerson person, LocalDate startDate, LocalDate endDate);
 	 List<CheckInOut> findByDateBetween(LocalDate startDate, LocalDate endDate);
-
+	 @Query("SELECT c FROM CheckInOut c WHERE c.date BETWEEN :startDate AND :endDate AND c.checkInTime > '09:00:00'")
+	 List<CheckInOut> findLateCheckInsBetweenDates(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);	 
 }

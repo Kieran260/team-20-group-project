@@ -4,8 +4,12 @@ import com.iamin.data.entity.CheckInOut;
 import com.iamin.data.entity.Login;
 import com.iamin.data.entity.SamplePerson;
 import com.iamin.data.service.CheckInOutService;
+import com.iamin.data.service.LoginService;
 import com.iamin.data.service.TasksService;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.html.H5;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.html.Label;
@@ -33,12 +37,14 @@ public class AnalyticsCard {
 
     private CheckInOutService checkInOutService;
     private TasksService taskService;
+    private LoginService loginService;
 
 
     @Autowired
-    public AnalyticsCard(CheckInOutService checkInOutService, TasksService taskService) {
+    public AnalyticsCard(CheckInOutService checkInOutService, TasksService taskService, LoginService loginService) {
         this.checkInOutService = checkInOutService;
         this.taskService = taskService;
+        this.loginService = loginService;
     }
 
     public Div createCard(Div card) {
@@ -50,14 +56,27 @@ public class AnalyticsCard {
     
         // Create div containers
         Div topLeft = createQuadrantDiv();
+        createTotalEmployees(topLeft);
+
+
         Div topRight = createQuadrantDiv();
+        createLateArrivals(topRight);
+
+
+
         Div bottomLeft = createQuadrantDiv();
+        createTasksCompletionRate(bottomLeft);
+
+
         Div bottomRight = createQuadrantDiv();
+        createTasksBeyondDeadline(bottomRight);
+
     
         // Create label
-        Label cardHeader = new Label("Analytics");
+        Label cardHeader = new Label("This Week's Statistics");
         cardHeader.getStyle().set("font-weight", "bold");
         cardHeader.getStyle().set("font-size", "18px");
+        cardHeader.getStyle().set("padding-bottom","10px");
     
         FlexLayout cardContent = new FlexLayout();
         cardContent.getStyle().set("display", "flex");
@@ -77,11 +96,84 @@ public class AnalyticsCard {
         quadrant.getStyle().set("width", "50%");
         quadrant.getStyle().set("height", "50%");
         quadrant.getStyle().set("box-sizing", "border-box");
-        quadrant.getStyle().set("padding", "4px");
     
-        quadrant.getStyle().set("border", "1px solid red");
     
         return quadrant;
+    }
+
+    private Div createTotalEmployees(Div div) {
+        div.getStyle().set("display", "flex");
+        div.getStyle().set("flex-direction", "column");
+        div.getStyle().set("justify-content", "flex-start");
+
+        int num = loginService.count();
+
+        Label subtext = new Label("Organisation Size");
+        subtext.getStyle().set("font-size", "14px");
+        subtext.getStyle().set("color", "grey");
+        Label value = new Label(""+num);
+        value.getStyle().set("font-size","50px");
+
+
+        div.add(subtext, value);    
+
+        return div;
+    }
+
+    private Div createTasksCompletionRate(Div div) {
+        div.getStyle().set("display", "flex");
+        div.getStyle().set("flex-direction", "column");
+        div.getStyle().set("justify-content", "flex-start");
+
+        double rate = taskService.calculateOnTimeCompletionPercentageForCurrentWeek();
+        Label subtext = new Label("On-Time Task Completion");
+        subtext.getStyle().set("font-size", "14px");
+        subtext.getStyle().set("color", "grey");
+        Label value = new Label(rate+"%");
+        value.getStyle().set("font-size","50px");
+
+
+        div.add(subtext, value);    
+
+        return div;
+    }
+
+    private Div createLateArrivals(Div div) {
+        div.getStyle().set("display", "flex");
+        div.getStyle().set("flex-direction", "column");
+        div.getStyle().set("justify-content", "flex-start");
+
+        int countLate = checkInOutService.countLateCheckInsForCurrentWeek();
+
+        Label subtext = new Label("Late Arrivals");
+        subtext.getStyle().set("font-size", "14px");
+        subtext.getStyle().set("color", "grey");
+        Label value = new Label(""+countLate);
+        value.getStyle().set("font-size","50px");
+
+
+        div.add(subtext, value);    
+
+        return div;
+    }
+
+    private Div createTasksBeyondDeadline(Div div) {
+        div.getStyle().set("display", "flex");
+        div.getStyle().set("flex-direction", "column");
+        div.getStyle().set("justify-content", "flex-start");
+
+        int countLate = taskService.countTasksBeyondDeadlineForCurrentWeek();
+
+        Label subtext = new Label("Tasks Beyond Schedule");
+        subtext.getStyle().set("font-size", "14px");
+        subtext.getStyle().set("color", "grey");
+        Label value = new Label(""+countLate);
+        value.getStyle().set("font-size","50px");
+
+
+        div.add(subtext, value);    
+
+        return div;
     }
     
 }

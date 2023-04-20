@@ -252,6 +252,7 @@ public class CreateEmployeeView extends VerticalLayout implements BeforeEnterObs
                 if (login != null) {
                     String generatedPassword = genPassword();
                     login.setHashedPassword(passwordEncoder.encode(generatedPassword));
+                    login.setPasswordSetFlag(false);
                     loginRepository.save(login);
                     Notification.show("Password changed successfully. Please click pending accounts to view the login credentials.").setPosition(Notification.Position.TOP_CENTER);
                 } else {

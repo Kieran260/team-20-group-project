@@ -125,8 +125,8 @@ public class AnalyticsCard {
         div.getStyle().set("flex-direction", "column");
         div.getStyle().set("justify-content", "flex-start");
 
-        double rate = taskService.calculateOnTimeCompletionPercentageForCurrentWeek();
-        Label subtext = new Label("On-Time Task Completion");
+        double roundedRate = taskService.calculateOnTimeCompletionPercentageForCurrentWeek();
+        double rate = Math.round(roundedRate * 100.0) / 100.0;        Label subtext = new Label("On-Time Task Completion");
         subtext.getStyle().set("font-size", "14px");
         subtext.getStyle().set("color", "grey");
         Label value = new Label(rate+"%");

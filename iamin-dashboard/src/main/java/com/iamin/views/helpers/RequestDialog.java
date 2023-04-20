@@ -61,8 +61,8 @@ public class RequestDialog {
         } else {
             // add absence info
             // authorisedBy, payAuthorisation
-            Label payAuthorisationLabel = new Label("Pay authorised: " + req.getIsPaid());
-            verticalLayout.add(payAuthorisationLabel);
+            Label deniedReasonLabel = new Label("Denial reason: " + req.getDenialReason());
+            verticalLayout.add(deniedReasonLabel);
         }
         dialog.add(verticalLayout);
         // Open the dialog

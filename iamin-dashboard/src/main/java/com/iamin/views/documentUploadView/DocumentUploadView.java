@@ -241,18 +241,17 @@ public class DocumentUploadView extends Div {
             String title = titleField.getValue();
             String description = descriptionField.getValue();
             if (fileUrl[0] != null && title != null && description != null && datePicker.getValue() != null && employeeList.getValue() != null) {
-                
-        
-                Document document = new Document();
-                document.setDocumentTitle(title);
-                document.setDocumentDescription(description);
-                document.setDocumentUrl(fileUrl[0]);
-                document.setUploadDate(LocalDate.now());
-                document.setSubmitDate(datePicker.getValue());
-                document.setSigned(false);
         
                 Set<SamplePerson> selectedEmployees = employeeList.getSelectedItems();
                 for (SamplePerson employee : selectedEmployees) {
+                    Document document = new Document();
+                    document.setDocumentTitle(title);
+                    document.setDocumentDescription(description);
+                    document.setDocumentUrl(fileUrl[0]);
+                    document.setUploadDate(LocalDate.now());
+                    document.setSubmitDate(datePicker.getValue());
+                    document.setSigned(false);
+        
                     document.setPerson(employee);
                     documentService.createDocument(document);
                 }
@@ -262,12 +261,13 @@ public class DocumentUploadView extends Div {
                 datePicker.clear();
                 employeeList.clear();
                 fileUrl[0] = "";
-                upload.getElement().setProperty("value", null);
+                upload.getElement().executeJavaScript("this.files=[]");
                 configureDocumentGrid();
             } else {
                 Notification.show("Please fill all fields", 3000, Notification.Position.TOP_CENTER);
             }
         });
+        
 
 
         uploadContainer.add(titleField, descriptionField, datePicker,  employeeList, upload, submitButton);

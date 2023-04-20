@@ -1,30 +1,7 @@
 package com.iamin.views.dashboard;
-import com.iamin.data.entity.Login;
-import com.iamin.data.service.LoginRepository;
-import com.iamin.data.Role;
-import com.iamin.security.AuthenticatedUser;
-import com.iamin.data.validation.Validation;
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.login.LoginForm;
-import com.vaadin.flow.component.login.LoginI18n;
-import com.vaadin.flow.server.VaadinService;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.textfield.PasswordField;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.orderedlayout.FlexLayout;
-import com.vaadin.flow.router.internal.RouteUtil;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
-import com.vaadin.flow.component.notification.Notification.Position;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import java.util.Set;
-import java.util.HashSet;
+
+import javax.annotation.security.PermitAll;
+
 import com.iamin.views.MainLayout;
 import com.iamin.views.helpers.EmployeeAttendanceCard;
 import com.iamin.views.helpers.EmployeeAverageAttendanceCard;
@@ -43,7 +20,10 @@ import com.iamin.views.helpers.PersonFormDialog;
 
 import com.iamin.data.entity.Login;
 import com.iamin.data.service.LoginRepository;
-import com.vaadin.flow.component.button.Button;
+
+
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -51,18 +31,11 @@ import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
-import java.util.Collections;
 
-import javax.annotation.security.PermitAll;
-import com.vaadin.flow.component.html.Div;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 

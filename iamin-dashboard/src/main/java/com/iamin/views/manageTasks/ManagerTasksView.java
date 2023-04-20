@@ -7,6 +7,7 @@ import com.iamin.data.service.TasksService;
 import com.iamin.views.MainLayout;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.component.select.Select;
@@ -161,10 +162,23 @@ public class ManagerTasksView extends Div {
                 Notification.show("Please fill all required fields.", 3000, Notification.Position.TOP_CENTER);
             }
         });
-
         button.setWidthFull();
 
-        content.add(selectEmployee,titleField,descriptionField, dueDate, button);
+        Button deleteButton = new Button("Delete Task");
+        deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+        deleteButton.addClickListener(event -> {
+            Tasks selectedTask = grid.asSingleSelect().getValue();
+            if (selectedTask != null) {
+                tasksService.delete(selectedTask.getId());
+                grid.getDataProvider().refreshAll();
+                Notification.show("Task deleted successfully.", 3000, Notification.Position.TOP_CENTER);
+            } else {
+                Notification.show("Please select a task to delete.", 3000, Notification.Position.TOP_CENTER);
+            }
+        });
+        deleteButton.setWidthFull();
+
+        content.add(selectEmployee, titleField, descriptionField, dueDate, button, deleteButton);
 
         splitLayout.addToSecondary(content);
     }

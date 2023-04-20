@@ -11,6 +11,7 @@ import com.iamin.data.service.TasksService;
 import com.iamin.views.MainLayout;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.progressbar.ProgressBar;
@@ -236,9 +237,23 @@ public class ManageEventsView extends Div {
             }
         });
         saveButton.setWidthFull();
+
+        Button deleteButton = new Button("Delete Event  ");
+        deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+        deleteButton.addClickListener(event -> {
+            Events selectedEvent = grid.asSingleSelect().getValue();
+            if (selectedEvent != null) {
+                eventService.deleteEvent(selectedEvent.getId());
+                grid.getDataProvider().refreshAll();
+                Notification.show("Task deleted successfully.", 3000, Notification.Position.TOP_CENTER);
+            } else {
+                Notification.show("Please select a task to delete.", 3000, Notification.Position.TOP_CENTER);
+            }
+        });
+        deleteButton.setWidthFull();
         
 
-        content.add(employeeList, eventTitle, eventDescription, eventDate, eventTime, eventType, eventLocation, saveButton);
+        content.add(employeeList, eventTitle, eventDescription, eventDate, eventTime, eventType, eventLocation, saveButton, deleteButton);
     
         splitLayout.addToSecondary(content);
     }

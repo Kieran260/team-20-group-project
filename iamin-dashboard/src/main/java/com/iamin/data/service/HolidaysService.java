@@ -58,7 +58,7 @@ public class HolidaysService {
     }
     public Integer getRemainingHolidays(SamplePerson person) {
         Integer totalHolidays = person.getMaxHolidays();
-        Integer usedHolidays = holidaysRepository.calculateTotalDaysOff(person);
+        Integer usedHolidays = calculateTotalDaysOff(person);
         if (usedHolidays == null) {
             usedHolidays = 0;
         }
@@ -70,6 +70,18 @@ public class HolidaysService {
 
     public Optional<Holidays> findById(Long requestId) {
         return holidaysRepository.findById(requestId);
+    }
+    public Integer calculateTotalDaysOff(SamplePerson person) {
+        // Call findByPerson to get the list of holidays for the given person
+        List<Holidays> holidaysList = holidaysRepository.findByPerson(person);
+
+        // Calculate the total days off by summing the approved holidays
+        int totalDaysOff = holidaysList.stream()
+                .filter(h -> h.getHolidaysApproval() == null || h.getHolidaysApproval())
+                .mapToInt(Holidays::getTotalDays)
+                .sum();
+
+        return totalDaysOff;
     }
 
 }

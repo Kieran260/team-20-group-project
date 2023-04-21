@@ -121,16 +121,15 @@ public class Validation {
 
     // Checks phone number is in one of the below formats:
     // (123) 456-7890, (123)-456-7890, 123-456-7890, 123.456.7890, 1234567890, 01234
-    // 435467
+    // 435467, 074123456789, +4474123456789
     public static boolean phoneValidation(String phoneNumber) {
 
-        String PHONE_REGEX = "^(\\(?\\d{3}\\)?[\\s.-]?){1,2}\\d{3}[\\s.-]?\\d{4}$";
+        String PHONE_REGEX = "^(\\+?\\d{1,2})?\\s?((\\(?\\d{3}\\)?[\\s.-]?){1,2}\\d{3}[\\s.-]?\\d{4})|(\\d{10,11})$";
 
         Pattern pattern = Pattern.compile(PHONE_REGEX);
         Matcher matcher = pattern.matcher(phoneNumber);
 
         return matcher.matches();
-
     }
 
     // Checks for SQL injections

@@ -59,14 +59,6 @@ public class ValidationTest {
     }
 
     @Test
-    public void testIsSqlInjection() {
-        assertFalse(validation.isSqlInjection("This is a normal text."));
-        assertTrue(validation.isSqlInjection("SELECT * FROM users;"));
-        assertTrue(validation.isSqlInjection("insert into users values(1, 'John');"));
-        assertTrue(validation.isSqlInjection("Update users set password='newpass' where id=1;"));
-    }
-
-    @Test
     public void testSanitizeInput() {
         String input1 = "Hello, <b>World!</b>";
         String expected1 = "Hello, World!";

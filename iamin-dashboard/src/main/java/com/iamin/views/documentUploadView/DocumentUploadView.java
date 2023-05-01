@@ -2,8 +2,10 @@ package com.iamin.views.documentUploadView;
 import com.google.cloud.storage.BlobId;
 import com.google.firebase.cloud.StorageClient;
 import com.iamin.data.entity.Document;
+import com.iamin.data.entity.Login;
 import com.iamin.data.entity.SamplePerson;
 import com.iamin.data.service.DocumentService;
+import com.iamin.data.service.LoginRepository;
 import com.iamin.data.service.SamplePersonService;
 import com.iamin.views.MainLayout;
 import com.vaadin.flow.component.button.Button;
@@ -23,6 +25,8 @@ import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.component.UI;
@@ -36,6 +40,11 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import javax.annotation.security.RolesAllowed;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.HttpMethod;
 import com.google.cloud.storage.Storage;
@@ -46,8 +55,29 @@ import com.google.auth.oauth2.GoogleCredentials;
 @Route(value = "assign-documents", layout = MainLayout.class)
 @PageTitle("Assign Documents")
 @RolesAllowed("ADMIN")
-public class DocumentUploadView extends Div {
-
+public class DocumentUploadView extends Div implements BeforeEnterObserver{
+    
+    //Checks if current user has a SamplePerson entity and if not shows a sign up dialog
+    @Autowired
+    LoginRepository loginRepository;
+    
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    Login userLogin;
+    String currentUsername = authentication.getName();
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        try{
+            userLogin = loginRepository.findByUsername(currentUsername);
+        }catch(Exception e){
+            userLogin = null;
+        }
+        // Check your condition and redirect if necessary
+        boolean Redirect = (userLogin != null && userLogin.getPerson() == null);
+        if (Redirect) {
+            UI.getCurrent().getPage().executeJs("location.href = 'dashboard'");
+        }
+    }
+    //end check
     private DocumentService documentService;
     private SamplePersonService personService;
     private FirebaseInitializer firebaseInitializer;

@@ -12,6 +12,8 @@ import com.google.cloud.storage.StorageOptions;
 import com.google.firebase.cloud.StorageClient;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
@@ -53,9 +55,11 @@ import com.google.cloud.storage.BlobId;
 import com.google.firebase.cloud.StorageClient;
 import com.iamin.data.entity.Absence;
 import com.iamin.data.entity.Holidays;
+import com.iamin.data.entity.Login;
 import com.iamin.data.entity.SamplePerson;
 import com.iamin.data.service.AbsenceService;
 import com.iamin.data.service.HolidaysService;
+import com.iamin.data.service.LoginRepository;
 import com.iamin.data.service.LoginService;
 import com.iamin.views.helpers.Request;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
@@ -66,8 +70,27 @@ import com.vaadin.flow.component.UI;
 @PageTitle("View Requests")
 @Route(value = "view-requests", layout = MainLayout.class)
 @RolesAllowed("USER")
-public class ViewRequestsView extends Div {
-
+public class ViewRequestsView extends Div implements BeforeEnterObserver{
+    //Checks if current user has reset their password
+    @Autowired
+    LoginRepository loginrepository;
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String currentUsername = authentication.getName();
+    Login userLogin;
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        try{
+            userLogin = loginrepository.findByUsername(currentUsername);
+        }catch(Exception e){
+            userLogin = null;
+        }
+        //check condition and redirect if necessary
+        boolean Redirect = (userLogin == null || userLogin.getPasswordSet() == false);
+        if (Redirect) {
+            UI.getCurrent().getPage().executeJs("location.href = 'dashboard'");
+        }
+    }
+    //end check
     String currentUserName;
     String currentUserRole;
 

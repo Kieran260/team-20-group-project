@@ -1,7 +1,9 @@
 package com.iamin.views.viewtasks;
 
+import com.iamin.data.entity.Login;
 import com.iamin.data.entity.SamplePerson;
 import com.iamin.data.entity.Tasks;
+import com.iamin.data.service.LoginRepository;
 import com.iamin.data.service.LoginService;
 import com.iamin.data.service.SamplePersonService;
 import com.iamin.data.service.TasksService;
@@ -23,6 +25,8 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
@@ -42,6 +46,7 @@ import javax.annotation.security.RolesAllowed;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.method.P;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -50,7 +55,27 @@ import org.springframework.stereotype.Component;
 @PageTitle("View Tasks")
 @Route(value = "view-tasks", layout = MainLayout.class)
 @RolesAllowed("USER")
-public class EmployeeViewTasks extends VerticalLayout{
+public class EmployeeViewTasks extends VerticalLayout implements BeforeEnterObserver{
+    
+    @Autowired
+    LoginRepository loginrepository;
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String currentUsername = authentication.getName();
+    Login userLogin;
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        try{
+            userLogin = loginrepository.findByUsername(currentUsername);
+        }catch(Exception e){
+            userLogin = null;
+        }
+        //check condition and redirect if necessary
+        boolean Redirect = (userLogin == null || userLogin.getPasswordSet() == false);
+        if (Redirect) {
+            UI.getCurrent().getPage().executeJs("location.href = 'dashboard'");
+        }
+    }
+    //end check
 
    private LoginService loginService;
    private TasksService tasksService;

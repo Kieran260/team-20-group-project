@@ -9,10 +9,12 @@ import com.google.cloud.storage.StorageOptions;
 import com.google.firebase.cloud.StorageClient;
 import com.iamin.data.entity.Absence;
 import com.iamin.data.entity.Holidays;
+import com.iamin.data.entity.Login;
 import com.iamin.data.service.AbsenceRepository;
 import com.iamin.data.service.AbsenceService;
 import com.iamin.data.service.HolidaysRepository;
 import com.iamin.data.service.HolidaysService;
+import com.iamin.data.service.LoginRepository;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
@@ -26,6 +28,8 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.function.ValueProvider;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
@@ -49,13 +53,36 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @CssImport(value = "dashboard-styles.css")
 @PageTitle("Manage Requests")
 @Route(value = "manage-requests", layout = MainLayout.class)
 @RolesAllowed("ADMIN")
-public class ManageRequestsView extends Div {
-
+public class ManageRequestsView extends Div implements BeforeEnterObserver{
+    //Checks if current user has a SamplePerson entity and if not shows a sign up dialog
+    @Autowired
+    LoginRepository loginRepository;
+    
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    Login userLogin;
+    String currentUsername = authentication.getName();
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        try{
+            userLogin = loginRepository.findByUsername(currentUsername);
+        }catch(Exception e){
+            userLogin = null;
+        }
+        // Check your condition and redirect if necessary
+        boolean Redirect = (userLogin != null && userLogin.getPerson() == null);
+        if (Redirect) {
+            UI.getCurrent().getPage().executeJs("location.href = 'dashboard'");
+        }
+    }
+    //end check
+    
     String currentUserName;
     String currentUserRole;
     private final AbsenceService absenceService;

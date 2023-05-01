@@ -1,11 +1,13 @@
-package com.iamin.views.manageTasks;
+package com.iamin.views.ManageTasks;
 
+import com.iamin.data.entity.Login;
 import com.iamin.data.entity.SamplePerson;
 import com.iamin.data.entity.Tasks;
+import com.iamin.data.service.LoginRepository;
 import com.iamin.data.service.SamplePersonService;
 import com.iamin.data.service.TasksService;
 import com.iamin.views.MainLayout;
-
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.progressbar.ProgressBar;
@@ -20,6 +22,8 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
@@ -33,13 +37,37 @@ import javax.annotation.security.RolesAllowed;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @Uses(Icon.class)
 @PageTitle("Manage Tasks")
 @Route(value = "manage-tasks", layout = MainLayout.class)
 @RolesAllowed("ADMIN")
-public class ManagerTasksView extends Div {
+public class ManagerTasksView extends Div implements BeforeEnterObserver{
 
+    //Checks if current user has a SamplePerson entity and if not shows a sign up dialog
+    @Autowired
+    LoginRepository loginRepository;
+    
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    Login userLogin;
+    String currentUsername = authentication.getName();
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        try{
+            userLogin = loginRepository.findByUsername(currentUsername);
+        }catch(Exception e){
+            userLogin = null;
+        }
+        // Check your condition and redirect if necessary
+        boolean Redirect = (userLogin != null && userLogin.getPerson() == null);
+        if (Redirect) {
+            UI.getCurrent().getPage().executeJs("location.href = 'dashboard'");
+        }
+    }
+    //end check
+    
     Grid<Tasks> grid = new Grid<>(Tasks.class, false);
 
     SplitLayout splitLayout = new SplitLayout();

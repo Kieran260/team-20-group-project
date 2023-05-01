@@ -119,19 +119,29 @@ public class Validation {
 
     }
 
-    // Checks phone number is in one of the below formats:
-    // (123) 456-7890, (123)-456-7890, 123-456-7890, 123.456.7890, 1234567890, 01234
-    // 435467
     public static boolean phoneValidation(String phoneNumber) {
 
-        String PHONE_REGEX = "^(\\(?\\d{3}\\)?[\\s.-]?){1,2}\\d{3}[\\s.-]?\\d{4}$";
+        //remove brackets and spaces if any
+        String phone = phoneNumber.replaceAll("[\\s()]+", "");
 
-        Pattern pattern = Pattern.compile(PHONE_REGEX);
-        Matcher matcher = pattern.matcher(phoneNumber);
+        //check for valid leading substrings: 0 or 0044 or +44 (UK only)
+        String leadRegex = "^(0044|0|\\+44)";
+        Pattern patternLead = Pattern.compile(leadRegex);
+        Matcher matcherLead = patternLead.matcher(phone);
+        if (!matcherLead.find()) {
+            return false;
+        }
 
-        return matcher.matches();
+        //check the rest of the string is all numbers
+        int idx = matcherLead.group(1).length();
+        System.out.println(idx);
+        boolean allNum = phone.substring(idx).matches("^[0-9]+$");
 
-    }
+        //check valid number length 9 or 10
+        boolean correctLen = phone.substring(idx).length() == 10 | phone.substring(idx).length() == 9;
+        
+        return correctLen & allNum;
+    }   
 
     // Checks for SQL injections
     public static boolean isSqlInjection(String message) {

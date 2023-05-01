@@ -26,7 +26,7 @@ import com.iamin.views.dashboard.DashboardView;
 import com.iamin.views.manageemployees.ManageEmployeesView;
 import com.iamin.views.timetable.TimetableView;
 import com.iamin.views.manageRequests.ManageRequestsView;
-import com.iamin.views.manageTasks.ManagerTasksView;
+import com.iamin.views.ManageTasks.ManagerTasksView;
 import com.iamin.views.viewtasks.EmployeeViewTasks;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;

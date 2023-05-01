@@ -22,6 +22,8 @@ import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
@@ -47,8 +49,10 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.StorageOptions;
 import com.iamin.data.entity.Document;
+import com.iamin.data.entity.Login;
 import com.iamin.data.entity.SamplePerson;
 import com.iamin.data.service.DocumentService;
+import com.iamin.data.service.LoginRepository;
 import com.iamin.data.service.LoginService;
 import com.iamin.views.MainLayout;
 import com.vaadin.flow.component.Component;
@@ -73,8 +77,27 @@ import com.iamin.FirebaseInitializer;
 @PageTitle("View Documents")
 @Route(value = "view-documents", layout = MainLayout.class)
 @RolesAllowed("USER")
-public class DocumentsEmployeeView extends VerticalLayout {
-
+public class DocumentsEmployeeView extends VerticalLayout implements BeforeEnterObserver{
+    //Checks if current user has reset their password
+    @Autowired
+    LoginRepository loginrepository;
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String currentUsername = authentication.getName();
+    Login userLogin;
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        try{
+            userLogin = loginrepository.findByUsername(currentUsername);
+        }catch(Exception e){
+            userLogin = null;
+        }
+        //check condition and redirect if necessary
+        boolean Redirect = (userLogin == null || userLogin.getPasswordSet() == false);
+        if (Redirect) {
+            UI.getCurrent().getPage().executeJs("location.href = 'dashboard'");
+        }
+    }
+    //end check
     private LoginService loginService;
     private DocumentService documentService;
     private FirebaseInitializer firebaseInitializer;

@@ -75,6 +75,16 @@ public class LoginView extends VerticalLayout {
         getStyle().set("width", "100%");
         getStyle().set("height", "100%");
 
+        // Set ID for testing
+        registerButton.setId("turn-to-register-button");
+        usernameField.setId("username-field");
+        passwordField.setId("password-field");
+        confirmPassword.setId("confirm-password-field");
+        signUpButton.setId("sign-up-button");
+        returnButton.setId("return-to-login-button");
+
+
+
         // Login Items Styles
         registerButton.getStyle().set("background-color", "light-grey");
         registerButton.getStyle().set("color", "#005eec");

@@ -32,9 +32,9 @@ import com.vaadin.flow.component.Component;
 // Pull records from DB and create Request object with important details?
 public class ViewRequestsTableCard {
 
-    private HolidaysService holidaysService;
+    HolidaysService holidaysService;
     
-    private AbsenceService absenceService;
+    AbsenceService absenceService;
 
 
 

@@ -91,7 +91,7 @@ public class AnalyticsCard {
     }
     
 
-    private Div createQuadrantDiv() {
+    public Div createQuadrantDiv() {
         Div quadrant = new Div();
         quadrant.getStyle().set("width", "50%");
         quadrant.getStyle().set("height", "50%");
@@ -101,7 +101,7 @@ public class AnalyticsCard {
         return quadrant;
     }
 
-    private Div createTotalEmployees(Div div) {
+    public Div createTotalEmployees(Div div) {
         div.getStyle().set("display", "flex");
         div.getStyle().set("flex-direction", "column");
         div.getStyle().set("justify-content", "flex-start");
@@ -120,7 +120,7 @@ public class AnalyticsCard {
         return div;
     }
 
-    private Div createTasksCompletionRate(Div div) {
+    public Div createTasksCompletionRate(Div div) {
         div.getStyle().set("display", "flex");
         div.getStyle().set("flex-direction", "column");
         div.getStyle().set("justify-content", "flex-start");
@@ -138,7 +138,7 @@ public class AnalyticsCard {
         return div;
     }
 
-    private Div createLateArrivals(Div div) {
+    public Div createLateArrivals(Div div) {
         div.getStyle().set("display", "flex");
         div.getStyle().set("flex-direction", "column");
         div.getStyle().set("justify-content", "flex-start");
@@ -157,7 +157,7 @@ public class AnalyticsCard {
         return div;
     }
 
-    private Div createTasksBeyondDeadline(Div div) {
+    public Div createTasksBeyondDeadline(Div div) {
         div.getStyle().set("display", "flex");
         div.getStyle().set("flex-direction", "column");
         div.getStyle().set("justify-content", "flex-start");

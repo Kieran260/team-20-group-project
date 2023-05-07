@@ -86,7 +86,7 @@ public class AverageAttendanceCard {
     }
     
 
-    private void updateAverageAttendance(String timePeriod, Div card) {
+    public void updateAverageAttendance(String timePeriod, Div card) {
         LocalDate startDate;
         LocalDate endDate = LocalDate.now();
 
@@ -132,7 +132,7 @@ public class AverageAttendanceCard {
         }
     }
 
-    private Select<String> createTimePeriodSelect() {
+    public Select<String> createTimePeriodSelect() {
         Select<String> timePeriodSelect = new Select<>();
         timePeriodSelect.setWidth("200px");
         timePeriodSelect.setLabel("Time Period");
@@ -141,7 +141,7 @@ public class AverageAttendanceCard {
         return timePeriodSelect;
     }
     
-    private Span createBadge(double percentageDifference) {
+    public Span createBadge(double percentageDifference) {
         Span badge = new Span();
         badge.setId("badge");
         badge.setWidth("50px");

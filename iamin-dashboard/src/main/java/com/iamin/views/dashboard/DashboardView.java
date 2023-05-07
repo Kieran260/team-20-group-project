@@ -198,7 +198,7 @@ public class DashboardView extends VerticalLayout {
         add(cardsContainer);
     }
 
-    private String getUserRole(Authentication authentication) {
+    public String getUserRole(Authentication authentication) {
         if (authentication != null && authentication.getAuthorities() != null) {
             for (GrantedAuthority authority : authentication.getAuthorities()) {
                 String role = authority.getAuthority();

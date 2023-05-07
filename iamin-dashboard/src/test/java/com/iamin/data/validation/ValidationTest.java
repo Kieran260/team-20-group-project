@@ -3,6 +3,9 @@ package com.iamin.data.validation;
 import org.junit.Test;
 import org.junit.Before;
 import static org.junit.Assert.*;
+
+import java.time.LocalDate;
+
 import com.iamin.data.service.LoginService;
 import org.mockito.Mockito;
 
@@ -28,10 +31,10 @@ public class ValidationTest {
         assertEquals("Username is taken", validation.usernameValidation("existing"));
     
         // Test for username shorter than 8 characters
-        assertEquals("Username must be exactly 8 characters in length", validation.usernameValidation("user123"));
+        assertEquals("Username must be exactly 8 characters in length", validation.usernameValidation("usernam"));
     
         // Test for username longer than 8 characters
-        assertEquals("Username must be exactly 8 characters in length", validation.usernameValidation("user12345"));
+        assertEquals("Username must be exactly 8 characters in length", validation.usernameValidation("usernamea"));
     
         // Test for username with non-alphabetic characters
         assertEquals("Username must contain alphabetic characters only", validation.usernameValidation("user1234"));
@@ -59,6 +62,15 @@ public class ValidationTest {
     }
 
     @Test
+    public void testIsAlpha() {
+        assertTrue(Validation.isAlpha("alphabet"));
+        assertFalse(Validation.isAlpha("alpha123"));
+        assertFalse(Validation.isAlpha("123456"));
+        assertFalse(Validation.isAlpha(" "));
+        assertFalse(Validation.isAlpha(""));
+    }
+
+    @Test
     public void testSanitizeInput() {
         String input1 = "Hello, <b>World!</b>";
         String expected1 = "Hello, World!";
@@ -77,5 +89,44 @@ public class ValidationTest {
     public void testUsernameValidationWithExistingUsername() {
         Mockito.when(mockLoginService.checkIfUsernameExists("user1234")).thenReturn(true);
         assertEquals("Username is taken", validation.usernameValidation("user1234"));
+    }
+
+    @Test
+    public void testAddressValidation() {
+        assertFalse(Validation.addressValidation("123 Main St", "Apt 4B", "New York", "NY10001"));
+        assertFalse(Validation.addressValidation("123 Main St", "Apt 4B", "New York", " "));
+        assertFalse(Validation.addressValidation("123 Main St", "Apt 4B", "New York9", "NY 10001"));
+        assertFalse(Validation.addressValidation("123 Main St", "Apt 4B", " ", "NY 10001"));
+    }
+
+    @Test
+    public void testPhoneValidation() {
+        assertTrue(Validation.phoneValidation("(123) 456-7890"));
+        assertTrue(Validation.phoneValidation("(123)-456-7890"));
+        assertTrue(Validation.phoneValidation("123-456-7890"));
+        assertTrue(Validation.phoneValidation("123.456.7890"));
+        assertTrue(Validation.phoneValidation("1234567890"));
+        assertTrue(Validation.phoneValidation("07123456789"));
+    }
+
+    @Test
+    public void testIsSqlInjection() {
+        assertTrue(Validation.isSqlInjection("SELECT * FROM users WHERE username = 'john'"));
+        assertTrue(Validation.isSqlInjection("DROP TABLE users;"));
+        assertTrue(Validation.isSqlInjection("1; DROP TABLE users;"));
+        assertFalse(Validation.isSqlInjection("john"));
+        assertFalse(Validation.isSqlInjection("john.doe"));
+        
+    }
+
+    @Test
+    public void testIsAfterCurrentDate() {
+        LocalDate currentDate = LocalDate.now();
+        LocalDate pastDate = currentDate.minusDays(1);
+        LocalDate futureDate = currentDate.plusDays(1);
+
+        assertFalse(Validation.isAfterCurrentDate(currentDate));
+        assertFalse(Validation.isAfterCurrentDate(pastDate));
+        assertTrue(Validation.isAfterCurrentDate(futureDate));
     }
 }

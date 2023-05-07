@@ -432,7 +432,8 @@ public class EmployeeAttendanceCard {
         card.add(workHoursCard,absenceCard);
         return(card);
     }
-    private void updateHolidaysSelectedLabel(DatePicker fromDate, DatePicker toDate, Label holidaysSelectedLabel, HolidaysService holidaysService) {
+    
+    public void updateHolidaysSelectedLabel(DatePicker fromDate, DatePicker toDate, Label holidaysSelectedLabel, HolidaysService holidaysService) {
         if (fromDate.getValue() != null && toDate.getValue() != null) {
             holidaysSelected = holidaysService.calculateTotalDaysOff(fromDate.getValue(), toDate.getValue());
             holidaysSelectedLabel.setText("Holidays Requested: " + holidaysSelected);
